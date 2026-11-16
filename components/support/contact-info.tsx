@@ -48,7 +48,7 @@ export function ContactInfo() {
                     <div className="flex flex-col gap-1">
                         <h3 className="text-foreground text-lg font-bold">Concierge Email</h3>
                         <p className="text-muted-foreground text-sm leading-relaxed">
-                            concierge@AbiaSMEMFB.com
+                            concierge@Partner MFB.com
                         </p>
                         <p className="text-accent text-xs font-semibold mt-1">Response within 2 hours</p>
                     </div>

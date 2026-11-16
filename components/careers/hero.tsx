@@ -31,7 +31,7 @@ export function CareersHero() {
                             href="#benefits"
                             className="inline-flex items-center justify-center px-8 py-3.5 text-sm font-bold text-white border border-white/20 rounded-lg hover:bg-white/10 transition-all duration-300"
                         >
-                            Why AbiaSMEMFB?
+                            Why Partner MFB?
                         </a>
                     </div>
                 </div>

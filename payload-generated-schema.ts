@@ -4634,7 +4634,7 @@ export const site_settings = pgTable(
   "site_settings",
   {
     id: serial("id").primaryKey(),
-    siteTitle: varchar("site_title").notNull().default("ABIASMEMFB"),
+    siteTitle: varchar("site_title").notNull().default("Partner MFB"),
     defaultSeoDescription: varchar("default_seo_description"),
     contactEmail: varchar("contact_email"),
     supportPhone: varchar("support_phone"),

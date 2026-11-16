@@ -475,7 +475,7 @@ export default function AdminOnboardingPage() {
 
                                         <div className="p-3 bg-amber-50 dark:bg-amber-950/20 border border-amber-200 dark:border-amber-900/50 rounded-xl">
                                             <p className="text-[10px] font-bold text-amber-700 dark:text-amber-400 leading-relaxed">
-                                                By submitting, you agree to the licensing guidelines set by Abia Microfinance Bank and declare that all details are accurate.
+                                                By submitting, you agree to the licensing guidelines set by Partner Microfinance Bank and declare that all details are accurate.
                                             </p>
                                         </div>
                                     </div>

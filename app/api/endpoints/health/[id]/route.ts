@@ -51,7 +51,7 @@ export async function GET(
                 method: 'HEAD',
                 signal: controller.signal,
                 headers: {
-                    'User-Agent': 'ABIA-MFB-HealthCheck/1.0',
+                    'User-Agent': 'Copteller-HealthCheck/1.0',
                 }
             });
             clearTimeout(timeoutId);

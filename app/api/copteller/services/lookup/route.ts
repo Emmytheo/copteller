@@ -49,7 +49,7 @@ export async function POST(req: NextRequest) {
                     success: true,
                     accountNumber,
                     bankCode: bank?.code || bankCode || '044',
-                    bankName: bank?.code === '044' ? 'Abia Microfinance Bank' : bankName,
+                    bankName: bank?.code === '044' ? 'Partner Microfinance Bank' : bankName,
                     accountName: resolvedName,
                     currency: 'NGN',
                     isLocal: true,

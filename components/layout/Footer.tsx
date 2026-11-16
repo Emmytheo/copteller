@@ -192,7 +192,7 @@ export function Footer() {
                     </div>
                     <div className="border-t border-white/10 dark:border-border pt-8 flex flex-col md:flex-row justify-between items-center gap-4">
                         <p className="text-white/70 text-xs">
-                            © 2024 Abia Microfinance Bank. All rights reserved.
+                            © 2024 Partner Microfinance Bank. All rights reserved.
                         </p>
                         <div className="flex space-x-6">
                             <Link

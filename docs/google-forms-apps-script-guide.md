@@ -2,7 +2,7 @@
 
 **Purpose:** Guide an AI agent (or engineer) to write a clean, runnable **Google Apps Script (`Code.gs`)** that programmatically generates shareable **Google Forms** (plus a companion **Google Sheet Field Matrix**) representing Copteller's Cooperative Registration, Admin Onboarding, and Member Onboarding flows.
 
-**Primary Business Goal:** Share the generated Google Forms with **Copteller stakeholders** (Abia MFB Compliance/Risk, Operations, Cooperative Leaders, and Product/Engineering) so they can review every proposed data point and submit structured feedback on **what data should be collected, made required/optional, modified, or removed**.
+**Primary Business Goal:** Share the generated Google Forms with **Copteller stakeholders** (Partner MFB Compliance/Risk, Operations, Cooperative Leaders, and Product/Engineering) so they can review every proposed data point and submit structured feedback on **what data should be collected, made required/optional, modified, or removed**.
 
 ---
 
@@ -24,7 +24,7 @@ Include a top-level configuration constant in the script:
 const CONFIG = {
   INCLUDE_STAKEHOLDER_REVIEW_PROMPTS: true,
   COLLECT_SENSITIVE_FIELDS_IN_GOOGLE_FORM: false, // Safety switch for BVN/PIN/Password notes
-  APP_NAME: 'Copteller (Abia MFB Cooperative OS)',
+  APP_NAME: 'Copteller (Partner MFB Cooperative OS)',
   VERSION: '1.0',
 };
 ```
@@ -129,7 +129,7 @@ In `POST /api/copteller/admin/cooperatives`, creating a cooperative requires a `
 >   4. Valid ID of Primary Union Leader
 
 Plus add the Declaration `CheckboxItem` matching `PrintableForm`:
-- *"I declare that all cooperative details are accurate and agree to Abia Microfinance Bank licensing and escrow clearing guidelines."*
+- *"I declare that all cooperative details are accurate and agree to Partner Microfinance Bank licensing and escrow clearing guidelines."*
 
 ---
 
@@ -227,7 +227,7 @@ These exact fields exist in `app/(copteller)/copteller/(portal)/admin/members/pa
 | Next of Kin Name, Relationship & Phone | `ParagraphTextItem` (Optional) | Recommended banking KYC/estate compliance field | *Not yet in schema* | **Proposed Banking Gap** for stakeholder input |
 | Preferred Notification Channels | `CheckboxItem` | `SMS Transaction Alerts`, `Push Notifications (Ajo/HP reminders)`, `Email Statements`, `WhatsApp Alerts` | `onboarding/member` Step 4 (`smsAlerts`, `pushAlerts`) | Live UI (`smsAlerts`, `pushAlerts`) |
 | Preferred Transaction Authorization Method | `MultipleChoiceItem` | `4-Digit Transaction PIN`, `PIN + SMS OTP`, `Biometric` *(Note: do NOT enter real PINs here)* | `onboarding/member` Step 4 (PIN setup) | Security-safe equivalent for review |
-| Member Declaration | `CheckboxItem` (Required) | *"I declare that all information provided is accurate and authorize Copteller / Abia Microfinance Bank to process cooperative escrow debits and credits per cooperative bylaws."* | `PrintableForm` Part D | Matches printable A4 form |
+| Member Declaration | `CheckboxItem` (Required) | *"I declare that all information provided is accurate and authorize Copteller / Partner Microfinance Bank to process cooperative escrow debits and credits per cooperative bylaws."* | `PrintableForm` Part D | Matches printable A4 form |
 
 ---
 

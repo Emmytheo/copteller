@@ -54,7 +54,7 @@ export function EcosystemSynergyCard({
         },
         {
             num: "3",
-            title: "Abia MFB Escrow",
+            title: "Partner MFB Escrow",
             org: `Dedicated Account ${escrowAccountNumber}`,
             icon: ShieldCheck,
             color: "text-purple-500 bg-purple-500/10 border-purple-500/20",

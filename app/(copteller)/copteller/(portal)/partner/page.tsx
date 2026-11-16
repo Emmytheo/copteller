@@ -116,7 +116,7 @@ export default function InstitutionalPartnerDashboard() {
         const csvContent =
             "data:text/csv;charset=utf-8," +
             [
-                `"ABIA MICROFINANCE BANK - INSTITUTIONAL ESCROW RECONCILIATION STATEMENT"`,
+                `"COPTELLER PARTNER MFB - INSTITUTIONAL ESCROW RECONCILIATION STATEMENT"`,
                 `"Partner Entity:","${activeOrg.name}"`,
                 `"Statutory Gazette / Reg:","${activeOrg.regNumber}"`,
                 `"Dedicated Escrow Account:","${activeOrg.escrowAccount.accountNumber}"`,
@@ -309,7 +309,7 @@ export default function InstitutionalPartnerDashboard() {
                 <div className="lg:col-span-1">
                     <SyndicationDonutChart
                         title="Float Syndication Ratio"
-                        subtitle={`Tripartite balance between ${activeOrg.shortName} statutory allocation, syndicated investor capital, and Abia MFB buffer`}
+                        subtitle={`Tripartite balance between ${activeOrg.shortName} statutory allocation, syndicated investor capital, and Partner MFB buffer`}
                         segments={[
                             {
                                 label: `${activeOrg.shortName} Statutory Float`,
@@ -324,7 +324,7 @@ export default function InstitutionalPartnerDashboard() {
                                 description: "Diaspora & institutional investor underwritten tranches (+16.5% APY)"
                             },
                             {
-                                label: "Abia MFB Liquidity Buffer",
+                                label: "Partner MFB Liquidity Buffer",
                                 value: Math.round(((activeOrg.escrowAccount.availableFloatKobo || 10150000000) / 100) * 0.10),
                                 color: "#8b5cf6",
                                 description: "Instant clearing reserve & emergency settlement pool"
@@ -580,7 +580,7 @@ export default function InstitutionalPartnerDashboard() {
                             Inject Float into {activeOrg.shortName} Escrow
                         </DialogTitle>
                         <DialogDescription className="text-xs text-muted-foreground font-semibold">
-                            Credit statutory underwriting liquidity into {activeOrg.escrowAccount.accountName} (Account #{activeOrg.escrowAccount.accountNumber}) at Abia State Microfinance Bank.
+                            Credit statutory underwriting liquidity into {activeOrg.escrowAccount.accountName} (Account #{activeOrg.escrowAccount.accountNumber}) at Partner Microfinance Bank.
                         </DialogDescription>
                     </DialogHeader>
 

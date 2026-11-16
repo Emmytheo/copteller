@@ -260,7 +260,7 @@ export async function GET(req: NextRequest) {
                 term: "24 months",
                 eligible: overallScore >= 800,
                 reason: "Exclusive to Tier 1 Guild Executives and Senior Fleet Operators with 800+ credit score.",
-                description: "Large-scale expansion credit line underwritten by Abia MFB partner liquidity vault.",
+                description: "Large-scale expansion credit line underwritten by Partner MFB partner liquidity vault.",
                 requirements: ["Tenure > 12 Months", "Minimum 800 Credit Score", "Asset Collateralization Registry"],
                 actionUrl: "/copteller/schemes"
             }
@@ -318,7 +318,7 @@ export async function GET(req: NextRequest) {
                 { id: "coop-working-cap", product: "Cooperative Working Capital", category: "SME Trade", limit: 350000, rate: "2.0% pm", term: "6 months", eligible: true, description: "Inventory purchase and working float financing for registered artisans, market traders, and fleet operators.", requirements: ["Continuous Ajo Streak > 90 days", "Minimum 620 Credit Score", "1 Guild Member Guarantor"], actionUrl: "/copteller/schemes" },
                 { id: "hp-asset-financing", product: "HP Vehicle & Asset Financing", category: "Asset Lease", limit: 1400000, rate: "1.8% pm", term: "18 months", eligible: true, description: "Acquire brand new TVS King Keke or commercial motorcycle with 20% equity and structured weekly repayments.", requirements: ["Verified Driver License / Union Badge", "Minimum 680 Credit Score", "2 Union Executive Endorsements"], actionUrl: "/copteller/schemes" },
                 { id: "govt-grant-voucher", product: "Abia State Agricultural & Trade Grant", category: "Government Grant", limit: 500000, rate: "0% interest", term: "Non-repayable", eligible: false, reason: "Requires minimum 750 Tier 1 credit score threshold for state economic recovery vouchers.", description: "State-backed financial empowerment grant for certified farmers, food processors, and leather fabricators.", requirements: ["Verified Business Premises in Abia State", "Minimum 750 Credit Score", "Tax Clearance Certificate"], actionUrl: "/copteller/schemes" },
-                { id: "priority-liquidity", product: "Priority Cooperative Treasury Pool", category: "Institutional", limit: 2500000, rate: "1.5% pm", term: "24 months", eligible: false, reason: "Exclusive to Tier 1 Guild Executives and Senior Fleet Operators with 800+ credit score.", description: "Large-scale expansion credit line underwritten by Abia MFB partner liquidity vault.", requirements: ["Tenure > 12 Months", "Minimum 800 Credit Score", "Asset Collateralization Registry"], actionUrl: "/copteller/schemes" }
+                { id: "priority-liquidity", product: "Priority Cooperative Treasury Pool", category: "Institutional", limit: 2500000, rate: "1.5% pm", term: "24 months", eligible: false, reason: "Exclusive to Tier 1 Guild Executives and Senior Fleet Operators with 800+ credit score.", description: "Large-scale expansion credit line underwritten by Partner MFB partner liquidity vault.", requirements: ["Tenure > 12 Months", "Minimum 800 Credit Score", "Asset Collateralization Registry"], actionUrl: "/copteller/schemes" }
             ],
             hasPendingReview: false,
             lastReviewDate: null,

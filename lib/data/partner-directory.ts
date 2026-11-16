@@ -91,7 +91,7 @@ export const INSTITUTIONAL_PARTNERS: InstitutionalPartner[] = [
         contactPhone: "0803 400 9281",
         escrowAccount: {
             accountNumber: "3000881920",
-            bankName: "Abia State Microfinance Bank",
+            bankName: "Partner Microfinance Bank",
             accountName: "ABSHIA Social Health Statutory Escrow",
             availableFloatKobo: 10150000000
         },
@@ -130,7 +130,7 @@ export const INSTITUTIONAL_PARTNERS: InstitutionalPartner[] = [
         contactPhone: "0812 390 1192",
         escrowAccount: {
             accountNumber: "3000882104",
-            bankName: "Abia State Microfinance Bank",
+            bankName: "Partner Microfinance Bank",
             accountName: "Ministry of Transport ATMA Transit Escrow",
             availableFloatKobo: 26800000000
         },
@@ -167,7 +167,7 @@ export const INSTITUTIONAL_PARTNERS: InstitutionalPartner[] = [
         contactPhone: "0802 881 0021",
         escrowAccount: {
             accountNumber: "3000883391",
-            bankName: "Abia State Microfinance Bank",
+            bankName: "Partner Microfinance Bank",
             accountName: "SMEDAN / Abia Artisan Matching Grant Facility",
             availableFloatKobo: 13000000000
         },
@@ -204,7 +204,7 @@ export const INSTITUTIONAL_PARTNERS: InstitutionalPartner[] = [
         contactPhone: "0807 990 4421",
         escrowAccount: {
             accountNumber: "3000884019",
-            bankName: "Abia State Microfinance Bank",
+            bankName: "Partner Microfinance Bank",
             accountName: "Feed the Future Smallholder Input Escrow",
             availableFloatKobo: 28600000000
         },
@@ -241,7 +241,7 @@ export const INSTITUTIONAL_PARTNERS: InstitutionalPartner[] = [
         contactPhone: "0800 74622 887",
         escrowAccount: {
             accountNumber: "3000885542",
-            bankName: "Abia State Microfinance Bank",
+            bankName: "Partner Microfinance Bank",
             accountName: "Simba TVS Hire-Purchase First-Loss Escrow",
             availableFloatKobo: 35500000000
         },

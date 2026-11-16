@@ -510,7 +510,7 @@ export default function CoptellerMerchantPage() {
                                         />
                                     </div>
                                     <div className="space-y-1">
-                                        <label className="text-[9px] font-bold text-slate-500 uppercase">Settlement Account (Abia MFB)</label>
+                                        <label className="text-[9px] font-bold text-slate-500 uppercase">Settlement Account (Partner MFB)</label>
                                         <input
                                             type="text"
                                             required

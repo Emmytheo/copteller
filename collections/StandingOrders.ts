@@ -44,7 +44,7 @@ export const StandingOrders: CollectionConfig = {
             name: 'destination_bank_code',
             type: 'text',
             required: true,
-            admin: { description: 'CBN institution code or "abiasmemfb" for intra-bank.' },
+            admin: { description: 'CBN institution code or "partner_mfb" for intra-bank.' },
         },
         {
             name: 'destination_account_number',

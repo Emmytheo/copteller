@@ -135,7 +135,7 @@ export function UnionCollectionChart({
                         Weekly Collections, Thrift & Escrow Remittance
                     </h3>
                     <p className="text-xs text-muted-foreground font-semibold mt-0.5">
-                        Real-time tracking of weekly member collections reconciled directly into Abia MFB Escrow Vault #3000881920.
+                        Real-time tracking of weekly member collections reconciled directly into Partner MFB Escrow Vault #3000881920.
                     </p>
                 </div>
 
@@ -175,7 +175,7 @@ export function UnionCollectionChart({
                         <Landmark className="h-3.5 w-3.5 text-emerald-500" />
                     </div>
                     <p className="text-base font-black text-foreground">{fmt(totalEscrowSettled)}</p>
-                    <p className="text-[10px] text-emerald-600 dark:text-emerald-400 font-bold">Abia MFB Vault</p>
+                    <p className="text-[10px] text-emerald-600 dark:text-emerald-400 font-bold">Partner MFB Vault</p>
                 </div>
 
                 <div className="p-3.5 rounded-2xl bg-muted/30 border border-border/80 space-y-1">

@@ -13,7 +13,7 @@ export async function NewsInsights() {
                     <div className="max-w-2xl">
                         <h2 className="text-accent font-bold tracking-wider uppercase text-sm mb-3">News & Insights</h2>
                         <h3 className="text-3xl md:text-4xl font-display font-bold text-card-foreground">
-                            Latest Updates from AbiaSMEMFB
+                            Latest Updates from Partner MFB
                         </h3>
                     </div>
                     <Link

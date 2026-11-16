@@ -24,7 +24,7 @@ export async function GET(req: NextRequest) {
         // If settings doesn't exist, we return a fallback structure matching collections config
         if (!settings) {
             settings = {
-                siteTitle: 'ABIASMEMFB',
+                siteTitle: 'Partner MFB',
                 copteller: {
                     masterFundingAccount: '3000392981',
                     kycEndpoint: null,

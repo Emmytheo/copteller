@@ -108,7 +108,7 @@ export default function PartnerGovernancePage() {
                         Governance, Legal Mandate &amp; Escrow Facility
                     </h1>
                     <p className="text-xs sm:text-sm text-muted-foreground mt-0.5 max-w-3xl font-semibold">
-                        Manage statutory legal authority, dedicated Abia MFB escrow float facilities, accredited desk signatories, and operational directorate sub-scopes.
+                        Manage statutory legal authority, dedicated Partner MFB escrow float facilities, accredited desk signatories, and operational directorate sub-scopes.
                     </p>
                 </div>
 
@@ -515,7 +515,7 @@ export default function PartnerGovernancePage() {
                                     Settlement Source
                                 </span>
                                 <p className="text-xs font-bold text-foreground">
-                                    Abia MFB Core Banking Treasury Liquidity Line
+                                    Partner MFB Core Banking Treasury Liquidity Line
                                 </p>
                                 <span className="text-[10px] text-muted-foreground font-semibold block">
                                     Instant credit to partner escrow account

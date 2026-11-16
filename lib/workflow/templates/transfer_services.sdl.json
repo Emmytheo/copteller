@@ -36,7 +36,7 @@
                     "label": "Target Account Number",
                     "type": "text",
                     "required": true,
-                    "placeholder": "Enter 10-digit ABIASMEMFB Account",
+                    "placeholder": "Enter 10-digit Partner MFB Account",
                     "events": [
                         {
                             "trigger": "onCondition",

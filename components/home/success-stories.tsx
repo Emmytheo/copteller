@@ -43,7 +43,7 @@ export function SuccessStories() {
                                     <div className="flex-1 text-center md:text-left">
                                         <blockquote className="mb-8">
                                             <p className="text-xl md:text-3xl font-display font-medium text-primary dark:text-white leading-relaxed italic">
-                                                "AbiaSMEMFB provided the capital I needed to expand my textile business when no one else would.
+                                                "Partner MFB provided the capital I needed to expand my textile business when no one else would.
                                                 Their personalized approach and flexible repayment terms were a game changer for my company's
                                                 growth."
                                             </p>

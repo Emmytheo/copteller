@@ -172,7 +172,7 @@ export async function CustomerBulkSyncExecutor(
                 continue;
             }
 
-            const email = qoreCust.Email || `${qoreCustomerID}@abia-mfb.internal`;
+            const email = qoreCust.Email || `${qoreCustomerID}@copteller.internal`;
             const bvn = qoreCust.BankVerificationNumber || qoreCust.BVN;
             const phone = qoreCust.PhoneNumber || qoreCust.PhoneNo;
 
@@ -200,7 +200,7 @@ export async function CustomerBulkSyncExecutor(
                 if (bvn) {
                     fallbackClauses.push({ bvn: { equals: bvn } });
                 }
-                if (email && !email.endsWith('@abia-mfb.internal')) {
+                if (email && !email.endsWith('@copteller.internal')) {
                     fallbackClauses.push({ email: { equals: email } });
                 }
                 if (phone) {

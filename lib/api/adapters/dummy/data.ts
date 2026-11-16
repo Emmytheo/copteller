@@ -38,7 +38,7 @@ export const MOCK_CUSTOMERS: Customer[] = [
 
 export const MOCK_USERS: User[] = [
     { id: 'usr_1', email: 'john@example.com', full_name: 'John Doe', role: 'customer', created_at: new Date().toISOString() },
-    { id: 'usr_2', email: 'admin@abiasmemfb.com', full_name: 'Admin User', role: 'admin', created_at: new Date().toISOString() },
+    { id: 'usr_2', email: 'admin@copteller.ng', full_name: 'Admin User', role: 'admin', created_at: new Date().toISOString() },
 ];
 
 export const MOCK_ACCOUNTS: Account[] = [
@@ -94,7 +94,7 @@ export const MOCK_TRANSACTIONS: Transaction[] = [
 ];
 
 export const MOCK_CONFIGS: SystemConfig[] = [
-    { id: 'cfg_1', key: 'Home_Welcome_Text', value: 'Welcome to ABIASMEMFB - Your Trusted Partner', category: 'Global Content', updated_at: new Date().toISOString() },
+    { id: 'cfg_1', key: 'Home_Welcome_Text', value: 'Welcome to Partner MFB - Your Trusted Partner', category: 'Global Content', updated_at: new Date().toISOString() },
     { id: 'cfg_2', key: 'Max_Loan_Amount', value: '5000000', category: 'Product Settings', updated_at: new Date().toISOString() },
 ];
 
@@ -244,7 +244,7 @@ export const MOCK_POSTS: BlogPost[] = [
             <p class="mb-10 text-foreground">
                 While digital adoption accelerates access, it also introduces a new layer of risk. We are witnessing
                 a bifurcation in the market: institutions that leverage data to empower their clients, and those
-                that use it merely to insulate themselves from risk. At AbiaSMEMFB, we believe the former is the only
+                that use it merely to insulate themselves from risk. At Partner MFB, we believe the former is the only
                 sustainable path forward.
             </p>
             <figure className="my-14 relative pl-8 py-2">
@@ -279,7 +279,7 @@ export const MOCK_POSTS: BlogPost[] = [
                 </div>
                 <div
                     class="p-4 bg-card text-sm text-muted-foreground border-t border-border flex justify-between items-center">
-                    <span>Source: AbiaSMEMFB internal data & Global Findex</span>
+                    <span>Source: Partner MFB internal data & Global Findex</span>
                     <button
                         class="text-accent hover:text-foreground transition-colors flex items-center gap-1 text-xs font-bold uppercase tracking-wider">
                         Expand <span class="material-symbols-outlined text-sm">open_in_full</span>
@@ -333,7 +333,7 @@ export const MOCK_POSTS: BlogPost[] = [
                     <div class="absolute bottom-8 left-8 right-8">
                         <p class="text-white font-serif text-xl font-medium drop-shadow-md">Watch: The Future of Community Banking
                         </p>
-                        <p class="text-white/80 text-sm mt-2 drop-shadow-md">Interview with AbiaSMEMFB CEO, 4:20</p>
+                        <p class="text-white/80 text-sm mt-2 drop-shadow-md">Interview with Partner MFB CEO, 4:20</p>
                     </div>
                 </div>
             </div>
@@ -375,7 +375,7 @@ export const MOCK_POSTS: BlogPost[] = [
     },
     {
         slug: "driving-financial-inclusion",
-        title: "Driving Financial Inclusion: The AbiaSMEMFB Impact",
+        title: "Driving Financial Inclusion: The Partner MFB Impact",
         excerpt: "Exploring how microfinance is transforming lives in rural communities across Abia State through accessible credit and financial literacy.",
         content: "<p>Full content would go here...</p>",
         coverImage: "https://images.unsplash.com/photo-1579621970588-a35d0e7ab9b6?ixlib=rb-4.0.3&auto=format&fit=crop&w=2070&q=80",
@@ -410,7 +410,7 @@ export const MOCK_POSTS: BlogPost[] = [
     {
         slug: "digital-banking-security",
         title: "Staying Safe: Advanced Security Features in Our New App",
-        excerpt: "A deep dive into the biometric and encryption technologies securing your transactions on the new AbiaSMEMFB mobile platform.",
+        excerpt: "A deep dive into the biometric and encryption technologies securing your transactions on the new Partner MFB mobile platform.",
         content: "<p>Full content would go here...</p>",
         coverImage: "https://images.unsplash.com/photo-1563986768609-322da13575f3?ixlib=rb-4.0.3&auto=format&fit=crop&w=1470&q=80",
         author: {

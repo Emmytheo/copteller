@@ -228,7 +228,7 @@ export async function RegistryBulkSyncExecutor() {
                         id: targetProduct.id,
                         data: {
                             category: categoryId,
-                            tagline: targetProduct.tagline || `ABIASMEMFB ${qoreProd.ProductName}`,
+                            tagline: targetProduct.tagline || `Partner MFB ${qoreProd.ProductName}`,
                             // Preserve form_schema and workflows but sync interest rate
                             financial_terms: targetProduct.financial_terms?.map((term: any) => {
                                 if (term.blockType === 'savings-terms' || term.blockType === 'loan-terms') {
@@ -247,7 +247,7 @@ export async function RegistryBulkSyncExecutor() {
                         data: {
                             name: qoreProd.ProductName,
                             category: categoryId,
-                            tagline: `Reliable ${qoreProd.ProductName} from ABIASMEMFB`,
+                            tagline: `Reliable ${qoreProd.ProductName} from Partner MFB`,
                             description: `The ${qoreProd.ProductName} is designed for our valued customers. Sync'd from Core Banking.`,
                             status: 'draft',
                             workflow_stages: [

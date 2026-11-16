@@ -136,7 +136,7 @@ export function SectorAllocationChart({
 
                 <div className="flex items-center justify-between text-[10px] text-muted-foreground font-bold">
                     <span>Low Risk Statutory Float</span>
-                    <span>100% Repayment Guarantee by Abia MFB</span>
+                    <span>100% Repayment Guarantee by Partner MFB</span>
                 </div>
             </div>
 

@@ -425,7 +425,7 @@ function MemberDashboardContent() {
                                     <ShieldCheck className="h-4 w-4" />
                                 </div>
                                 <div className="min-w-0">
-                                    <p className="text-xs font-black text-foreground truncate">Abia MFB Deposit Guarantee</p>
+                                    <p className="text-xs font-black text-foreground truncate">Partner MFB Deposit Guarantee</p>
                                     <p className="text-[10px] text-muted-foreground font-semibold truncate">CBN licensed microfinance</p>
                                 </div>
                             </div>

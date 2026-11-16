@@ -46,7 +46,7 @@ export function PrintableForm({ roleType = "member", coopName = "", sector = "",
                     <p className="text-xs font-bold text-slate-700 uppercase">OFFICIAL COOPERATIVE APPLICATION FORM</p>
                     <div className="flex items-center gap-1 text-[10px] font-bold text-slate-500">
                         <ShieldCheck className="h-3.5 w-3.5 text-black" />
-                        <span>Abia Microfinance Bank Cleared Escrow Network</span>
+                        <span>Partner Microfinance Bank Cleared Escrow Network</span>
                     </div>
                 </div>
                 

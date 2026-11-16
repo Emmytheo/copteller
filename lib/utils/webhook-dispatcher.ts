@@ -20,8 +20,8 @@ export async function dispatchWebhook(url: string, secretKey: string, payload: W
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
-                    'x-abia-signature': signature,
-                    'User-Agent': 'AbiaSMEMFB-Webhook-Dispatcher/1.0',
+                    'x-copteller-signature': signature,
+                    'User-Agent': 'Copteller-Webhook-Dispatcher/1.0',
                 },
                 body: bodyStr,
                 signal: controller.signal

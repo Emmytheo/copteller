@@ -36,7 +36,7 @@ const SLIDES = [
         badge: "State-of-the-Art Banking",
         headline: ["Modernizing Abia Trade.", "Seeding Co-ops."],
         accentLine: "Seeding Co-ops.",
-        body: "AbiaSME MFB is the engine empowering entrepreneurs, digitized Esusu thrifts, local trade unions, and market merchants with secure loans, smart cards, and agent banking solutions built for Abia.",
+        body: "Partner MFB is the engine empowering entrepreneurs, digitized Esusu thrifts, local trade unions, and market merchants with secure loans, smart cards, and agent banking solutions built for Abia.",
         cta: { label: "Unions & Business Suite", href: "/business" },
         ctaSecondary: { label: "Esusu Calculator", href: "/business#esusu" },
         stats: [
@@ -303,7 +303,7 @@ export function HeroExpository() {
 
                                 <img
                                     src="/images/elephant-1.png"
-                                    alt="Abia MFB — Modern Banking Building"
+                                    alt="Partner MFB — Modern Banking Building"
                                     className="w-full h-auto object-cover grayscale-[0.4] group-hover:grayscale-0 transition-all duration-1000 scale-105 group-hover:scale-100"
                                 />
 

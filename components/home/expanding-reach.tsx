@@ -35,7 +35,7 @@ export function ExpandingReach() {
         setUssdOutput("Select Cycle:\n1. Ariaria Market Thrift\n2. Aba Shoe Union\n[0] Back");
         setUssdState("success");
       } else if (command === "3") {
-        setUssdOutput("Transfers:\n1. To Abia MFB Account\n2. To Other Banks\n[0] Back");
+        setUssdOutput("Transfers:\n1. To Partner MFB Account\n2. To Other Banks\n[0] Back");
         setUssdState("success");
       } else {
         setUssdState("idle");
@@ -87,7 +87,7 @@ export function ExpandingReach() {
               <div className="absolute top-0 right-0 w-24 h-24 bg-white/5 rounded-full blur-xl"></div>
               
               <div className="flex justify-between items-start z-10">
-                <span className="text-[10px] font-black uppercase tracking-[0.2em] opacity-80">Abia MFB</span>
+                <span className="text-[10px] font-black uppercase tracking-[0.2em] opacity-80">Partner MFB</span>
                 <span className="text-[10px] font-extrabold uppercase bg-white/10 px-2 py-0.5 rounded backdrop-blur">Smart Card</span>
               </div>
 
@@ -164,7 +164,7 @@ export function ExpandingReach() {
 
             {ussdState === "menu" && (
               <div className="space-y-1.5">
-                <p className="text-white border-b border-slate-800 pb-1 font-bold text-[10px] uppercase text-emerald-500">ABIA MFB MOBILE</p>
+                <p className="text-white border-b border-slate-800 pb-1 font-bold text-[10px] uppercase text-emerald-500">PARTNER MFB MOBILE</p>
                 <div className="space-y-0.5 text-[10px]">
                   <p className="hover:text-white cursor-pointer" onClick={() => triggerUssd("1")}>1. Account Balance</p>
                   <p className="hover:text-white cursor-pointer" onClick={() => triggerUssd("2")}>2. My Esusu Cycles</p>

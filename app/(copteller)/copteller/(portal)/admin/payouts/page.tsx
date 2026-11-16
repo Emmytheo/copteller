@@ -66,7 +66,7 @@ export default function AdminPayoutsPage() {
                     id: p.id,
                     recipient: p.recipient,
                     accountNo: p.accountNumber,
-                    bank: 'Abia MFB',
+                    bank: 'Partner MFB',
                     pool: p.cycle,
                     amount: p.amount,
                     maturityDate: p.dueDate,

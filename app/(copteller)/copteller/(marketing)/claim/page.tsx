@@ -25,7 +25,7 @@ const NIGERIAN_BANKS = [
     { code: "999992", name: "OPay Digital Services" },
     { code: "999991", name: "PalmPay" },
     { code: "090267", name: "Kuda Bank" },
-    { code: "090110", name: "Abia State Microfinance Bank" },
+    { code: "090110", name: "Partner Microfinance Bank" },
 ]
 
 export default function PublicClaimPage() {
@@ -132,7 +132,7 @@ function ClaimContent() {
                     <Gift className="h-10 w-10 text-emerald-500" />
                 </div>
                 <h3 className="text-base font-black text-foreground">Verifying Escrow Allocation...</h3>
-                <p className="text-xs text-muted-foreground">Checking claim token with Abia MFB Settlement Gateway</p>
+                <p className="text-xs text-muted-foreground">Checking claim token with Partner MFB Settlement Gateway</p>
             </div>
         )
     }
@@ -302,7 +302,7 @@ function ClaimContent() {
                                         />
                                     </div>
                                     <p className="text-[10px] text-muted-foreground font-semibold">
-                                        ⚡ If you don't have a Copteller account, a zero-fee Tier-1 wallet backed by Abia MFB will be created for you automatically.
+                                        ⚡ If you don't have a Copteller account, a zero-fee Tier-1 wallet backed by Partner MFB will be created for you automatically.
                                     </p>
                                 </div>
                             ) : (
@@ -358,7 +358,7 @@ function ClaimContent() {
                 </div>
 
                 <div className="text-center text-[10px] font-bold text-muted-foreground">
-                    Powered by Copteller Escrow Clearing &copy; Abia State Microfinance Bank
+                    Powered by Copteller Escrow Clearing &copy; Partner Microfinance Bank
                 </div>
             </div>
         </div>

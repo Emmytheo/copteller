@@ -488,7 +488,7 @@ export default function ProductEditorPage() {
                                     {/* App Brand Header */}
                                     <div className="flex justify-between items-center">
                                         <span className="text-[9px] font-black text-amber-500 tracking-wider">COPTELLER</span>
-                                        <span className="text-[7px] font-semibold text-muted-foreground">Abia MFB Escrow</span>
+                                        <span className="text-[7px] font-semibold text-muted-foreground">Partner MFB Escrow</span>
                                     </div>
 
                                     {/* Card */}

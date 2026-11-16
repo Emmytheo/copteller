@@ -271,7 +271,7 @@ export default function MemberDuesPage() {
                                         </div>
                                         <div>
                                             <h3 className="text-base font-black text-foreground">Official Payment Receipt</h3>
-                                            <p className="text-[11px] text-muted-foreground font-semibold">Abia MFB Cooperative Clearing</p>
+                                            <p className="text-[11px] text-muted-foreground font-semibold">Partner MFB Cooperative Clearing</p>
                                         </div>
                                     </div>
                                     <button

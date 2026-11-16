@@ -20,7 +20,7 @@ Copteller is a standalone Next.js + Payload CMS + Supabase platform for autonomo
 ## Running Locally
 
 1. Configure `.env.local` (see `.env.example` for required variables).
-2. Start the development server (defaults to port `3001` so it can run alongside the Abia MFB Core Banking Suite on port `3000`):
+2. Start the development server (defaults to port `3001` so it can run alongside the Partner MFB Core Banking Suite on port `3000`):
    ```bash
    yarn dev
    ```

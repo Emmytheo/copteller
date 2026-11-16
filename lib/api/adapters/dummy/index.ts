@@ -391,7 +391,7 @@ export const DummyAdapter: ApiAdapter = {
             return [
                 {
                     id: 'svc_intra',
-                    name: 'Transfer to ABIASMEMFB',
+                    name: 'Transfer to Partner MFB',
                     category: 'cat_transfers',
                     provider_service_code: 'INTRA',
                     service_intent: 'transfer_intra',
@@ -631,7 +631,7 @@ export const DummyAdapter: ApiAdapter = {
     getSiteSettings: async () => {
         await delay(300);
         return {
-            siteTitle: 'ABIASMEMFB',
+            siteTitle: 'Partner MFB',
             sync: {
                 baselineAccounts: [{ accountNumber: '0123456789' }],
                 autoDiscoveryEnabled: true,

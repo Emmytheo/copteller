@@ -146,7 +146,7 @@ const DEFAULT_ELIGIBILITY: LoanEligibility[] = [
         term: "24 months",
         eligible: false,
         reason: "Exclusive to Tier 1 Guild Executives and Senior Fleet Operators with 800+ credit score.",
-        description: "Large-scale expansion credit line underwritten by Abia MFB partner liquidity vault.",
+        description: "Large-scale expansion credit line underwritten by Partner MFB partner liquidity vault.",
         requirements: ["Tenure > 12 Months", "Minimum 800 Credit Score", "Asset Collateralization Registry"],
         actionUrl: "/copteller/schemes"
     }
@@ -816,7 +816,7 @@ export default function MemberCreditPage() {
                                         Your score of {overallScore}/850 unlocks 3 Pre-Approved Credit Lines!
                                     </h4>
                                     <p className="text-xs text-muted-foreground font-medium mt-0.5">
-                                        Zero upfront collateral required. Subsidized interest underwritten by Abia State Microfinance Bank.
+                                        Zero upfront collateral required. Subsidized interest underwritten by Partner Microfinance Bank.
                                     </p>
                                 </div>
                             </div>

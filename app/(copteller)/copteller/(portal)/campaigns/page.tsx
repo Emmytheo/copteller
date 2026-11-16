@@ -283,7 +283,7 @@ export default function DisbursementCampaignsPage() {
                                 ₦{(totalDisbursedAll - totalClaimedAll).toLocaleString()}
                             </p>
                             <span className="text-[10px] sm:text-[11px] text-muted-foreground font-semibold flex items-center gap-1.5 mt-1 truncate">
-                                <Lock className="w-3 h-3 text-indigo-600 dark:text-indigo-400 shrink-0" /> Held in Abia MFB
+                                <Lock className="w-3 h-3 text-indigo-600 dark:text-indigo-400 shrink-0" /> Held in Partner MFB
                             </span>
                         </div>
                     </div>

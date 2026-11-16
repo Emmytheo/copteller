@@ -12,7 +12,7 @@ export const SiteSettings: GlobalConfig = {
         {
             name: 'siteTitle',
             type: 'text',
-            defaultValue: 'ABIASMEMFB',
+            defaultValue: 'Partner MFB',
             required: true,
         },
         {

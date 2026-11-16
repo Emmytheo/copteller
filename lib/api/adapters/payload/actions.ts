@@ -1729,9 +1729,9 @@ export const getBlogPosts = async (params?: any): Promise<BlogPost[]> => {
                 excerpt: doc.excerpt || doc.meta?.description || 'Read this post...',
                 coverImage: doc.featuredImage?.url || 'https://images.unsplash.com/photo-1579621970588-a35d0e7ab9b6?auto=format&fit=crop&w=2070&q=80',
                 author: {
-                    name: authorDoc?.name || 'Abia MFB Team',
+                    name: authorDoc?.name || 'Copteller Team',
                     role: authorDoc?.role || 'Editorial',
-                    avatar: 'https://ui-avatars.com/api/?name=Abia+MFB+Team&background=3B82F6&color=fff'
+                    avatar: 'https://ui-avatars.com/api/?name=Copteller+Team&background=3B82F6&color=fff'
                 },
                 date: new Date(doc.createdAt).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }),
                 category: typeof doc.category === 'object' && doc.category ? doc.category.title : 'Company News',

@@ -39,7 +39,7 @@ const accountEnquiry: MockHandler = (_req, body, query) => {
             AccountNumber: accountNo,
             AccountName: 'MOCK ACCOUNT HOLDER',
             BankCode: '070',
-            BankName: 'ABIA MFB',
+            BankName: 'PARTNER MFB',
         },
     });
 };
@@ -113,7 +113,7 @@ const banksList: MockHandler = () => NextResponse.json({
         { BankCode: '033', BankName: 'United Bank for Africa' },
         { BankCode: '035', BankName: 'Wema Bank' },
         { BankCode: '057', BankName: 'Zenith Bank' },
-        { BankCode: '070', BankName: 'Abia MFB' },
+        { BankCode: '070', BankName: 'Partner MFB' },
     ],
 });
 

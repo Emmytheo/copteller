@@ -483,7 +483,7 @@ export default function CoptellerFeaturesPage() {
                                 <motion.div key="super" initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -10 }} className="space-y-6">
                                     <div className="flex justify-between items-center border-b pb-4">
                                         <div>
-                                            <h4 className="text-sm font-black">Abia Microfinance Bank Control Panel</h4>
+                                            <h4 className="text-sm font-black">Partner Microfinance Bank Control Panel</h4>
                                             <p className="text-[10px] text-muted-foreground font-semibold">Regulator & Cleared Escrow Console</p>
                                         </div>
                                         <Badge className="bg-blue-500/10 text-blue-600 border-none font-bold uppercase text-[9px] tracking-wider">CBN Compliant</Badge>

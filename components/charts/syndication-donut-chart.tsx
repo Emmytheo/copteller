@@ -25,7 +25,7 @@ interface SyndicationDonutChartProps {
 
 export function SyndicationDonutChart({
     title = "Institutional Syndication & Float Composition",
-    subtitle = "Tripartite co-funding ratio between statutory parastatals, private investors, and Abia MFB",
+    subtitle = "Tripartite co-funding ratio between statutory parastatals, private investors, and Partner MFB",
     segments: propSegments,
     totalLabel = "Total Tranche Pool",
     totalValue: propTotalValue,
@@ -45,7 +45,7 @@ export function SyndicationDonutChart({
             description: "Diaspora & institutional tranches earning 16.5% p.a."
         },
         {
-            label: "Abia MFB Liquidity Buffer",
+            label: "Partner MFB Liquidity Buffer",
             value: 12500000,
             color: "#8b5cf6",
             description: "Statutory reserve & emergency float clearing"

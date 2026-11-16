@@ -28,7 +28,7 @@ export function FinancialJournal() {
                             </div>
                         </div>
                         <div className="mt-8 text-center opacity-0 group-hover:opacity-100 transition-opacity duration-500 transform translate-y-2 group-hover:translate-y-0">
-                            <p className="text-muted-foreground text-sm max-w-xs">Comprehensive breakdown of AbiaSMEMFB's yearly performance and community impact.</p>
+                            <p className="text-muted-foreground text-sm max-w-xs">Comprehensive breakdown of Partner MFB's yearly performance and community impact.</p>
                         </div>
                     </div>
 

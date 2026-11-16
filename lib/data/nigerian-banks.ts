@@ -36,7 +36,7 @@ export const NIGERIAN_BANKS: NigerianBank[] = [
     { code: "057", shortCode: "zenith", name: "Zenith Bank" },
     { code: "110", shortCode: "vpc", name: "VFD Microfinance Bank" },
     { code: "566", shortCode: "carbon", name: "Carbon (Paylater)" },
-    { code: "090", shortCode: "abia_mfb", name: "Abia Microfinance Bank" },
+    { code: "090", shortCode: "partner_mfb", name: "Partner Microfinance Bank" },
 ];
 
 export function getBankByCode(code: string): NigerianBank | undefined {

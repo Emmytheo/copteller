@@ -387,7 +387,7 @@ export function LiquidityFlowChart({
                 </div>
 
                 <div className="text-[10px] text-muted-foreground font-semibold">
-                    Audited by Abia MFB Clearinghouse
+                    Audited by Partner MFB Clearinghouse
                 </div>
             </div>
 

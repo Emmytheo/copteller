@@ -115,7 +115,7 @@ const qoreRequest = async (
     return await res.json();
 };
 
-// ── Core ApiAdapter Implementations (Internal ABIASMEMFB Logic) ────────
+// ── Core ApiAdapter Implementations (Internal Partner MFB Logic) ────────
 
 export const createAccount = async (data: Omit<Account, 'id' | 'created_at' | 'updated_at'>): Promise<Account> => {
     const qoreRes = await createAccountQuick({
@@ -616,7 +616,7 @@ export const interBankTransfer = async (data: {
         body: JSON.stringify({
             Amount: data.Amount,
             PayerAccountNumber: data.FromAccountNumber,
-            Payer: 'ABIASMEMFB CUSTOMER', // Required by documentation
+            Payer: 'Partner MFB CUSTOMER', // Required by documentation
             ReceiverAccountNumber: data.ToAccountNumber,
             ReceiverBankCode: data.DestinationBankCode,
             Narration: data.Narration,

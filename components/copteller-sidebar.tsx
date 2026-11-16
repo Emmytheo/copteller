@@ -398,7 +398,7 @@ export function CoptellerSidebar() {
                                                 activeScope.role === 'coop_admin' ? 'Abia Tricycle Operators Guild' :
                                                 activeScope.role === 'investor' ? 'Syndicate Capital & Payouts' :
                                                 activeScope.role === 'partner' ? 'State Parastatal Programs' :
-                                                activeScope.role === 'superadmin' ? 'Abia MFB Central Treasury' :
+                                                activeScope.role === 'superadmin' ? 'Partner MFB Central Treasury' :
                                                 'Primary Savings & Thrift'
                                             )}
                                         </p>
@@ -466,7 +466,7 @@ export function CoptellerSidebar() {
                                                             scope.role === 'coop_admin' ? 'Abia Tricycle Operators Guild' :
                                                             scope.role === 'investor' ? 'Syndicate Capital & Payouts' :
                                                             scope.role === 'partner' ? 'State Parastatal Programs' :
-                                                            scope.role === 'superadmin' ? 'Abia MFB Central Treasury' :
+                                                            scope.role === 'superadmin' ? 'Partner MFB Central Treasury' :
                                                             'Primary Savings & Thrift'
                                                         )}
                                                     </p>

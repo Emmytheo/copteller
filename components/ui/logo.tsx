@@ -44,7 +44,7 @@ export function Logo({
             <div className="grid flex-1 text-left leading-tight">
                 {/* UPDATE HERE: Update your brand name globally */}
                 <span className={cn("truncate font-bold text-primary font-display", textClassName)}>
-                    AbiaSME<span className="font-light">MFB</span>
+                    Partner<span className="font-light">MFB</span>
                 </span>
                 {subtitle && (
                     <span className={cn("truncate text-xs text-muted-foreground tracking-widest uppercase font-medium", subtitleClassName)}>

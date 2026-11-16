@@ -57,7 +57,7 @@ export default function MemberWalletPage() {
     const [depositAmt, setDepositAmt] = React.useState(5000)
     const [transferAmt, setTransferAmt] = React.useState(2000)
     const [transferDest, setTransferDest] = React.useState("")
-    const [transferBank, setTransferBank] = React.useState("Abia MFB Core Rails")
+    const [transferBank, setTransferBank] = React.useState("Partner MFB Core Rails")
     const [submitting, setSubmitting] = React.useState(false)
 
     const copyToClipboard = () => {
@@ -254,7 +254,7 @@ export default function MemberWalletPage() {
                                         <div className="w-10 h-7 rounded-md bg-gradient-to-r from-amber-400 to-yellow-600 border border-yellow-300/40 flex items-center justify-center p-1 shadow-inner">
                                             <div className="w-full h-full border border-yellow-800/40 rounded-sm grid grid-cols-2 gap-0.5 opacity-80" />
                                         </div>
-                                        <span className="text-[10px] font-mono tracking-widest text-slate-400 font-bold">ABIA MFB</span>
+                                        <span className="text-[10px] font-mono tracking-widest text-slate-400 font-bold">PARTNER MFB</span>
                                     </div>
                                     <span className="text-[10px] font-black uppercase text-emerald-400 tracking-widest bg-emerald-500/20 px-2 py-0.5 rounded-full border border-emerald-500/30">
                                         TIER 2
@@ -477,7 +477,7 @@ export default function MemberWalletPage() {
                                                 onChange={e => setTransferBank(e.target.value)}
                                                 className="w-full h-11 px-3 rounded-xl border border-border bg-background text-xs font-semibold text-foreground"
                                             >
-                                                <option value="Abia MFB Core Rails">Abia Microfinance Bank (Internal)</option>
+                                                <option value="Partner MFB Core Rails">Partner Microfinance Bank (Internal)</option>
                                                 <option value="Access Bank">Access Bank Plc</option>
                                                 <option value="First Bank of Nigeria">First Bank of Nigeria</option>
                                                 <option value="Zenith Bank">Zenith Bank Plc</option>

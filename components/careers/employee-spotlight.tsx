@@ -17,7 +17,7 @@ export function EmployeeSpotlight() {
                                 <Quote className="w-12 h-12 fill-current" />
                             </div>
                             <blockquote className="text-2xl font-medium text-white mb-8 leading-relaxed">
-                                "Working at AbiaSMEMFB has been the most rewarding chapter of my career. The focus on community impact combined with a supportive team makes every challenge worth tackling."
+                                "Working at Partner MFB has been the most rewarding chapter of my career. The focus on community impact combined with a supportive team makes every challenge worth tackling."
                             </blockquote>
                             <div>
                                 <cite className="not-italic text-lg font-bold text-white block">Amara Ndukwe</cite>

@@ -207,7 +207,7 @@ export default function InvestorSchemesPage() {
                 <div>
                     <span className="text-[10px] font-black bg-orange-500/10 text-orange-600 dark:text-orange-400 border border-orange-500/20 px-2 py-0.5 rounded-full uppercase tracking-wider">Investments</span>
                     <h1 className="text-2xl sm:text-3xl font-black mt-2">Underwrite Institutional Schemes</h1>
-                    <p className="text-xs text-muted-foreground mt-1 font-semibold max-w-2xl">Co-fund verified state parastatal expansion tranches held in statutory Abia MFB escrow with scheduled weekly Ajo returns.</p>
+                    <p className="text-xs text-muted-foreground mt-1 font-semibold max-w-2xl">Co-fund verified state parastatal expansion tranches held in statutory Partner MFB escrow with scheduled weekly Ajo returns.</p>
                 </div>
                 <Button onClick={() => setPanelMode('propose')} className="w-full sm:w-auto bg-orange-500 hover:bg-orange-600 text-black font-black h-10 rounded-xl text-xs shadow-md shrink-0 flex items-center justify-center gap-2 border-0">
                     <PlusCircle className="h-4 w-4" /> Propose Investment

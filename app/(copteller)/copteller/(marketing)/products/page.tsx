@@ -277,7 +277,7 @@ export default function CooperativeProductRegistryPage() {
                                         {[
                                             { title: "NIBSS BVN Verification", desc: "Must verify identity via matching Bank Verification Number." },
                                             { title: "Active Trade Union Membership", desc: "Requires joining an approved local transport or market cooperative society." },
-                                            { title: "Escrow Reserve Handshake", desc: "Must fund initial member deposits inside Abia MFB vaults." }
+                                            { title: "Escrow Reserve Handshake", desc: "Must fund initial member deposits inside Partner MFB vaults." }
                                         ].map((item, idx) => (
                                             <div key={idx} className="flex gap-3 text-xs">
                                                 <ShieldCheck className="h-5 w-5 text-primary shrink-0" />

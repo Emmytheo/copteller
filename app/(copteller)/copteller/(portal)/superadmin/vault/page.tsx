@@ -43,14 +43,14 @@ const INITIAL_CREDENTIALS: ApiCredential[] = [
         id: 'cred_001', name: 'Core Banking Platform', provider: 'Licensed MFB Partner (Qore)', providerType: 'core-banking',
         status: 'live', publicKey: 'cbk_live_pub_xK9mN2pQ8rT5vY3wZ1aB', secretKey: 'cbk_live_sec_••••••••••••••••••••',
         scopes: ['ledger.read', 'ledger.write', 'escrow.write', 'account.create', 'audit.log'],
-        webhookUrl: 'https://copteller.abiamfb.ng/api/webhooks/core', lastUsed: '2 minutes ago',
+        webhookUrl: 'https://app.copteller.ng/api/webhooks/core', lastUsed: '2 minutes ago',
         requestsToday: 1842, errorRate: 0.02, environment: 'production'
     },
     {
         id: 'cred_002', name: 'Payment Processor', provider: 'Paystack', providerType: 'payment',
         status: 'live', publicKey: 'pk_live_xK9mN2pQ8rT5vY3wZ1aB4cD', secretKey: 'sk_live_••••••••••••••••••••••',
         scopes: ['charge', 'transfer', 'verify', 'refund'],
-        webhookUrl: 'https://copteller.abiamfb.ng/api/webhooks/paystack', lastUsed: '14 minutes ago',
+        webhookUrl: 'https://app.copteller.ng/api/webhooks/paystack', lastUsed: '14 minutes ago',
         requestsToday: 234, errorRate: 0.0, environment: 'production'
     },
     {

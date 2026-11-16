@@ -168,7 +168,7 @@ export default function InvestorDashboard() {
                             </Badge>
                         </div>
                         <p className="text-xs text-foreground font-bold">
-                            Underwrite Institutional Expansion Tranches Protected by Dedicated Abia MFB Escrow
+                            Underwrite Institutional Expansion Tranches Protected by Dedicated Partner MFB Escrow
                         </p>
                         <p className="text-[11px] text-muted-foreground font-semibold max-w-3xl">
                             Co-fund wholesale welfare and asset schemes sponsored by ABSHIA, Ministry of Transport (ATMA), USAID, and SMEDAN. Beneficiaries repay via automated weekly Ajo deductions with a 94.2% verified SLA.

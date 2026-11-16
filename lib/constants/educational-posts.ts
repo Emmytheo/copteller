@@ -10,7 +10,7 @@ export const EDUCATIONAL_POSTS: BlogPost[] = [
       
       <p>For decades, trade associations and market unions across Aba—from the Ariaria International Market to the shoe and leather guilds—have relied on traditional thrift systems. These rotating savings and credit associations, locally referred to as <strong>Esusu</strong> or <strong>Ajo</strong>, have served as the financial lifeblood of informal micro-enterprises.</p>
       
-      <p>However, cash-based Esusu cycles suffer from significant hurdles: lack of transparency, security vulnerabilities during cash collections, and zero formal credit history reporting. Today, <strong>Abia MFB</strong> is leading a digital revolution to formalize these traditional trust networks.</p>
+      <p>However, cash-based Esusu cycles suffer from significant hurdles: lack of transparency, security vulnerabilities during cash collections, and zero formal credit history reporting. Today, <strong>Partner MFB</strong> is leading a digital revolution to formalize these traditional trust networks.</p>
       
       <h3 className="text-2xl font-bold text-foreground mt-8 mb-4">The Digital Esusu Transformation</h3>
       <p>By migrating traditional paper ledger books into the secure cloud, trade union cooperatives enjoy unprecedented benefits:</p>
@@ -26,7 +26,7 @@ export const EDUCATIONAL_POSTS: BlogPost[] = [
       </blockquote>
 
       <h3 className="text-2xl font-bold text-foreground mt-8 mb-4">Bridging informal savings to corporate credit</h3>
-      <p>Perhaps the most critical advantage of digital Esusu is credit building. When market sellers save systematically through digitized Abia MFB thrift cycles, the transaction velocity generates an auditable credit profile. This enables Abia MFB to grant competitive micro-loans at lower rates than traditional commercial banks, empowering Aba's retail industry to expand global trade networks.</p>
+      <p>Perhaps the most critical advantage of digital Esusu is credit building. When market sellers save systematically through digitized Partner MFB thrift cycles, the transaction velocity generates an auditable credit profile. This enables Partner MFB to grant competitive micro-loans at lower rates than traditional commercial banks, empowering Aba's retail industry to expand global trade networks.</p>
     `,
     coverImage: "https://images.unsplash.com/photo-1542838132-92c53300491e?auto=format&fit=crop&w=800&q=80",
     author: {
@@ -42,17 +42,17 @@ export const EDUCATIONAL_POSTS: BlogPost[] = [
   },
   {
     slug: "maximizing-agency-banking-payouts",
-    title: "Maximizing Profit as an Authorized Abia MFB Agency Banking Partner",
+    title: "Maximizing Profit as an Authorized Partner MFB Agency Banking Partner",
     excerpt: "Discover the exact commission structure, neighborhood liquidity strategies, and bonus reward milestones designed to make your local POS agency point a highly lucrative enterprise.",
     content: `
       <p className="lead font-semibold text-lg text-primary mb-6">Neighborhood entrepreneurship is booming. Turn your retail kiosk into a licensed mini-banking point.</p>
       
-      <p>Agency Banking has transformed financial accessibility across Nigeria, particularly in semi-urban and local trade hubs where commercial bank ATMs are scarce. As an authorized <strong>Abia MFB Agency partner</strong>, you do not just provide financial access; you establish a highly lucrative service hub right in your neighborhood.</p>
+      <p>Agency Banking has transformed financial accessibility across Nigeria, particularly in semi-urban and local trade hubs where commercial bank ATMs are scarce. As an authorized <strong>Partner MFB Agency partner</strong>, you do not just provide financial access; you establish a highly lucrative service hub right in your neighborhood.</p>
       
       <p>Let's look at the operational strategies and commission models that enable our leading agents to generate solid monthly payouts.</p>
       
-      <h3 className="text-2xl font-bold text-foreground mt-8 mb-4">The Abia MFB Agency Advantage</h3>
-      <p>Unlike standard generic fintech merchant POS points, Abia MFB Agents operate with premium banking privileges:</p>
+      <h3 className="text-2xl font-bold text-foreground mt-8 mb-4">The Partner MFB Agency Advantage</h3>
+      <p>Unlike standard generic fintech merchant POS points, Partner MFB Agents operate with premium banking privileges:</p>
       <ul>
         <li><strong>Low network latency:</strong> Our custom processing routing ensures a 99.8% transaction success rate, eliminating card-debit customer disputes.</li>
         <li><strong>Dynamic cash points:</strong> Facilitate card-less cash deposits, direct government payouts, utility bill clearings, and Esusu union collections.</li>
@@ -68,7 +68,7 @@ export const EDUCATIONAL_POSTS: BlogPost[] = [
       </ol>
 
       <blockquote className="border-l-4 border-primary pl-4 italic my-6 text-muted-foreground">
-        "Transitioning to the Abia MFB Agent network boosted my grocery shop's foot traffic by 60%. The real-time commission payout system has significantly smoothed our working capital."
+        "Transitioning to the Partner MFB Agent network boosted my grocery shop's foot traffic by 60%. The real-time commission payout system has significantly smoothed our working capital."
         <br /><span className="text-xs font-bold uppercase tracking-wider text-foreground">— Mrs. Chinyere Okey, Merchant & Agent</span>
       </blockquote>
 
@@ -100,7 +100,7 @@ export const EDUCATIONAL_POSTS: BlogPost[] = [
       <h3 className="text-2xl font-bold text-foreground mt-8 mb-4">The Latency Dilemma</h3>
       <p>Mobile transfers rely on multi-hop network rails: from the customer's mobile app, to their commercial bank's core, through clearing switches, and finally to the merchant's bank. During peak trade hours, network congestion leads to delayed bank credit alerts—creating long checkout queues and retail friction.</p>
       
-      <p>In contrast, <strong>Abia MFB Smart Cards (Visa, Mastercard, Verve)</strong> leverage dedicated low-latency POS transaction channels. Card processing operations complete in under 2.5 seconds, providing immediate receipts and transaction certainty.</p>
+      <p>In contrast, <strong>Partner MFB Smart Cards (Visa, Mastercard, Verve)</strong> leverage dedicated low-latency POS transaction channels. Card processing operations complete in under 2.5 seconds, providing immediate receipts and transaction certainty.</p>
 
       <h3 className="text-2xl font-bold text-foreground mt-8 mb-4">Financial & Security Risks</h3>
       <ul>
@@ -109,7 +109,7 @@ export const EDUCATIONAL_POSTS: BlogPost[] = [
         <li><strong>Direct spending limit rules:</strong> With smart virtual cards, business owners can set daily limits to restrict staff overhead spending instantly.</li>
       </ul>
 
-      <p>For modern enterprises looking to automate operations, deploying Abia MFB physical and virtual cards remains the safest and most efficient path to high-velocity retail scaling.</p>
+      <p>For modern enterprises looking to automate operations, deploying Partner MFB physical and virtual cards remains the safest and most efficient path to high-velocity retail scaling.</p>
     `,
     coverImage: "https://images.unsplash.com/photo-1556742044-3c52d6e88c62?auto=format&fit=crop&w=800&q=80",
     author: {

@@ -70,7 +70,7 @@ export function SpotlightSection() {
                                 <div className="w-12 h-12 rounded-full bg-zinc-800 border border-zinc-700"></div>
                                 <div>
                                     <p className="text-white font-bold text-sm">Management Team</p>
-                                    <p className="text-accent text-xs font-bold uppercase tracking-wider">AbiaSMEMFB</p>
+                                    <p className="text-accent text-xs font-bold uppercase tracking-wider">Partner MFB</p>
                                 </div>
                             </div>
                         </div>

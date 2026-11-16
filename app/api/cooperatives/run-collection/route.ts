@@ -7,7 +7,7 @@ import configPromise from '@payload-config'
 
 export async function POST(req: NextRequest) {
     try {
-        // Authenticate via Copteller auth first, then fallback to standard Abia MFB bank auth
+        // Authenticate via Copteller auth first, then fallback to standard Partner MFB bank auth
         let authenticatedUserId: string | null = null
         try {
             const coptellerAuth = await getCoptellerAuth(req)

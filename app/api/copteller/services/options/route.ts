@@ -109,7 +109,7 @@ export async function GET(req: NextRequest) {
         return NextResponse.json({
             success: true,
             options: [
-                { label: 'Abia MFB Primary Settlement', value: '044' },
+                { label: 'Partner MFB Primary Settlement', value: '044' },
                 { label: 'Access Bank', value: '044' },
                 { label: 'First Bank of Nigeria', value: '011' },
                 { label: 'Zenith Bank', value: '057' },

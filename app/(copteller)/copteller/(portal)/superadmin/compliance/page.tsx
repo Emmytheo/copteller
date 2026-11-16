@@ -54,13 +54,13 @@ const FILINGS: ComplianceFiling[] = [
 ]
 
 const AUDIT_LOGS: AuditLog[] = [
-    { id: 'aud_001', action: 'API credential accessed for Core Banking API', actor: 'superadmin@abiamfb.ng', timestamp: 'Aug 7, 2026 11:42am', category: 'access' },
-    { id: 'aud_002', action: 'Grant disbursement approved: ₦250,000 to Kalu Onyekachi', actor: 'admin@abiamfb.ng', timestamp: 'Aug 7, 2026 10:15am', category: 'transaction' },
-    { id: 'aud_003', action: 'HP Asset ABA-519 status changed to Defaulted', actor: 'superadmin@abiamfb.ng', timestamp: 'Aug 7, 2026 9:30am', category: 'configuration' },
-    { id: 'aud_004', action: 'New cooperative Ariaria Traders Union approved', actor: 'superadmin@abiamfb.ng', timestamp: 'Aug 6, 2026 4:45pm', category: 'compliance' },
-    { id: 'aud_005', action: 'AML Report CBN-AML-2026-Q2 submitted to CBN portal', actor: 'compliance@abiamfb.ng', timestamp: 'Aug 6, 2026 2:00pm', category: 'compliance' },
-    { id: 'aud_006', action: 'Member Ngozi Eze KYC upgraded to Tier 2', actor: 'admin@abiamfb.ng', timestamp: 'Aug 6, 2026 11:00am', category: 'configuration' },
-    { id: 'aud_007', action: 'Workflow "Weekly Ajo Cycle" manually triggered', actor: 'superadmin@abiamfb.ng', timestamp: 'Aug 5, 2026 8:00am', category: 'configuration' },
+    { id: 'aud_001', action: 'API credential accessed for Core Banking API', actor: 'superadmin@copteller.ng', timestamp: 'Aug 7, 2026 11:42am', category: 'access' },
+    { id: 'aud_002', action: 'Grant disbursement approved: ₦250,000 to Kalu Onyekachi', actor: 'admin@copteller.ng', timestamp: 'Aug 7, 2026 10:15am', category: 'transaction' },
+    { id: 'aud_003', action: 'HP Asset ABA-519 status changed to Defaulted', actor: 'superadmin@copteller.ng', timestamp: 'Aug 7, 2026 9:30am', category: 'configuration' },
+    { id: 'aud_004', action: 'New cooperative Ariaria Traders Union approved', actor: 'superadmin@copteller.ng', timestamp: 'Aug 6, 2026 4:45pm', category: 'compliance' },
+    { id: 'aud_005', action: 'AML Report CBN-AML-2026-Q2 submitted to CBN portal', actor: 'compliance@copteller.ng', timestamp: 'Aug 6, 2026 2:00pm', category: 'compliance' },
+    { id: 'aud_006', action: 'Member Ngozi Eze KYC upgraded to Tier 2', actor: 'admin@copteller.ng', timestamp: 'Aug 6, 2026 11:00am', category: 'configuration' },
+    { id: 'aud_007', action: 'Workflow "Weekly Ajo Cycle" manually triggered', actor: 'superadmin@copteller.ng', timestamp: 'Aug 5, 2026 8:00am', category: 'configuration' },
 ]
 
 const AUDIT_CAT_STYLE: Record<string, string> = {
