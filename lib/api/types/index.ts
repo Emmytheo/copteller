@@ -1,0 +1,554 @@
+export type Role = 'user' | 'customer' | 'admin';
+
+export interface User {
+    id: string;
+    email: string;
+    full_name: string;
+    avatar_url?: string;
+    role: Role;
+    created_at: string;
+}
+
+export interface Account {
+    id: string;
+    user_id: string;
+    account_number: string;
+    account_type: 'Savings' | 'Current' | 'Fixed Deposit';
+    balance: number;
+    status: 'active' | 'dormant' | 'frozen';
+    created_at: string;
+    // Extended fields for BankOne
+    is_frozen?: boolean;
+    pnd_enabled?: boolean;
+    lien_amount?: number;
+    source: 'qore' | 'local';
+    is_primary: boolean;
+    is_archived: boolean;
+    customer?: string | Customer;
+    metadata?: any;
+}
+
+export interface Customer {
+    id: string;
+    firstName: string;
+    lastName: string;
+    email: string;
+    phone_number?: string;
+    bvn?: string;
+    qore_customer_id?: string;
+    supabase_id?: string | null;
+    kyc_status: 'pending' | 'active' | 'inactive' | 'rejected';
+    risk_tier: 'low' | 'medium' | 'high';
+    onboarding_status?: 'pending' | 'skipped' | 'completed';
+    is_associated: boolean;
+    dob?: string;
+    gender?: number;
+    merger_status?: 'none' | 'pending' | 'completed' | 'archived';
+    is_archived: boolean;
+    is_test_account: boolean;
+    address?: string;
+    metadata?: any;
+    created_at: string;
+    updated_at: string;
+}
+
+export interface AccountOfficer {
+    id: string;
+    name: string;
+    code: string;
+    branch?: string;
+    gender?: string;
+    phone?: string;
+    email?: string;
+    linked_user_id?: string;
+    created_at: string;
+    updated_at: string;
+}
+
+export interface Loan {
+    id: string;
+    user_id: string;
+    product_type_id?: string;
+    amount: number;
+    interest_rate: number;
+    duration_months: number;
+    outstanding_balance?: number;
+    monthly_installment?: number;
+    next_payment_date?: string;
+    maturity_date?: string;
+    status: 'pending' | 'approved' | 'rejected' | 'repaid' | 'under_review' | 'active' | 'defaulted' | 'written_off';
+    created_at: string;
+    customer?: string | Customer;
+}
+
+export interface FieldValidation {
+    type: 'regex' | 'min' | 'max' | 'api_lookup';
+    value: string;
+    errorMessage?: string;
+}
+
+export interface FieldEvent {
+    trigger: 'onChange' | 'onBlur' | 'onLoad' | 'onCondition';
+    condition?: {
+        type: 'length' | 'regex' | 'regex_not_match';
+        value: string | number;
+    };
+    action: 'EXECUTE_ENDPOINT' | 'SET_VALUE' | 'SET_VALUES';
+    endpointId?: string;
+    mappingConfig?: Record<string, any>;
+}
+
+export interface FormField {
+    id: string;
+    label: string;
+    type: 'text' | 'number' | 'email' | 'select' | 'file' | 'destination_bank_lookup' | 'beneficiary_select' | 'autocomplete_select' | 'api_select' | 'hidden';
+    required: boolean;
+    options?: string[]; // For select fields
+    placeholder?: string;
+    description?: string;
+    options_endpoint?: string | any;
+    options_text_key?: string;
+    options_value_key?: string;
+    validations?: FieldValidation[];
+    events?: FieldEvent[];
+}
+
+export interface ProductClass {
+    id: string;
+    name: string;
+    description: string;
+    status: 'active' | 'inactive';
+    created_at: string;
+}
+
+export interface ProductCategory {
+    id: string;
+    class_id: string;
+    name: string;
+    description: string;
+    status: 'active' | 'inactive';
+    created_at: string;
+}
+
+export interface LoanTermsConfig {
+    blockType: 'loan-terms';
+    interest_rate: number;
+    min_amount: number;
+    max_amount: number;
+    min_duration?: number;
+    max_duration?: number;
+}
+
+export interface SavingsTermsConfig {
+    blockType: 'savings-terms';
+    interest_rate?: number;
+    min_balance: number;
+    monthly_maintenance_fee?: number;
+}
+
+export interface FixedDepositTermsConfig {
+    blockType: 'fixed-deposit-terms';
+    interest_rate: number;
+    min_amount: number;
+    lockup_period: number;
+    penalty_rate?: number;
+}
+
+export type ProductFinancialTerms = LoanTermsConfig | SavingsTermsConfig | FixedDepositTermsConfig;
+
+export interface ProductType {
+    id: string;
+    name: string;
+    category: string; // References ProductCategory ID or slug
+    tagline: string;
+    description: string;
+    financial_terms: ProductFinancialTerms[];
+    image_url?: string;
+    form_schema: FormField[];
+    workflow_stages: string[]; // e.g., ['Submitted', 'Under Review', 'Approved']
+    status: 'active' | 'draft' | 'archived';
+    created_at: string;
+}
+
+export interface ProductApplication {
+    id: string;
+    user_id: string;
+    product_type_id: string;
+    status: 'pending' | 'approved' | 'rejected' | 'under_review' | 'withdrawn';
+    workflow_stage: string;
+    submitted_data: Record<string, any>;
+    requested_amount?: number;
+    created_at: string;
+    updated_at: string;
+    metadata?: any;
+}
+
+export interface Transaction {
+    id: string;
+    user_id: string;
+    amount: number;
+    type: 'credit' | 'debit' | 'transfer' | 'disbursement' | 'repayment' | 'fee' | 'interest';
+    category?: 'Bills' | 'School Fees' | 'Utilities' | 'e-Pins' | 'Transfer';
+    status: 'successful' | 'pending' | 'failed' | 'reversed';
+    reference: string;
+    narration?: string;
+    from_account?: string | Account; // Properly typed for fully populated relation
+    to_account?: string | Account; // Properly typed for fully populated relation
+    workflow_execution?: string | any;
+    balance_after?: number;
+    metadata?: any;
+    created_at: string;
+}
+
+export interface SystemConfig {
+    id: string;
+    key: string;
+    value: string;
+    category: 'Global Content' | 'Product Settings';
+    updated_at: string;
+}
+
+export interface SiteSyncConfig {
+    baselineAccounts: { accountNumber: string }[];
+    autoDiscoveryEnabled: boolean;
+    customerLookupEndpoint: string | any;
+    accountEnquiryEndpoint: string | any;
+    customerAccountsEndpoint?: string | any;
+    productSyncEndpoint?: string | any;
+    serviceSyncEndpoint?: string | any;
+    customerUpdateEndpoint?: string | any;
+    bvnLookupEndpoint?: string | any;
+    accountOfficerEndpoint?: string | any;
+    acctMgmt?: {
+        freeze?: string | any;
+        unfreeze?: string | any;
+        freezeStatus?: string | any;
+        pnd?: string | any;
+        unpnd?: string | any;
+        pndStatus?: string | any;
+        lien?: string | any;
+        unlien?: string | any;
+        lienStatus?: string | any;
+        notifPref?: string | any;
+        stmt?: string | any;
+        close?: string | any;
+        upload?: string | any;
+        tier?: string | any;
+        txStatus?: string | any;
+        history?: string | any;
+        create?: string | any;
+        defaultAccountOfficerCode?: string;
+    };
+}
+
+export interface SiteSettings {
+    siteTitle: string;
+    contactEmail?: string;
+    supportPhone?: string;
+    sync: SiteSyncConfig;
+}
+
+export interface Beneficiary {
+    id: string;
+    user: string;
+    account_name: string;
+    account_number: string;
+    bank_name: string;
+    bank_code?: string;
+    is_international?: boolean;
+    routing_number?: string;
+    country?: string;
+    iban?: string;
+    swift_code?: string;
+    currency?: string;
+    created_at: string;
+    updated_at?: string;
+}
+
+export interface BlogPost {
+    id?: string | number;
+    slug: string;
+    title: string;
+    excerpt: string;
+    content: string; // HTML or Markdown
+    coverImage: string;
+    author: {
+        name: string;
+        role: string;
+        avatar: string;
+    };
+    date: string;
+    category: string;
+    tags: string[];
+    featured: boolean;
+    readTime: string;
+}
+
+export interface JobPosition {
+    id: string;
+    title: string;
+    department: string;
+    location: string;
+    type: "Full-time" | "Part-time" | "Contract" | "Remote" | "On-site";
+    description?: string;
+}
+
+export interface Promotion {
+    id: string;
+    title: string;
+    description?: string;
+    imageSource?: 'url' | 'media';
+    externalUrl?: string;
+    mediaImage?: any; // Media object from Payload
+    resolvedImageUrl?: string; // Client-side computed URL for easy rendering
+    link?: string;
+    isActive: boolean;
+    placement: 'hero' | 'banner' | 'sidebar';
+    updatedAt: string;
+    createdAt: string;
+}
+
+export interface CustomerAudit {
+    accounts: number;
+    loans: number;
+    applications: number;
+    beneficiaries: number;
+    financialData: {
+        accounts: Account[];
+        loans: Loan[];
+    };
+}
+
+// Unified API Adapter Interface
+export interface ApiAdapter {
+    // Users
+    getCurrentUser: () => Promise<User | null>;
+    getAllUsers: () => Promise<User[]>;
+
+    // Customers
+    getAllCustomers: () => Promise<Customer[]>;
+    getCustomerById: (id: string) => Promise<Customer | null>;
+    getCustomerBySupabaseId: (supabaseId: string) => Promise<Customer | null>;
+    restoreCustomerIdentity: (customerId: string, supabaseId: string, email: string) => Promise<boolean>;
+    syncBankingIdentity: (userId: string) => Promise<{ success: boolean; message: string }>;
+    repointAccount: (accountId: string, winnerId: string, winnerSupabaseId: string | null) => Promise<boolean>;
+    repointDigitalIdentity: (customerId: string, supabaseId: string) => Promise<boolean>;
+    updateCustomer: (id: string, data: Partial<Customer>) => Promise<Customer>;
+    getCustomerAudit: (id: string) => Promise<CustomerAudit>;
+    deleteCustomer: (id: string) => Promise<boolean>;
+    verifyIdentity: (bvn: string) => Promise<any>;
+    createCoreBankingProfile: (data: any) => Promise<any>;
+    saveOnboardingDraft: (data: Partial<Customer> & { userId: string }) => Promise<Customer>;
+    skipOnboarding: (userId: string) => Promise<boolean>;
+
+    // Products (Accounts, Loans)
+    getAllAccounts: () => Promise<Account[]>;
+    getUserAccounts: (userId: string) => Promise<Account[]>;
+    getAccountById: (id: string) => Promise<Account | null>;
+    createAccount: (data: Omit<Account, 'id' | 'created_at' | 'updated_at'>) => Promise<Account>;
+    updateAccount: (id: string, data: Partial<Account>) => Promise<Account | null>;
+    getAllLoans: () => Promise<Loan[]>;
+    getUserLoans: (userId: string) => Promise<Loan[]>;
+    getLoanById: (id: string) => Promise<Loan | null>;
+    createLoan: (data: Omit<Loan, 'id' | 'created_at' | 'updated_at'>) => Promise<Loan>;
+    updateLoan: (id: string, data: Partial<Loan>) => Promise<Loan | null>;
+    recordLoanRepayment: (loanId: string, amountNaira: number, narration?: string) => Promise<boolean>;
+    getCustomerAccounts: (customerId: string) => Promise<Account[]>;
+    getCustomerLoans: (customerId: string) => Promise<Loan[]>;
+    getCustomerTransactions: (customerId: string, limit?: number) => Promise<Transaction[]>;
+    getAccountTransactionSummary: (accountId: string, days?: number) => Promise<{ totalCredits: number; totalDebits: number; series: { date: string; credit: number; debit: number }[] }>;
+    withdrawApplication: (id: string) => Promise<boolean>;
+    getAllTransactionsPaginated: (page?: number, limit?: number, filters?: { type?: string; status?: string; fromDate?: string; toDate?: string }) => Promise<{ docs: Transaction[]; totalDocs: number; totalPages: number; page: number }>;
+
+    // Beneficiaries
+    getUserBeneficiaries: (userId: string) => Promise<Beneficiary[]>;
+    getBeneficiaryById: (id: string) => Promise<Beneficiary | null>;
+    saveBeneficiary: (data: Omit<Beneficiary, 'id' | 'created_at' | 'updated_at'>) => Promise<Beneficiary>;
+    deleteBeneficiary: (id: string, userId: string) => Promise<boolean>;
+
+    // Product Configuration & Dynamic Forms
+    getAllProductClasses: () => Promise<ProductClass[]>;
+    createProductClass: (data: Omit<ProductClass, 'id' | 'created_at'>) => Promise<ProductClass>;
+    updateProductClass: (id: string, data: Partial<ProductClass>) => Promise<ProductClass>;
+    deleteProductClass: (id: string) => Promise<boolean>;
+
+    getAllProductCategories: () => Promise<ProductCategory[]>;
+    createProductCategory: (data: Omit<ProductCategory, 'id' | 'created_at'>) => Promise<ProductCategory>;
+    updateProductCategory: (id: string, data: Partial<ProductCategory>) => Promise<ProductCategory>;
+    deleteProductCategory: (id: string) => Promise<boolean>;
+
+    getAllProductTypes: () => Promise<ProductType[]>;
+    getProductTypeById: (id: string) => Promise<ProductType | null>;
+    saveProductType: (data: ProductType) => Promise<ProductType>;
+    deleteProductType: (id: string) => Promise<boolean>;
+
+    // Product Applications
+    createProductApplication: (data: Omit<ProductApplication, 'id' | 'created_at' | 'updated_at'>) => Promise<ProductApplication>;
+    updateApplication: (id: string, data: Partial<ProductApplication>) => Promise<ProductApplication>;
+    getUserApplications: (userId: string) => Promise<ProductApplication[]>;
+    getAllApplications: () => Promise<ProductApplication[]>;
+    reprovisionApplication: (id: string) => Promise<{ accountNumber?: string }>;
+
+    // Services (Transactions)
+    getAllTransactions: () => Promise<Transaction[]>;
+    getUserTransactions: (userId: string) => Promise<Transaction[]>;
+    getLoanTransactions: (loanId: string) => Promise<Transaction[]>;
+    getAccountTransactions: (accountId: string) => Promise<Transaction[]>;
+    getTransactionById: (id: string | number) => Promise<Transaction | null>;
+    getTransactionsByCategory: (category: Transaction['category']) => Promise<Transaction[]>;
+
+    // Account Funding
+    processAccountFunding: (targetAccountId: string, amountNaira: number, reference?: string) => Promise<{ success: boolean; data?: any; error?: string }>;
+
+    // Service Integrations
+    getServiceCategories: () => Promise<ServiceCategory[]>;
+    getServicesByCategory: (categorySlug: string) => Promise<Service[]>;
+    getAllServices: () => Promise<Service[]>;
+    getServiceById: (id: string) => Promise<Service | null>;
+    createServiceCategory: (data: Omit<ServiceCategory, 'id' | 'created_at'>) => Promise<ServiceCategory>;
+    updateServiceCategory: (id: string, data: Partial<ServiceCategory>) => Promise<ServiceCategory>;
+    deleteServiceCategory: (id: string) => Promise<boolean>;
+    createService: (data: Omit<Service, 'id' | 'created_at'>) => Promise<Service>;
+    updateService: (id: string, data: Partial<Service>) => Promise<Service>;
+    deleteService: (id: string) => Promise<boolean>;
+    executeServiceWorkflow: (serviceId: string, formData: Record<string, any>) => Promise<string>;
+    validateServiceWorkflow: (serviceId: string, formData: Record<string, any>) => Promise<any>;
+    getWorkflowExecutionById: (executionId: string) => Promise<any>;
+
+    // Workflows
+    getWorkflows: () => Promise<{ docs: { id: string, name: string }[] }>;
+
+    // Settings (Config)
+    getConfigsByCategory: (category: SystemConfig['category']) => Promise<SystemConfig[]>;
+
+    // Global CMS
+    getPageBySlug: (slug: string) => Promise<any | null>;
+    getPromotions: (placement?: string) => Promise<Promotion[]>;
+    createPromotion: (data: Omit<Promotion, 'id' | 'createdAt' | 'updatedAt'>) => Promise<Promotion>;
+    updatePromotion: (id: string, data: Partial<Promotion>) => Promise<Promotion>;
+    deletePromotion: (id: string) => Promise<boolean>;
+
+    // Site Settings
+    getSiteSettings: () => Promise<SiteSettings | null>;
+    updateSiteSettings: (data: Partial<SiteSettings>) => Promise<SiteSettings>;
+
+    // Blog
+    getBlogPosts: (params?: any) => Promise<BlogPost[]>;
+    getBlogPostBySlug: (slug: string) => Promise<BlogPost | undefined>;
+    getFeaturedPosts: () => Promise<BlogPost[]>;
+    getPostsByCategory: (category: string) => Promise<BlogPost[]>;
+    getPopularPosts: () => Promise<BlogPost[]>;
+    getAllTags: () => Promise<string[]>;
+
+    // Account Officers
+    getAllAccountOfficers: () => Promise<AccountOfficer[]>;
+    linkOfficerToUser: (officerId: string, userId: string) => Promise<boolean>;
+
+    // Careers
+    getOpenPositions: () => Promise<JobPosition[]>;
+
+    // Endpoints
+    getAllEndpoints: () => Promise<any[]>;
+
+    // Merge & Reconciliation
+    mergeCustomers: (params: {
+        primaryCustomerId: string;
+        supabaseUserId: string;
+        profileData: Partial<Customer>;
+        selectedAccountNumbers: string[];
+        isCustomerToCustomer?: boolean;
+        keepTargetAsPrimary?: boolean;
+    }) => Promise<{ success: boolean; mergedRecords: number; archivedIds: string[] }>;
+    getQoreAccounts: (customerId: string) => Promise<any[]>;
+    unlinkCustomer: (id: string) => Promise<Customer>;
+
+    // Standing Orders
+    getUserStandingOrders: (userId: string) => Promise<StandingOrder[]>;
+    createStandingOrder: (data: Omit<StandingOrder, 'id' | 'created_at'>) => Promise<StandingOrder>;
+    updateStandingOrder: (id: string, data: Partial<StandingOrder>) => Promise<StandingOrder>;
+    deleteStandingOrder: (id: string) => Promise<boolean>;
+
+    // Invoices
+    getInvoices: (merchantId: string) => Promise<Invoice[]>;
+    createInvoice: (data: Omit<Invoice, 'id' | 'created_at'>) => Promise<Invoice>;
+    updateInvoice: (id: string, data: Partial<Invoice>) => Promise<Invoice>;
+    deleteInvoice: (id: string) => Promise<boolean>;
+}
+
+export interface StandingOrder {
+    id: string;
+    user_id: string;
+    customer: string | Customer;
+    source_account: string | Account;
+    destination_bank_name: string;
+    destination_bank_code: string;
+    destination_account_number: string;
+    destination_account_name: string;
+    amount: number;
+    frequency: 'daily' | 'weekly' | 'monthly';
+    start_date: string;
+    end_date?: string;
+    next_run_date: string;
+    status: 'active' | 'paused' | 'completed' | 'cancelled';
+    narration?: string;
+    created_at: string;
+}
+
+export interface Invoice {
+    id: string;
+    user_id: string;
+    client_name: string;
+    amount: number;
+    status: 'paid' | 'unpaid' | 'overdue' | 'cancelled';
+    issue_date: string;
+    due_date?: string;
+    created_at: string;
+}
+
+export interface ServiceCategory {
+    id: string;
+    name: string;
+    slug: string;
+    description?: string;
+    icon?: string;
+    status: 'active' | 'inactive';
+    ui_layout: 'default' | 'transfer_tabs';
+    created_at: string;
+}
+
+export interface ServiceFormSchema {
+    id: string;
+    name: string; // Internal variable name
+    label: string; // UI label
+    type: 'text' | 'number' | 'email' | 'select' | 'file' | 'destination_bank_lookup' | 'beneficiary_select' | 'autocomplete_select' | 'api_select' | 'hidden';
+    required: boolean;
+    placeholder?: string;
+    options?: string; // Comma-separated options for 'select'
+    triggers_validation: boolean;
+    options_endpoint?: string | any;
+    options_text_key?: string;
+    options_value_key?: string;
+    validations?: FieldValidation[];
+    events?: FieldEvent[];
+}
+
+export interface Service {
+    id: string;
+    name: string;
+    /** Resolved display name of the category (from depth:1 population) */
+    category: string;
+    /** Raw category ID — use this when sending updates to the API */
+    category_id?: string;
+    provider?: string;
+    provider_service_code?: string;
+    /** Can be a workflow ID string or a populated workflow object */
+    validation_workflow?: string | { id: string; name: string };
+    /** Can be a workflow ID string or a populated workflow object */
+    execution_workflow?: string | { id: string; name: string };
+    fee_type: 'none' | 'flat' | 'percentage' | 'tiered';
+    fee_value?: number;
+    form_schema: ServiceFormSchema[];
+    status: 'active' | 'inactive';
+    service_intent: 'none' | 'transfer_intra' | 'transfer_interbank' | 'transfer_international';
+    created_at?: string;
+}

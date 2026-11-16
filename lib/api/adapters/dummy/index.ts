@@ -1,0 +1,743 @@
+import { ApiAdapter, ProductApplication } from '../../types';
+import { MOCK_USERS, MOCK_ACCOUNTS, MOCK_LOANS, MOCK_TRANSACTIONS, MOCK_CONFIGS, MOCK_POSTS, MOCK_JOBS, MOCK_PRODUCT_TYPES, MOCK_APPLICATIONS, MOCK_CUSTOMERS } from './data';
+
+// Simulate network delay for realistic mock
+const delay = (ms: number) => new Promise(resolve => setTimeout(resolve, ms));
+
+export const DummyAdapter: ApiAdapter = {
+    // Users
+    getCurrentUser: async () => {
+        await delay(200);
+        return MOCK_USERS[1]; // Admin by default for this view
+    },
+
+    getAllUsers: async () => {
+        await delay(500);
+        return MOCK_USERS;
+    },
+
+    // Customers
+    getAllCustomers: async () => {
+        await delay(500);
+        return MOCK_CUSTOMERS;
+    },
+
+    getCustomerById: async (id) => {
+        await delay(400);
+        return MOCK_CUSTOMERS.find(c => c.id === id) || null;
+    },
+    
+    getCustomerBySupabaseId: async (supabaseId) => {
+        await delay(400);
+        return MOCK_CUSTOMERS.find(c => c.supabase_id === supabaseId) || null;
+    },
+
+    syncBankingIdentity: async (userId) => {
+        await delay(1000);
+        return { success: true, message: "Banking identity synced successfully" };
+    },
+
+    repointAccount: async () => {
+        await delay(500);
+        return true;
+    },
+
+    repointDigitalIdentity: async () => {
+        await delay(500);
+        return true;
+    },
+
+    updateCustomer: async (id, data) => {
+        await delay(600);
+        const existing = MOCK_CUSTOMERS.find(c => c.id === id);
+        return { 
+            ...(existing || MOCK_CUSTOMERS[0]), 
+            ...data, 
+            updated_at: new Date().toISOString() 
+        } as any;
+    },
+
+    restoreCustomerIdentity: async () => {
+        await delay(500);
+        return true;
+    },
+
+    getCustomerAudit: async (id) => {
+        await delay(800);
+        return {
+            accounts: 2,
+            loans: 1,
+            applications: 1,
+            beneficiaries: 0,
+            financialData: {
+                accounts: MOCK_ACCOUNTS.slice(0, 2),
+                loans: MOCK_LOANS.slice(0, 1)
+            }
+        };
+    },
+
+    deleteCustomer: async (id) => {
+        await delay(500);
+        return true;
+    },
+
+    verifyIdentity: async (bvn) => {
+        await delay(800);
+        return { IsSuccessful: true, Payload: { BVN: bvn, FirstName: "John", LastName: "Doe" } };
+    },
+
+    createCoreBankingProfile: async (data) => {
+        await delay(1500);
+        return { customerId: "C123", accountNumber: "0123456789", localAccountId: "acc_123" };
+    },
+    
+    saveOnboardingDraft: async (data: any) => {
+        await delay(500);
+        return {
+            id: 'dummy-id',
+            firstName: data.firstName || 'John',
+            lastName: data.lastName || 'Doe',
+            email: 'john.doe@example.com',
+            kyc_status: 'pending',
+            ...data
+        } as any;
+    },
+    skipOnboarding: async (userId: string) => {
+        console.log('[Mock] Skipping onboarding for user:', userId);
+        return true;
+    },
+
+    // Products
+    getAllAccounts: async () => {
+        await delay(600);
+        return MOCK_ACCOUNTS;
+    },
+
+    getUserAccounts: async (userId) => {
+        await delay(400);
+        return MOCK_ACCOUNTS.filter(a => a.user_id === userId);
+    },
+
+    createAccount: async (data) => {
+        await delay(500);
+        return { ...data, id: `acc_${Date.now()}`, created_at: new Date().toISOString(), updated_at: new Date().toISOString() };
+    },
+
+    updateAccount: async (id, data) => {
+        await delay(500);
+        const existing = MOCK_ACCOUNTS.find(a => a.id === id);
+        return {
+            ...(existing || MOCK_ACCOUNTS[0]),
+            ...data,
+            updated_at: new Date().toISOString()
+        } as any;
+    },
+
+    getAllLoans: async () => {
+        await delay(500);
+        return MOCK_LOANS;
+    },
+
+    getUserLoans: async (userId) => {
+        await delay(400);
+        return MOCK_LOANS.filter(l => l.user_id === userId);
+    },
+
+    createLoan: async (data) => {
+        await delay(500);
+        return { ...data, id: `loan_${Date.now()}`, created_at: new Date().toISOString(), updated_at: new Date().toISOString() };
+    },
+
+    getAccountById: async (id) => {
+        await delay(300);
+        return MOCK_ACCOUNTS.find(a => a.id === id) || null;
+    },
+
+    getLoanById: async (id) => {
+        await delay(300);
+        return MOCK_LOANS.find(l => l.id === id) || null;
+    },
+
+    // ── Extended accounting methods ──────────────────────────────────────
+    updateLoan: async (id, data) => {
+        await delay(400);
+        const existing = MOCK_LOANS.find(l => l.id === id);
+        return { ...(existing || MOCK_LOANS[0]), ...data, updated_at: new Date().toISOString() } as any;
+    },
+
+    recordLoanRepayment: async (loanId, amountNaira, narration) => {
+        await delay(600);
+        console.log(`[Mock] Recording repayment of ₦${amountNaira} for loan ${loanId}`, narration);
+        return true;
+    },
+
+    getCustomerAccounts: async (customerId) => {
+        await delay(350);
+        return MOCK_ACCOUNTS.filter(a =>
+            (typeof a.customer === 'object' ? (a.customer as any)?.id === customerId : a.customer === customerId)
+        );
+    },
+
+    getCustomerLoans: async (customerId) => {
+        await delay(350);
+        return MOCK_LOANS.filter(l =>
+            (typeof l.customer === 'object' ? (l.customer as any)?.id === customerId : l.customer === customerId)
+        );
+    },
+
+    getCustomerTransactions: async (customerId, limit = 50) => {
+        await delay(400);
+        return MOCK_TRANSACTIONS.slice(0, limit);
+    },
+
+    getAccountTransactionSummary: async (accountId, days = 30) => {
+        await delay(400);
+        const series = Array.from({ length: Math.min(days, 30) }, (_, i) => {
+            const d = new Date();
+            d.setDate(d.getDate() - (29 - i));
+            return { date: d.toISOString().slice(0, 10), credit: Math.random() * 50000, debit: Math.random() * 30000 };
+        });
+        return {
+            totalCredits: series.reduce((s, r) => s + r.credit, 0),
+            totalDebits: series.reduce((s, r) => s + r.debit, 0),
+            series,
+        };
+    },
+
+    withdrawApplication: async (id) => {
+        await delay(500);
+        console.log(`[Mock] Withdrawing application ${id}`);
+        return true;
+    },
+
+    getAllTransactionsPaginated: async (page = 1, limit = 20, filters) => {
+        await delay(400);
+        const docs = MOCK_TRANSACTIONS.slice((page - 1) * limit, page * limit);
+        return { docs, totalDocs: MOCK_TRANSACTIONS.length, totalPages: Math.ceil(MOCK_TRANSACTIONS.length / limit), page };
+    },
+    // ─────────────────────────────────────────────────────────────────────
+
+    // Product Configuration & Dynamic Forms
+    getAllProductClasses: async () => {
+        await delay(300);
+        return [];
+    },
+    createProductClass: async (data) => {
+        await delay(400);
+        return { ...data, id: `cls_${Date.now()}`, created_at: new Date().toISOString() };
+    },
+    updateProductClass: async (id, data) => {
+        await delay(400);
+        return { id, ...data } as any;
+    },
+    deleteProductClass: async (id) => {
+        await delay(300);
+        return true;
+    },
+
+    getAllProductCategories: async () => {
+        await delay(300);
+        return [];
+    },
+    createProductCategory: async (data) => {
+        await delay(400);
+        return { ...data, id: `cat_${Date.now()}`, created_at: new Date().toISOString() };
+    },
+    updateProductCategory: async (id, data) => {
+        await delay(400);
+        return { id, ...data } as any;
+    },
+    deleteProductCategory: async (id) => {
+        await delay(300);
+        return true;
+    },
+
+    getAllProductTypes: async () => {
+        await delay(400);
+        return MOCK_PRODUCT_TYPES;
+    },
+
+    getProductTypeById: async (id) => {
+        await delay(200);
+        return MOCK_PRODUCT_TYPES.find(p => p.id === id) || null;
+    },
+
+    saveProductType: async (data) => {
+        await delay(600);
+        // Simulate saving/updating by returning the data
+        return data;
+    },
+
+    deleteProductType: async (id) => {
+        await delay(400);
+        return true;
+    },
+
+    // Product Applications
+    createProductApplication: async (data) => {
+        await delay(800);
+        return {
+            ...data,
+            id: `APP_${Math.random().toString(36).substr(2, 6)}`,
+            created_at: new Date().toISOString(),
+            updated_at: new Date().toISOString()
+        } as ProductApplication;
+    },
+
+    updateApplication: async (id, data) => {
+        await delay(800);
+        return {
+            ...data,
+            id,
+            user_id: data.user_id || 'dummy_user', // Placeholder
+            product_type_id: data.product_type_id || 'dummy_product', // Placeholder
+            workflow_stage: data.workflow_stage || 'Submitted', // Placeholder
+            status: data.status || 'pending', // Placeholder
+            submitted_data: data.submitted_data || {},
+            created_at: data.created_at || new Date().toISOString(), // Placeholder
+            updated_at: new Date().toISOString()
+        } as ProductApplication;
+    },
+
+    getUserApplications: async (userId) => {
+        await delay(500);
+        return MOCK_APPLICATIONS.filter(a => a.user_id === userId);
+    },
+
+    getAllApplications: async () => {
+        await delay(600);
+        return MOCK_APPLICATIONS;
+    },
+    reprovisionApplication: async (id) => {
+        await delay(1000);
+        return { accountNumber: "0123456789" };
+    },
+
+    // Services
+    getAllTransactions: async () => {
+        await delay(500);
+        return MOCK_TRANSACTIONS;
+    },
+
+    getUserTransactions: async (userId) => {
+        await delay(500);
+        return MOCK_TRANSACTIONS.filter(t => t.user_id === userId);
+    },
+
+    getLoanTransactions: async (loanId) => {
+        await delay(400);
+        // In mock mode, filter by metadata.loan_id if present, otherwise return empty
+        return MOCK_TRANSACTIONS.filter(t =>
+            (t.metadata as any)?.loan_id === loanId ||
+            (t.metadata as any)?.loan === loanId
+        );
+    },
+
+    getAccountTransactions: async (accountId) => {
+        await delay(400);
+        // Filter by to_account or from_account
+        return MOCK_TRANSACTIONS.filter(t => {
+            const toAcc = typeof t.to_account === 'object' && t.to_account ? (t.to_account as any).id : t.to_account;
+            const fromAcc = typeof t.from_account === 'object' && t.from_account ? (t.from_account as any).id : t.from_account;
+            return toAcc === accountId || fromAcc === accountId;
+        });
+    },
+
+    getTransactionById: async (id) => {
+        await delay(300);
+        return MOCK_TRANSACTIONS.find(t => t.id === String(id)) || null;
+    },
+
+    getTransactionsByCategory: async (category) => {
+        await delay(400);
+        return MOCK_TRANSACTIONS.filter(t => t.category === category);
+    },
+
+    // Account Funding
+    processAccountFunding: async (targetAccountId, amountNaira, reference) => {
+        await delay(1000);
+        return { success: true, data: { status: 'SUCCESS', new_balance: amountNaira + 1000 } };
+    },
+
+    // Service Integrations
+    getServiceCategories: async () => {
+        await delay(300);
+        return [
+            {
+                id: 'cat_transfers',
+                name: 'Transfers',
+                slug: 'transfers',
+                description: 'Send money to any bank account.',
+                icon: 'landmark',
+                status: 'active',
+                ui_layout: 'transfer_tabs',
+                created_at: new Date().toISOString()
+            },
+            {
+                id: 'cat_bills',
+                name: 'Pay Bills',
+                slug: 'bills',
+                description: 'Utility, Internet, and Cable TV.',
+                icon: 'zap',
+                status: 'active',
+                ui_layout: 'default',
+                created_at: new Date().toISOString()
+            }
+        ];
+    },
+    getServicesByCategory: async (categorySlug) => {
+        await delay(300);
+        if (categorySlug === 'transfers') {
+            return [
+                {
+                    id: 'svc_intra',
+                    name: 'Transfer to ABIASMEMFB',
+                    category: 'cat_transfers',
+                    provider_service_code: 'INTRA',
+                    service_intent: 'transfer_intra',
+                    fee_type: 'none',
+                    fee_value: 0,
+                    status: 'active',
+                    form_schema: [
+                        { name: 'beneficiary_id', label: 'Select Beneficiary', type: 'beneficiary_select', required: true, 
+                          events: [{ trigger: 'onChange', action: 'SET_VALUES', mappingConfig: { destinationAccount: '{{$value.account_number}}', resolvedName: '{{$value.account_name}}' } }] 
+                        },
+                        { name: 'destinationAccount', label: 'Account Number', type: 'number', required: true, 
+                          events: [{ trigger: 'onBlur', action: 'EXECUTE_ENDPOINT', endpointId: 'enquiry', mappingConfig: { resolvedName: '{{$response.account_name}}' } }] 
+                        },
+                        { name: 'resolvedName', label: 'Account Name', type: 'text', required: true, placeholder: 'Will be resolved automatically' },
+                        { name: 'amount', label: 'Amount', type: 'number', required: true },
+                        { name: 'narration', label: 'Narration / Description', type: 'text', required: false }
+                    ]
+                },
+                {
+                    id: 'svc_inter',
+                    name: 'Transfer to Other Banks',
+                    category: 'cat_transfers',
+                    provider_service_code: 'INTER',
+                    service_intent: 'transfer_interbank',
+                    fee_type: 'flat',
+                    fee_value: 10,
+                    status: 'active',
+                    form_schema: [
+                        { name: 'beneficiary_id', label: 'Select Beneficiary', type: 'beneficiary_select', required: true, 
+                          events: [{ trigger: 'onChange', action: 'SET_VALUES', mappingConfig: { destinationAccount: '{{$value.account_number}}', resolvedName: '{{$value.account_name}}', bankCode: '{{$value.bank_code}}' } }] 
+                        },
+                        { name: 'bankCode', label: 'Destination Bank', type: 'destination_bank_lookup', required: true },
+                        { name: 'destinationAccount', label: 'Account Number', type: 'number', required: true, 
+                          events: [{ trigger: 'onBlur', action: 'EXECUTE_ENDPOINT', endpointId: 'enquiry', mappingConfig: { resolvedName: '{{$response.account_name}}' } }] 
+                        },
+                        { name: 'resolvedName', label: 'Account Name', type: 'text', required: true, placeholder: 'Will be resolved automatically' },
+                        { name: 'amount', label: 'Amount', type: 'number', required: true },
+                        { name: 'narration', label: 'Narration', type: 'text' }
+                    ]
+                }
+            ] as any[];
+        }
+        return [];
+    },
+    getAllServices: async () => {
+        await delay(300);
+        return [];
+    },
+    getServiceById: async (id) => {
+        await delay(350);
+        return null;
+    },
+    createServiceCategory: async (data) => {
+        await delay(400);
+        return { ...data, id: `scat_${Date.now()}`, created_at: new Date().toISOString() } as any;
+    },
+    updateServiceCategory: async (id, data) => {
+        await delay(400);
+        return { id, ...data } as any;
+    },
+    deleteServiceCategory: async (id) => {
+        await delay(300);
+        return true;
+    },
+    createService: async (data) => {
+        await delay(400);
+        return { ...data, id: `svc_${Date.now()}`, created_at: new Date().toISOString() } as any;
+    },
+    updateService: async (id, data) => {
+        await delay(400);
+        return { id, ...data } as any;
+    },
+    deleteService: async (id) => {
+        await delay(300);
+        return true;
+    },
+    executeServiceWorkflow: async (serviceId, formData) => {
+        await delay(800);
+        return `exec_${Date.now()}`;
+    },
+    validateServiceWorkflow: async (serviceId, formData) => {
+        await delay(400);
+        return { valid: true };
+    },
+    getWorkflowExecutionById: async (executionId) => {
+        await delay(300);
+        return { id: executionId, status: 'completed' };
+    },
+
+    // Workflows
+    getWorkflows: async () => {
+        await delay(300);
+        return { docs: [] };
+    },
+
+    // Settings
+    getConfigsByCategory: async (category) => {
+        await delay(300);
+        return MOCK_CONFIGS.filter(c => c.category === category);
+    },
+
+    // Global CMS
+    getPageBySlug: async (slug) => {
+        await delay(200);
+        return null; // Mock returns null for pages to fallback to standard routing for now
+    },
+
+    getPromotions: async (placement) => {
+        await delay(200);
+        return [
+            {
+                id: 'dummy_promo_1',
+                title: '5% Cash Back on Business Loans',
+                description: 'Apply for a business loan this month and get 5% cash back on your first repayment.',
+                image: { url: 'https://images.unsplash.com/photo-1556742049-0cfed4f6a45d?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=800&q=80' },
+                link: '/business',
+                isActive: true,
+                placement: 'hero',
+                createdAt: new Date().toISOString(),
+                updatedAt: new Date().toISOString()
+            },
+            {
+                id: 'dummy_promo_2',
+                title: 'High Yield Savings',
+                description: 'Earn up to 10% per annum with our secure fixed deposit accounts.',
+                image: { url: 'https://images.unsplash.com/photo-1601597111158-2fceff292cdc?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=800&q=80' },
+                link: '/personal-banking',
+                isActive: true,
+                placement: 'hero',
+                createdAt: new Date().toISOString(),
+                updatedAt: new Date().toISOString()
+            }
+        ].filter(p => placement ? p.placement === placement : true) as any[];
+    },
+
+    createPromotion: async (data) => {
+        await delay(500);
+        return {
+            ...data,
+            id: `promo_${Date.now()}`,
+            createdAt: new Date().toISOString(),
+            updatedAt: new Date().toISOString()
+        } as any;
+    },
+
+    updatePromotion: async (id, data) => {
+        await delay(500);
+        return { id, ...data, updatedAt: new Date().toISOString() } as any;
+    },
+
+    deletePromotion: async (id) => {
+        await delay(400);
+        return true;
+    },
+
+    // Blog
+    getBlogPosts: async () => {
+        await delay(300);
+        return MOCK_POSTS;
+    },
+
+    getBlogPostBySlug: async (slug) => {
+        return MOCK_POSTS.find(p => p.slug === slug) || undefined;
+    },
+
+    getFeaturedPosts: async () => {
+        await delay(200);
+        return MOCK_POSTS.filter((p) => p.featured);
+    },
+
+    getPostsByCategory: async (categorySlug) => {
+        await delay(300);
+        const normalizedSlug = categorySlug.toLowerCase().replace(/-/g, ' ');
+        return MOCK_POSTS.filter((p) =>
+            p.category.toLowerCase().includes(normalizedSlug) ||
+            normalizedSlug.includes(p.category.toLowerCase())
+        );
+    },
+
+    getPopularPosts: async () => {
+        await delay(200);
+        return MOCK_POSTS.slice(0, 3);
+    },
+
+    getAllTags: async () => {
+        await delay(100);
+        const tags = new Set<string>();
+        MOCK_POSTS.forEach((post: any) => {
+            post.tags.forEach((tag: string) => tags.add(tag));
+        });
+        return Array.from(tags);
+    },
+
+    // Careers
+    getOpenPositions: async () => {
+        await delay(500);
+        return MOCK_JOBS;
+    },
+
+    // Account Officers
+    getAllAccountOfficers: async () => {
+        await delay(300);
+        return [];
+    },
+    linkOfficerToUser: async (officerId: string, userId: string) => {
+        await delay(500);
+        return true;
+    },
+
+    // Beneficiaries
+    getUserBeneficiaries: async (userId) => {
+        await delay(400);
+        return [];
+    },
+
+    getBeneficiaryById: async (id) => {
+        await delay(300);
+        return null;
+    },
+
+    saveBeneficiary: async (data) => {
+        await delay(500);
+        return {
+            ...data,
+            id: `ben_${Date.now()}`,
+            created_at: new Date().toISOString(),
+            updated_at: new Date().toISOString()
+        } as any;
+    },
+
+    deleteBeneficiary: async (id, userId) => {
+        await delay(400);
+        return true;
+    },
+
+    // Site Settings
+    getSiteSettings: async () => {
+        await delay(300);
+        return {
+            siteTitle: 'ABIASMEMFB',
+            sync: {
+                baselineAccounts: [{ accountNumber: '0123456789' }],
+                autoDiscoveryEnabled: true,
+                customerLookupEndpoint: 'dummy-ep-1',
+                accountEnquiryEndpoint: 'dummy-ep-2',
+                customerAccountsEndpoint: 'dummy-ep-3'
+            }
+        };
+    },
+
+    updateSiteSettings: async (data) => {
+        await delay(500);
+        return data as any;
+    },
+
+    // Endpoints
+    getAllEndpoints: async () => {
+        await delay(400);
+        return [
+            { id: 'dummy-ep-1', name: 'Standard Customer Lookup' },
+            { id: 'dummy-ep-2', name: 'General Account Enquiry' },
+            { id: 'dummy-ep-3', name: 'Customer Accounts Discovery' }
+        ];
+    },
+
+    // Merge & Reconciliation
+    mergeCustomers: async (params) => {
+        await delay(1500);
+        return { success: true, mergedRecords: 1, archivedIds: ['merged_dummy_id'] };
+    },
+    getQoreAccounts: async () => {
+        await delay(800);
+        return [
+            { AccountNo: '1234567890', AccountType: '10', AvailableBalance: '50000.00', Status: 'Active' },
+            { AccountNo: '0987654321', AccountType: '20', AvailableBalance: '150000.00', Status: 'Active' }
+        ];
+    },
+    unlinkCustomer: async (id) => {
+        await delay(800);
+        return MOCK_CUSTOMERS[0];
+    },
+    getUserStandingOrders: async (userId) => {
+        await delay(400);
+        return [];
+    },
+    createStandingOrder: async (data) => {
+        await delay(400);
+        return {
+            id: 'dummy-so-1',
+            ...data,
+            created_at: new Date().toISOString(),
+        } as any;
+    },
+    updateStandingOrder: async (id, data) => {
+        await delay(400);
+        return {
+            id,
+            ...data,
+            created_at: new Date().toISOString(),
+        } as any;
+    },
+    deleteStandingOrder: async (id) => {
+        await delay(400);
+        return true;
+    },
+    getInvoices: async (merchantId) => {
+        await delay(400);
+        return [
+            {
+                id: 'inv_1',
+                user_id: merchantId,
+                client_name: 'Tech Solutions Inc.',
+                amount: 150000,
+                status: 'paid',
+                issue_date: new Date().toISOString(),
+                created_at: new Date().toISOString()
+            },
+            {
+                id: 'inv_2',
+                user_id: merchantId,
+                client_name: 'Acme Corp',
+                amount: 75000,
+                status: 'unpaid',
+                issue_date: new Date().toISOString(),
+                created_at: new Date().toISOString()
+            }
+        ];
+    },
+    createInvoice: async (data) => {
+        await delay(400);
+        return {
+            ...data,
+            id: `inv_${Date.now()}`,
+            created_at: new Date().toISOString()
+        } as any;
+    },
+    updateInvoice: async (id, data) => {
+        await delay(400);
+        return {
+            id,
+            ...data,
+            created_at: new Date().toISOString()
+        } as any;
+    },
+    deleteInvoice: async (id) => {
+        await delay(400);
+        return true;
+    }
+};

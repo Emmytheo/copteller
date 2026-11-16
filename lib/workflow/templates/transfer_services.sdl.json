@@ -1,0 +1,228 @@
+{
+    "version": "1.1.1",
+    "description": "Harmonized Transfer Services with Event-Driven Beneficiary Selection",
+    "products": [],
+    "services": [
+        {
+            "name": "Intra-Bank Funds Transfer",
+            "categorySlug": "transfers",
+            "provider_service_code": "QORE-INTRA-TRF",
+            "service_intent": "transfer_intra",
+            "execution_workflow_slug": "Intra-Account Transfer",
+            "fee_type": "none",
+            "fee_value": 0,
+            "status": "active",
+            "form_schema": [
+                {
+                    "id": "beneficiary_id",
+                    "name": "beneficiary_id",
+                    "label": "Select Saved Beneficiary",
+                    "type": "beneficiary_select",
+                    "required": false,
+                    "events": [
+                        {
+                            "trigger": "onChange",
+                            "action": "SET_VALUES",
+                            "mappingConfig": {
+                                "destination_account": "{{$value.account_number}}",
+                                "destination_name": "{{$value.account_name}}"
+                            }
+                        }
+                    ]
+                },
+                {
+                    "id": "destination_account",
+                    "name": "destination_account",
+                    "label": "Target Account Number",
+                    "type": "text",
+                    "required": true,
+                    "placeholder": "Enter 10-digit ABIASMEMFB Account",
+                    "events": [
+                        {
+                            "trigger": "onCondition",
+                            "condition": { "type": "length", "value": 10 },
+                            "action": "EXECUTE_ENDPOINT",
+                            "endpointId": 2,
+                            "mappingConfig": {
+                                "AccountName": "destination_name"
+                            }
+                        }
+                    ]
+                },
+                {
+                    "id": "destination_name",
+                    "name": "destination_name",
+                    "label": "Verified Account Name",
+                    "type": "text",
+                    "required": true,
+                    "placeholder": "Auto-verifying..."
+                },
+                {
+                    "id": "amount",
+                    "name": "amount",
+                    "label": "Transfer Amount",
+                    "type": "number",
+                    "required": true
+                },
+                {
+                    "id": "narration",
+                    "name": "narration",
+                    "label": "Transaction Narration",
+                    "type": "text",
+                    "required": true,
+                    "placeholder": "e.g. Lunch with the team"
+                }
+            ]
+        },
+        {
+            "name": "Inter-Bank Funds Transfer (NIP)",
+            "categorySlug": "transfers",
+            "provider_service_code": "QORE-NIP-TRF",
+            "service_intent": "transfer_interbank",
+            "execution_workflow_slug": "Interbank Transfer",
+            "fee_type": "flat",
+            "fee_value": 50,
+            "status": "active",
+            "form_schema": [
+                {
+                    "id": "beneficiary_id",
+                    "name": "beneficiary_id",
+                    "label": "Select Saved Beneficiary",
+                    "type": "beneficiary_select",
+                    "required": false,
+                    "events": [
+                        {
+                            "trigger": "onChange",
+                            "action": "SET_VALUES",
+                            "mappingConfig": {
+                                "destination_account": "{{$value.account_number}}",
+                                "destination_bank_code": "{{$value.bank_code}}",
+                                "destination_name": "{{$value.account_name}}"
+                            }
+                        }
+                    ]
+                },
+                {
+                    "id": "destination_bank_code",
+                    "name": "destination_bank_code",
+                    "label": "Destination Bank",
+                    "type": "api_select",
+                    "options_endpoint": 36,
+                    "options_text_key": "BankName",
+                    "options_value_key": "BankCode",
+                    "options_data_path": "CommercialBanks",
+                    "required": true
+                },
+                {
+                    "id": "destination_account",
+                    "name": "destination_account",
+                    "label": "Target Account Number",
+                    "type": "text",
+                    "required": true,
+                    "placeholder": "Enter 10-digit Account Number",
+                    "events": [
+                        {
+                            "trigger": "onCondition",
+                            "condition": { "type": "length", "value": 10 },
+                            "action": "EXECUTE_ENDPOINT",
+                            "endpointId": 37,
+                            "mappingConfig": {
+                                "AccountName": "destination_name"
+                            }
+                        }
+                    ]
+                },
+                {
+                    "id": "destination_name",
+                    "name": "destination_name",
+                    "label": "Verified Account Name",
+                    "type": "text",
+                    "required": true,
+                    "placeholder": "Auto-verified name"
+                },
+                {
+                    "id": "amount",
+                    "name": "amount",
+                    "label": "Transfer Amount",
+                    "type": "number",
+                    "required": true
+                },
+                {
+                    "id": "narration",
+                    "name": "narration",
+                    "label": "Transaction Narration",
+                    "type": "text",
+                    "required": true,
+                    "placeholder": "e.g. Supplier payment"
+                }
+            ]
+        },
+        {
+            "name": "International Wire Transfer (SWIFT)",
+            "categorySlug": "transfers",
+            "provider_service_code": "QORE-SWIFT-TRF",
+            "service_intent": "transfer_international",
+            "execution_workflow_slug": "International Transfer",
+            "fee_type": "percentage",
+            "fee_value": 0.5,
+            "status": "active",
+            "form_schema": [
+                {
+                    "id": "beneficiary_id",
+                    "name": "beneficiary_id",
+                    "label": "Select Saved Beneficiary",
+                    "type": "beneficiary_select",
+                    "required": false,
+                    "events": [
+                        {
+                            "trigger": "onChange",
+                            "action": "SET_VALUES",
+                            "mappingConfig": {
+                                "destination_account": "{{$value.account_number}}",
+                                "swift_code": "{{$value.swift_code}}",
+                                "destination_name": "{{$value.account_name}}",
+                                "country": "{{$value.country}}"
+                            }
+                        }
+                    ]
+                },
+                {
+                    "id": "destination_name",
+                    "name": "destination_name",
+                    "label": "Beneficiary Full Name",
+                    "type": "text",
+                    "required": true
+                },
+                {
+                    "id": "destination_account",
+                    "name": "destination_account",
+                    "label": "IBAN / Account Number",
+                    "type": "text",
+                    "required": true
+                },
+                {
+                    "id": "swift_code",
+                    "name": "swift_code",
+                    "label": "SWIFT / BIC Code",
+                    "type": "text",
+                    "required": true
+                },
+                {
+                    "id": "country",
+                    "name": "country",
+                    "label": "Destination Country",
+                    "type": "text",
+                    "required": true,
+                    "placeholder": "e.g. US, GB, DE"
+                },
+                {
+                    "id": "amount",
+                    "name": "amount",
+                    "label": "Amount (USD/GBP/EUR)",
+                    "type": "number",
+                    "required": true
+                }
+            ]
+        }
+    ]
+}
