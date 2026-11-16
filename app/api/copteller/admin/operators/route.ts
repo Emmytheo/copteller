@@ -1,6 +1,6 @@
 import { getDb } from '@/lib/copteller/db'
 import { NextRequest, NextResponse } from 'next/server'
-import { getCoptellerAuth } from '@/lib/copteller/auth'
+import { requireCoptellerRole } from '@/lib/copteller/auth'
 import { getMemberships } from '@/lib/copteller/db'
 export const FALLBACK_OPERATORS = [
     {
@@ -180,7 +180,7 @@ export const FALLBACK_OPERATORS = [
 ]
 
 export async function GET(req: NextRequest) {
-    const auth = await getCoptellerAuth(req)
+    const auth = await requireCoptellerRole(req, ['coop_admin', 'superadmin', 'bank_staff'])
     if (auth instanceof NextResponse) return auth
 
     const fetchOperators = async () => {
@@ -368,7 +368,7 @@ export async function GET(req: NextRequest) {
 }
 
 export async function POST(req: NextRequest) {
-    const auth = await getCoptellerAuth(req)
+    const auth = await requireCoptellerRole(req, ['coop_admin', 'superadmin', 'bank_staff'])
     if (auth instanceof NextResponse) return auth
 
     try {
@@ -502,7 +502,7 @@ export async function POST(req: NextRequest) {
  * Updates a member's status (active/suspended/exited) or KYC tier in database
  */
 export async function PATCH(req: NextRequest) {
-    const auth = await getCoptellerAuth(req)
+    const auth = await requireCoptellerRole(req, ['coop_admin', 'superadmin', 'bank_staff'])
     if (auth instanceof NextResponse) return auth
 
     try {

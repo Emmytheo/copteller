@@ -38,25 +38,6 @@ export async function GET(req: NextRequest) {
             }
         }
 
-        // Ensure Institutional Partner profile is always available in profile scope switcher
-        const hasPartner = profiles.some((p: any) => p.role === 'partner')
-        if (!hasPartner) {
-            profiles.push({
-                id: `prof_partner_${auth.userId ? auth.userId.slice(0, 8) : 'desk'}`,
-                user_id: auth.userId,
-                role: 'partner',
-                display_name: 'Institutional Partner (ABSHIA / Agencies)',
-                cooperative_id: null,
-                cooperative_name: 'Abia Parastatals & Development Desk',
-                avatar_url: null,
-                is_active: true,
-                onboarding_done: true,
-                metadata: { partner_slug: 'abshia' },
-                created_at: new Date().toISOString(),
-                updated_at: new Date().toISOString(),
-            } as any)
-        }
-        
         return NextResponse.json({ success: true, profiles })
     }
 
@@ -187,22 +168,25 @@ export async function POST(req: NextRequest) {
             return NextResponse.json({ error: 'role is required' }, { status: 400 })
         }
 
-        const validRoles: CoptellerRole[] = ['member', 'coop_admin', 'investor', 'superadmin', 'bank_staff']
+        const validRoles: CoptellerRole[] = ['member', 'coop_admin', 'investor', 'partner', 'superadmin', 'bank_staff']
         if (!validRoles.includes(role)) {
             return NextResponse.json({ error: `Invalid role: ${role}` }, { status: 400 })
         }
 
-        // Restrict superadmin and bank_staff roles using ADMIN_SECRET or existing metadata roles
-        if (role === 'superadmin' || role === 'bank_staff') {
-            const systemSecret = process.env.COPTELLER_ADMIN_SECRET || process.env.ADMIN_SECRET || 'password'
-            const isAuthorized = auth.role === 'superadmin' || auth.role === 'bank_staff' || (admin_secret && admin_secret === systemSecret)
+        // Restrict partner, superadmin, and bank_staff roles using ADMIN_SECRET or existing staff privileges
+        if (role === 'partner' || role === 'superadmin' || role === 'bank_staff') {
+            const systemSecret = process.env.COPTELLER_ADMIN_SECRET || process.env.ADMIN_SECRET
+            const isAuthorized =
+                auth.role === 'superadmin' ||
+                auth.role === 'bank_staff' ||
+                Boolean(systemSecret && admin_secret && admin_secret === systemSecret)
             
             if (!isAuthorized) {
-                return NextResponse.json({ error: 'Access denied. A valid Admin Secret is required to elevate to this staff role.' }, { status: 403 })
+                return NextResponse.json({ error: 'Access denied. A valid Admin Secret is required to activate this institutional or staff role.' }, { status: 403 })
             }
 
-            // Elevate role permanently in Supabase auth metadata
-            if (admin_secret && admin_secret === systemSecret && auth.role !== role) {
+            // Elevate role permanently in Supabase auth metadata when provisioned with secret
+            if (systemSecret && admin_secret && admin_secret === systemSecret && auth.role !== role) {
                 try {
                     const { createCoptellerAdminClient } = require('@/lib/copteller/supabase/admin')
                     const adminClient = createCoptellerAdminClient()
@@ -219,7 +203,7 @@ export async function POST(req: NextRequest) {
             display_name: display_name || auth.displayName,
             cooperative_id,
             cooperative_name,
-            onboarding_done: (role === 'superadmin' || role === 'bank_staff') ? true : undefined,
+            onboarding_done: (role === 'partner' || role === 'superadmin' || role === 'bank_staff') ? true : undefined,
         })
 
         if (!profile) {

@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server"
-import { getCoptellerAuth } from "@/lib/copteller/auth"
+import { requireCoptellerRole } from "@/lib/copteller/auth"
 import { INSTITUTIONAL_PARTNERS } from "@/lib/data/partner-directory"
 
 export const dynamic = 'force-dynamic'
@@ -145,7 +145,7 @@ let SETTLEMENT_LEDGER: SettlementLedgerEntry[] = [
 
 export async function GET(req: NextRequest) {
     try {
-        const auth = await getCoptellerAuth(req)
+        const auth = await requireCoptellerRole(req, ['partner', 'superadmin', 'bank_staff'])
         if (auth instanceof NextResponse) return auth
 
         const { searchParams } = new URL(req.url)
@@ -207,7 +207,7 @@ export async function GET(req: NextRequest) {
 
 export async function POST(req: NextRequest) {
     try {
-        const auth = await getCoptellerAuth(req)
+        const auth = await requireCoptellerRole(req, ['partner', 'superadmin', 'bank_staff'])
         if (auth instanceof NextResponse) return auth
 
         const body = await req.json().catch(() => ({}))

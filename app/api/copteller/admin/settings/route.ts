@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { getCoptellerAuth } from '@/lib/copteller/auth'
+import { requireCoptellerRole } from '@/lib/copteller/auth'
 import { queryCopteller } from '@/lib/copteller/pg'
 
 export const dynamic = 'force-dynamic'
@@ -10,7 +10,7 @@ export const dynamic = 'force-dynamic'
  */
 export async function GET(req: NextRequest) {
     try {
-        const auth = await getCoptellerAuth(req)
+        const auth = await requireCoptellerRole(req, ['coop_admin', 'superadmin', 'bank_staff'])
         if (auth instanceof NextResponse) return auth
 
         const coopRes = await queryCopteller(`
@@ -47,7 +47,7 @@ export async function GET(req: NextRequest) {
  */
 export async function PATCH(req: NextRequest) {
     try {
-        const auth = await getCoptellerAuth(req)
+        const auth = await requireCoptellerRole(req, ['coop_admin', 'superadmin', 'bank_staff'])
         if (auth instanceof NextResponse) return auth
 
         const body = await req.json()

@@ -309,10 +309,10 @@ export default function SelectProfilePage() {
                 <div className="flex flex-col sm:flex-row items-center gap-3 pt-2">
                     <Button
                         onClick={() => {
-                            // Find first available role to set as default
+                            // Find first available self-service role to set as default
                             const existing = profiles.map(p => p.role)
                             const firstAvail = (Object.keys(ROLE_CONFIG) as CoptellerRole[]).find(
-                                r => !existing.includes(r) && r !== 'superadmin' && r !== 'bank_staff'
+                                r => !existing.includes(r) && r !== 'partner' && r !== 'superadmin' && r !== 'bank_staff'
                             )
                             if (firstAvail) setNewRole(firstAvail)
                             setShowAddProfile(true)
@@ -354,7 +354,7 @@ export default function SelectProfilePage() {
                                     <label className="block text-[10px] font-black uppercase tracking-wider text-muted-foreground mb-1.5">Select Role</label>
                                     <div className="grid grid-cols-1 gap-2">
                                         {(Object.keys(ROLE_CONFIG) as CoptellerRole[])
-                                            .filter(r => showStaffAccess || (r !== 'superadmin' && r !== 'bank_staff'))
+                                            .filter(r => showStaffAccess || (r !== 'partner' && r !== 'superadmin' && r !== 'bank_staff'))
                                             .map(r => {
                                                 const cfg = ROLE_CONFIG[r]
                                                 const hasRole = profiles.some(p => p.role === r)
@@ -387,7 +387,7 @@ export default function SelectProfilePage() {
                                         onClick={() => {
                                             const nextVal = !showStaffAccess
                                             setShowStaffAccess(nextVal)
-                                            if (!nextVal && (newRole === 'superadmin' || newRole === 'bank_staff')) {
+                                            if (!nextVal && (newRole === 'partner' || newRole === 'superadmin' || newRole === 'bank_staff')) {
                                                 setNewRole('member')
                                             }
                                         }}

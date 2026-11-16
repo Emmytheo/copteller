@@ -52,12 +52,20 @@ export { getProfilesForUser, createProfileForUser } from '@/lib/copteller/supaba
  *   3. Fallback: 'member'
  */
 export async function getCoptellerAuth(req: NextRequest): Promise<CoptellerAuthContext | NextResponse> {
+    const internalSecret = req.headers.get('x-copteller-internal-secret')
+    const hasVerifiedInternalSecret = Boolean(
+        internalSecret &&
+        process.env.ADMIN_SECRET &&
+        internalSecret === process.env.ADMIN_SECRET
+    )
+
     const headerUserId = req.headers.get('x-copteller-user-id')
     let userId = headerUserId
     let email = req.headers.get('x-copteller-user-email') || ''
     let displayName = req.headers.get('x-copteller-user-name') || email
+    let verifiedMetadataRole: CoptellerRole | undefined = undefined
 
-    if (!userId) {
+    if (!userId || !hasVerifiedInternalSecret) {
         const supabase = await createCoptellerServerClient()
         const { data: { user }, error } = await supabase.auth.getUser()
 
@@ -70,12 +78,21 @@ export async function getCoptellerAuth(req: NextRequest): Promise<CoptellerAuthC
         userId = user.id
         email = user.email || ''
         displayName = user.user_metadata?.full_name || user.email
+        const rawMetaRole = String(user.user_metadata?.role || '').toLowerCase()
+        if (rawMetaRole === 'superadmin' || rawMetaRole === 'bank_staff') {
+            verifiedMetadataRole = ROLE_ALIASES[rawMetaRole]
+        }
+    } else {
+        const headerRole = req.headers.get('x-copteller-user-role')
+        if (headerRole && ROLE_ALIASES[headerRole]) {
+            verifiedMetadataRole = ROLE_ALIASES[headerRole]
+        }
     }
 
     // Check for an active profile header or cookie
     const profileId = req.headers.get('x-copteller-profile-id') || req.cookies.get('copteller_profile_id')?.value
 
-    let role: CoptellerRole = (req.headers.get('x-copteller-user-role') as CoptellerRole) || 'member'
+    let role: CoptellerRole = verifiedMetadataRole || 'member'
     let activeProfileId: string | undefined
     let cooperativeId: string | undefined
     let cooperativeName: string | undefined
@@ -83,7 +100,7 @@ export async function getCoptellerAuth(req: NextRequest): Promise<CoptellerAuthC
     const profiles = await getProfilesForUser(userId)
 
     if (profileId) {
-        // Resolve the specific profile chosen by the user
+        // Resolve the specific profile ONLY if it belongs to this authenticated user in DB
         const activeProfile = profiles.find(p => p.id === profileId)
         if (activeProfile) {
             role = activeProfile.role
@@ -93,71 +110,31 @@ export async function getCoptellerAuth(req: NextRequest): Promise<CoptellerAuthC
             displayName = activeProfile.display_name ?? displayName
         }
     }
-    
-    // If not matched or active role is still default, check referer/route context
-    if (!activeProfileId || role === 'member') {
+
+    // Route-context matching: ONLY switch into a workspace role the user ACTUALLY owns in DB
+    if (!activeProfileId) {
         const referer = req.headers.get('referer') || ''
-        if (referer.includes('/copteller/admin')) {
-            const p = profiles.find(pr => pr.role === 'coop_admin')
-            if (p) {
-                role = p.role
-                activeProfileId = p.id
-                cooperativeId = p.cooperative_id ?? undefined
-                cooperativeName = p.cooperative_name ?? undefined
-                displayName = p.display_name ?? displayName
-            } else {
-                role = 'coop_admin'
-                cooperativeName = 'Abia State Tricycle Operators Association (ASTOA)'
-                displayName = displayName || 'Cooperative Administrator'
-            }
-        } else if (referer.includes('/copteller/superadmin')) {
-            const p = profiles.find(pr => pr.role === 'superadmin')
-            if (p) {
-                role = p.role
-                activeProfileId = p.id
-                displayName = p.display_name ?? displayName
-            } else {
-                role = 'superadmin'
-                displayName = displayName || 'Bank Superadmin'
-            }
-        } else if (referer.includes('/copteller/investor')) {
-            const p = profiles.find(pr => pr.role === 'investor')
-            if (p) {
-                role = p.role
-                activeProfileId = p.id
-                displayName = p.display_name ?? displayName
-            } else {
-                role = 'investor'
-                displayName = displayName || 'Scheme Investor'
-            }
-        } else if (referer.includes('/copteller/partner')) {
-            const p = profiles.find(pr => pr.role === 'partner')
-            if (p) {
-                role = p.role
-                activeProfileId = p.id
-                displayName = p.display_name ?? displayName
-            } else {
-                role = 'partner'
-                displayName = 'Institutional Partner Desk'
-            }
+        const findOwned = (roles: CoptellerRole[]) => profiles.find(pr => roles.includes(pr.role))
+
+        const routeProfile = referer.includes('/copteller/superadmin')
+            ? findOwned(['superadmin', 'bank_staff'])
+            : referer.includes('/copteller/partner')
+                ? findOwned(['partner', 'superadmin', 'bank_staff'])
+                : referer.includes('/copteller/admin')
+                    ? findOwned(['coop_admin', 'superadmin', 'bank_staff'])
+                    : referer.includes('/copteller/investor')
+                        ? findOwned(['investor', 'superadmin', 'bank_staff'])
+                        : undefined
+
+        const resolvedProfile = routeProfile || findOwned(['member']) || profiles[0]
+        if (resolvedProfile) {
+            role = resolvedProfile.role
+            activeProfileId = resolvedProfile.id
+            cooperativeId = resolvedProfile.cooperative_id ?? undefined
+            cooperativeName = resolvedProfile.cooperative_name ?? undefined
+            displayName = resolvedProfile.display_name ?? displayName
         } else {
-            const memberProfile = profiles.find(pr => pr.role === 'member')
-            if (memberProfile) {
-                role = memberProfile.role
-                activeProfileId = memberProfile.id
-                cooperativeId = memberProfile.cooperative_id ?? undefined
-                cooperativeName = memberProfile.cooperative_name ?? undefined
-                displayName = memberProfile.display_name ?? displayName
-            } else if (profiles.length > 0) {
-                const firstProfile = profiles[0]
-                role = firstProfile.role
-                activeProfileId = firstProfile.id
-                cooperativeId = firstProfile.cooperative_id ?? undefined
-                cooperativeName = firstProfile.cooperative_name ?? undefined
-                displayName = firstProfile.display_name ?? displayName
-            } else {
-                role = role || 'member'
-            }
+            role = verifiedMetadataRole || 'member'
         }
     }
 

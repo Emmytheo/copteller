@@ -97,24 +97,7 @@ export function ScopeProvider({
       const profiles: any[] = (data.profiles || []).filter((p: any) => p.is_active);
 
       if (profiles.length > 0) {
-        let mapped = buildScopesFromProfiles(profiles);
-
-        // If visiting admin route without an explicit coop_admin profile, provide fallback admin scope
-        if (pathname.startsWith('/copteller/admin') && !mapped.some((s) => s.role === 'coop_admin')) {
-          mapped = [
-            {
-              id: 'admin_synth_profile',
-              type: 'coop_admin' as ScopeType,
-              name: 'Cooperative Admin',
-              description: 'ASTOA Union Administration',
-              icon: ROLE_ICON.coop_admin || Users,
-              role: 'coop_admin',
-              cooperativeName: 'Abia State Tricycle Operators Association (ASTOA)',
-              onboarding_done: true,
-            },
-            ...mapped
-          ];
-        }
+        const mapped = buildScopesFromProfiles(profiles);
 
         setScopes(mapped);
 

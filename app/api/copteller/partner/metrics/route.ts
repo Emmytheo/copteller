@@ -1,12 +1,12 @@
 import { NextRequest, NextResponse } from "next/server"
-import { getCoptellerAuth } from "@/lib/copteller/auth"
+import { requireCoptellerRole } from "@/lib/copteller/auth"
 import { INSTITUTIONAL_PARTNERS, ACCREDITED_PROVIDERS } from "@/lib/data/partner-directory"
 
 export const dynamic = 'force-dynamic'
 
 export async function GET(req: NextRequest) {
     try {
-        const auth = await getCoptellerAuth(req)
+        const auth = await requireCoptellerRole(req, ['partner', 'superadmin', 'bank_staff'])
         if (auth instanceof NextResponse) return auth
 
         const { searchParams } = new URL(req.url)

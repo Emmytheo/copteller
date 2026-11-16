@@ -124,5 +124,6 @@ export async function createProfileForUser(
         console.error('[Copteller Admin] createProfileForUser error:', error)
         return null
     }
+    profileCache.delete(userId)
     return data as CoptellerProfileRow
 }

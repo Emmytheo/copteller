@@ -324,6 +324,57 @@ function MobilePortalBottomNav() {
     )
 }
 
+const PORTAL_DASHBOARD: Record<string, string> = {
+    member: '/copteller/dashboard',
+    coop_admin: '/copteller/admin',
+    admin: '/copteller/admin',
+    investor: '/copteller/investor',
+    partner: '/copteller/partner',
+    superadmin: '/copteller/superadmin',
+    bank_staff: '/copteller/superadmin',
+}
+
+function getRequiredRolesForPath(pathname: string): string[] | null {
+    if (pathname.startsWith('/copteller/superadmin')) return ['superadmin', 'bank_staff']
+    if (pathname.startsWith('/copteller/partner')) return ['partner', 'superadmin', 'bank_staff']
+    if (pathname.startsWith('/copteller/admin')) return ['coop_admin', 'admin', 'superadmin', 'bank_staff']
+    if (pathname.startsWith('/copteller/investor')) return ['investor', 'superadmin', 'bank_staff']
+    return null
+}
+
+function PortalRoleGuard({ children }: { children: React.ReactNode }) {
+    const pathname = usePathname()
+    const router = useRouter()
+    const { scopes, activeScope, isLoadingScopes } = useScope()
+
+    const requiredRoles = getRequiredRolesForPath(pathname)
+    const ownedRoles = scopes.map(s => s.role).filter(Boolean) as string[]
+    const isAuthorized = !requiredRoles || requiredRoles.some(r => ownedRoles.includes(r))
+
+    React.useEffect(() => {
+        if (isLoadingScopes) return
+        if (!isAuthorized) {
+            const fallbackRole = activeScope?.role && PORTAL_DASHBOARD[activeScope.role]
+                ? activeScope.role
+                : ownedRoles[0]
+            router.replace((fallbackRole && PORTAL_DASHBOARD[fallbackRole]) || '/copteller/onboarding')
+        }
+    }, [isLoadingScopes, isAuthorized, activeScope, ownedRoles, router])
+
+    if (requiredRoles && (isLoadingScopes || !isAuthorized)) {
+        return (
+            <div className="min-h-[60vh] flex flex-col items-center justify-center p-6 text-center space-y-2">
+                <ShieldCheck className="h-8 w-8 text-emerald-500 animate-pulse" />
+                <p className="text-xs font-black uppercase tracking-widest text-muted-foreground">
+                    {isLoadingScopes ? 'Verifying workspace permissions...' : 'Redirecting to your authorized workspace...'}
+                </p>
+            </div>
+        )
+    }
+
+    return <>{children}</>
+}
+
 export default function CoptellerPortalLayout({
     children,
 }: {
@@ -383,7 +434,9 @@ export default function CoptellerPortalLayout({
 
                         {/* Dashboard content wrapper */}
                         <main className="flex-1 overflow-x-hidden overflow-y-auto relative pb-24 md:pb-6">
-                            {children}
+                            <PortalRoleGuard>
+                                {children}
+                            </PortalRoleGuard>
                         </main>
 
                         {/* Mobile bottom navigation dock */}
