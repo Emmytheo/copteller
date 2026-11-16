@@ -278,7 +278,7 @@ export default function MemberOnboardingPage() {
 
     if (authLoading) {
         return (
-            <div className="min-h-screen bg-background text-foreground flex flex-col justify-center items-center gap-4">
+            <div className="min-h-[100dvh] bg-background text-foreground flex flex-col justify-center items-center gap-4">
                 <Loader2 className="h-10 w-10 animate-spin text-emerald-500" />
                 <p className="text-muted-foreground font-semibold text-[10px] uppercase tracking-widest animate-pulse">Verifying credentials...</p>
             </div>
@@ -287,7 +287,7 @@ export default function MemberOnboardingPage() {
 
     if (!authenticated) {
         return (
-            <div className="min-h-screen bg-background text-foreground flex flex-col justify-center items-center p-6 relative font-sans selection:bg-emerald-500/20 overflow-hidden">
+            <div className="min-h-[100dvh] bg-background text-foreground flex flex-col justify-center items-center p-6 relative font-sans selection:bg-emerald-500/20 overflow-hidden">
                 <div className="pointer-events-none absolute inset-0 overflow-hidden">
                     <div className="absolute top-0 right-0 w-[500px] h-[500px] bg-emerald-500/5 rounded-full blur-[120px]" />
                     <div className="absolute bottom-0 left-0 w-[400px] h-[400px] bg-amber-500/4 rounded-full blur-[120px]" />
@@ -316,7 +316,7 @@ export default function MemberOnboardingPage() {
     }
 
     return (
-        <div className="min-h-screen bg-background text-foreground font-sans selection:bg-emerald-500/30">
+        <div className="min-h-[100dvh] bg-background text-foreground font-sans selection:bg-emerald-500/30">
             {/* Ambient */}
             <div className="pointer-events-none fixed inset-0 overflow-hidden z-0">
                 <div className="absolute top-0 right-0 w-[500px] h-[500px] bg-emerald-500/5 rounded-full blur-[120px]" />

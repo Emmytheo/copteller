@@ -170,7 +170,7 @@ export function LiquidityFlowChart({
             </div>
 
             {/* Metric Summary Strips */}
-            <div className="grid grid-cols-3 gap-2.5 sm:gap-4 p-3 rounded-2xl bg-muted/20 border border-border/50 text-xs">
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-2.5 sm:gap-4 p-3 rounded-2xl bg-muted/20 border border-border/50 text-xs">
                 <button
                     onClick={() => setActiveMetric(activeMetric === "deployed" ? "all" : "deployed")}
                     className={`p-2.5 rounded-xl text-left transition-all ${

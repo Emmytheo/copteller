@@ -192,7 +192,7 @@ export default function OperatorRosterPage() {
                                 initial={{ opacity: 0, scale: 0.95 }}
                                 animate={{ opacity: 1, scale: 1 }}
                                 exit={{ opacity: 0, scale: 0.95 }}
-                                className="bg-background border border-slate-200 dark:border-slate-800 rounded-2xl sm:rounded-3xl max-w-md w-full p-4 sm:p-6 space-y-4 shadow-2xl font-sans max-h-[90vh] overflow-y-auto"
+                                className="bg-background border border-slate-200 dark:border-slate-800 rounded-2xl sm:rounded-3xl max-w-md w-full p-4 sm:p-6 space-y-4 shadow-2xl font-sans max-h-[90dvh] overflow-y-auto"
                             >
                                 <div className="flex justify-between items-start">
                                     <div>

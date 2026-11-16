@@ -308,7 +308,7 @@ export function PrintableFormDialog({
                             initial={{ opacity: 0, scale: 0.95 }}
                             animate={{ opacity: 1, scale: 1 }}
                             exit={{ opacity: 0, scale: 0.95 }}
-                            className="bg-slate-900 border border-slate-800 rounded-3xl w-full max-w-4xl h-[90vh] flex flex-col overflow-hidden shadow-2xl"
+                            className="bg-slate-900 border border-slate-800 rounded-2xl sm:rounded-3xl w-full max-w-4xl h-[90dvh] flex flex-col overflow-hidden shadow-2xl"
                         >
                             <div className="p-4 sm:p-6 border-b border-slate-800 flex flex-wrap justify-between items-center gap-3 bg-slate-950/45">
                                 <div>

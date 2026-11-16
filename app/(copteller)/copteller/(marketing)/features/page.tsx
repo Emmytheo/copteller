@@ -142,7 +142,7 @@ export default function CoptellerFeaturesPage() {
     }, [selectedWorkflow])
 
     return (
-        <div className="bg-background text-foreground min-h-screen font-sans selection:bg-emerald-500/30 overflow-x-hidden relative">
+        <div className="bg-background text-foreground min-h-[100dvh] font-sans selection:bg-emerald-500/30 overflow-x-hidden relative">
             <div className="pointer-events-none fixed inset-0 overflow-hidden z-0">
                 <div className="absolute top-[-5%] right-[15%] w-[500px] h-[500px] bg-emerald-600/5 dark:bg-emerald-500/8 rounded-full blur-[160px]" />
                 <div className="absolute bottom-[20%] left-[10%] w-[400px] h-[400px] bg-amber-600/4 dark:bg-amber-500/6 rounded-full blur-[140px]" />

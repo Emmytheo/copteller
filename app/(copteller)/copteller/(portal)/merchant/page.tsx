@@ -464,7 +464,7 @@ export default function CoptellerMerchantPage() {
                                 initial={{ opacity: 0, y: 10 }}
                                 animate={{ opacity: 1, y: 0 }}
                                 exit={{ opacity: 0, y: -10 }}
-                                className="bg-white dark:bg-slate-950/60 border border-slate-200 dark:border-slate-900 rounded-2xl sm:rounded-3xl p-5 sm:p-6 shadow-sm space-y-4 max-h-[80vh] overflow-y-auto"
+                                className="bg-white dark:bg-slate-950/60 border border-slate-200 dark:border-slate-900 rounded-2xl sm:rounded-3xl p-5 sm:p-6 shadow-sm space-y-4 max-h-[80dvh] overflow-y-auto"
                             >
                                 <div className="flex justify-between items-start">
                                     <div>

@@ -137,7 +137,7 @@ export default function CollectionsLedgerPage() {
                                 initial={{ opacity: 0, y: 20 }} 
                                 animate={{ opacity: 1, y: 0 }} 
                                 exit={{ opacity: 0, y: 20 }} 
-                                className="relative bg-background border-t sm:border border-slate-200 dark:border-slate-800 rounded-t-[28px] sm:rounded-3xl max-w-md w-full p-5 sm:p-6 shadow-2xl z-10 max-h-[88vh] flex flex-col"
+                                className="relative bg-background border-t sm:border border-slate-200 dark:border-slate-800 rounded-t-[28px] sm:rounded-3xl max-w-md w-full p-5 sm:p-6 shadow-2xl z-10 max-h-[88dvh] flex flex-col"
                             >
                                 {/* Mobile pull handle indicator */}
                                 <div className="sm:hidden w-10 h-1 bg-slate-200 dark:bg-slate-800 rounded-full mx-auto -mt-1 mb-3 shrink-0" />

@@ -148,7 +148,7 @@ export default function CoptellerAuthPage() {
 
     if (signupSuccess) {
         return (
-            <div className="bg-background text-foreground min-h-screen flex flex-col justify-center items-center p-6 relative selection:bg-emerald-500/30">
+            <div className="bg-background text-foreground min-h-[100dvh] flex flex-col justify-center items-center p-6 relative selection:bg-emerald-500/30">
                 <div className="absolute top-0 right-0 w-96 h-96 bg-emerald-600/5 dark:bg-emerald-600/10 rounded-full blur-[100px] pointer-events-none" />
                 <motion.div
                     initial={{ opacity: 0, scale: 0.9 }}
@@ -175,19 +175,19 @@ export default function CoptellerAuthPage() {
     }
 
     return (
-        <div className="bg-background text-foreground min-h-screen flex flex-col justify-center items-center p-6 relative selection:bg-emerald-500/30 overflow-hidden">
+        <div className="bg-background text-foreground min-h-[100dvh] flex flex-col justify-between items-center p-4 sm:p-6 relative selection:bg-emerald-500/30 overflow-x-clip">
             {/* Glowing backgrounds */}
             <div className="absolute top-0 right-0 w-96 h-96 bg-emerald-600/5 dark:bg-emerald-600/10 rounded-full blur-[100px] pointer-events-none" />
             <div className="absolute bottom-0 left-0 w-96 h-96 bg-amber-600/5 dark:bg-amber-600/10 rounded-full blur-[100px] pointer-events-none" />
 
             {/* Back link */}
-            <div className="absolute top-6 left-6">
-                <Link href="/copteller" className="inline-flex items-center gap-2 text-xs font-bold text-muted-foreground hover:text-foreground transition-colors">
+            <div className="w-full max-w-md pt-1 pb-4 relative z-10">
+                <Link href="/copteller" className="inline-flex items-center gap-2 text-xs font-bold text-muted-foreground hover:text-foreground transition-colors py-1.5">
                     <ArrowLeft className="h-4 w-4" /> Back to landing
                 </Link>
             </div>
 
-            <div className="w-full max-w-md bg-slate-50 dark:bg-slate-950/40 border border-slate-200 dark:border-slate-900 rounded-3xl p-8 backdrop-blur-xl shadow-2xl space-y-6 relative">
+            <div className="w-full max-w-md bg-slate-50 dark:bg-slate-950/40 border border-slate-200 dark:border-slate-900 rounded-3xl p-5 sm:p-8 backdrop-blur-xl shadow-2xl space-y-5 sm:space-y-6 relative my-auto">
 
                 {/* Header */}
                 <div className="text-center space-y-2">
@@ -328,6 +328,7 @@ export default function CoptellerAuthPage() {
                     </Button>
                 </form>
             </div>
+            <div className="h-4 shrink-0" />
         </div>
     )
 }

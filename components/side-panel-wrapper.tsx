@@ -73,7 +73,7 @@ export function SidePanelWrapper({
                                 animate={{ y: 0, opacity: 1 }}
                                 exit={{ y: "100%", opacity: 0.5 }}
                                 transition={{ type: "spring", damping: 28, stiffness: 240 }}
-                                className="relative w-full max-w-lg bg-white dark:bg-slate-950 border-t sm:border border-slate-200 dark:border-slate-800 rounded-t-[32px] sm:rounded-[32px] p-5 sm:p-6 shadow-2xl flex flex-col max-h-[88vh] z-10"
+                                className="relative w-full max-w-lg bg-white dark:bg-slate-950 border-t sm:border border-slate-200 dark:border-slate-800 rounded-t-[28px] sm:rounded-[32px] p-4 sm:p-6 pb-[max(1.25rem,env(safe-area-inset-bottom))] shadow-2xl flex flex-col max-h-[90dvh] z-10"
                             >
                                 {/* Mobile pull handle indicator */}
                                 <div className="sm:hidden w-10 h-1 bg-slate-200 dark:bg-slate-800 rounded-full mx-auto -mt-1 mb-3 shrink-0" />

@@ -91,19 +91,23 @@ function ScopeChip() {
         router.push(DASH[scopeRole] || '/copteller/dashboard')
     }
 
+    const mobileLabel = ROLE_THEMES[role]?.badge || 'Member'
+
     return (
         <div ref={ref} className="relative">
             <button
+                type="button"
                 onClick={() => setOpen(o => !o)}
-                className={`flex items-center gap-2 px-3 py-1.5 rounded-full border text-[10px] font-black transition-all ${colors.bg} ${colors.text} shadow-sm`}
+                className={`flex items-center gap-1.5 sm:gap-2 px-2.5 sm:px-3 py-1.5 min-h-[34px] rounded-full border text-[10px] font-black transition-all ${colors.bg} ${colors.text} shadow-sm`}
             >
-                <div className={`w-1.5 h-1.5 rounded-full ${colors.dot} ${open ? '' : 'animate-pulse'}`} />
+                <div className={`w-1.5 h-1.5 rounded-full shrink-0 ${colors.dot} ${open ? '' : 'animate-pulse'}`} />
+                <span className="sm:hidden max-w-[78px] truncate">{mobileLabel}</span>
                 <span className="hidden sm:inline max-w-[140px] truncate">{activeScope.name}</span>
-                <ChevronDown className={`h-3 w-3 transition-transform ${open ? 'rotate-180' : ''}`} />
+                <ChevronDown className={`h-3 w-3 shrink-0 transition-transform ${open ? 'rotate-180' : ''}`} />
             </button>
 
             {open && (
-                <div className="absolute right-0 top-full mt-2 w-64 bg-popover text-popover-foreground border border-border rounded-2xl shadow-2xl shadow-black/20 overflow-hidden z-50 animate-in fade-in zoom-in-95 duration-150">
+                <div className="absolute right-0 top-full mt-2 w-64 max-w-[calc(100vw-1.5rem)] bg-popover text-popover-foreground border border-border rounded-2xl shadow-2xl shadow-black/20 overflow-hidden z-50 animate-in fade-in zoom-in-95 duration-150">
                     <div className="px-4 py-2.5 border-b border-border/60 bg-muted/30">
                         <p className="text-[9px] font-black uppercase tracking-widest text-muted-foreground">Switch Workspace</p>
                     </div>
@@ -269,7 +273,7 @@ function MobilePortalBottomNav() {
     return (
         <nav
             aria-label="Mobile Navigation Dock"
-            className="sm:hidden fixed bottom-0 left-0 right-0 z-40 bg-background/90 dark:bg-slate-950/90 backdrop-blur-2xl border-t border-border/80 px-2 py-1.5 flex items-center justify-around shadow-[0_-10px_35px_rgba(0,0,0,0.08)] dark:shadow-[0_-10px_35px_rgba(0,0,0,0.4)] safe-area-pb"
+            className="md:hidden fixed bottom-0 left-0 right-0 z-40 bg-background/95 dark:bg-slate-950/95 backdrop-blur-2xl border-t border-border/80 px-1.5 pt-1.5 flex items-center justify-around shadow-[0_-10px_35px_rgba(0,0,0,0.08)] dark:shadow-[0_-10px_35px_rgba(0,0,0,0.4)] safe-area-pb"
         >
             {navItems.map((item) => {
                 const isRootDashboard = [
@@ -290,7 +294,7 @@ function MobilePortalBottomNav() {
                     <Link
                         key={item.href}
                         href={item.href}
-                        className={`relative flex flex-col items-center justify-center py-1 px-2.5 rounded-2xl transition-all duration-200 active:scale-90 ${
+                        className={`relative flex flex-col items-center justify-center min-h-[44px] min-w-[48px] py-1 px-2 rounded-2xl transition-all duration-200 active:scale-90 ${
                             isActive
                                 ? `${currentTheme.color} ${currentTheme.activeBg} font-black`
                                 : 'text-muted-foreground hover:text-foreground font-semibold'
@@ -300,7 +304,7 @@ function MobilePortalBottomNav() {
                             <span className={`absolute -top-1.5 w-6 h-1 rounded-full ${currentTheme.indicator} shadow-sm animate-in fade-in duration-200`} />
                         )}
                         <Icon className={`h-4 w-4 transition-transform ${isActive ? 'scale-110' : ''}`} />
-                        <span className="text-[9px] mt-0.5 tracking-tight truncate max-w-[54px]">
+                        <span className="text-[10px] mt-0.5 tracking-tight truncate max-w-[58px]">
                             {item.label}
                         </span>
                     </Link>
@@ -311,10 +315,10 @@ function MobilePortalBottomNav() {
             <button
                 type="button"
                 onClick={toggleSidebar}
-                className="relative flex flex-col items-center justify-center py-1 px-2.5 rounded-2xl text-muted-foreground hover:text-foreground font-semibold transition-all duration-200 active:scale-90"
+                className="relative flex flex-col items-center justify-center min-h-[44px] min-w-[48px] py-1 px-2 rounded-2xl text-muted-foreground hover:text-foreground font-semibold transition-all duration-200 active:scale-90"
             >
                 <Menu className="h-4 w-4" />
-                <span className="text-[9px] mt-0.5 tracking-tight">Menu</span>
+                <span className="text-[10px] mt-0.5 tracking-tight">Menu</span>
             </button>
         </nav>
     )
@@ -331,18 +335,18 @@ export default function CoptellerPortalLayout({
     return (
         <ScopeProvider>
             <SidebarProvider>
-                <div className="flex w-full min-h-screen bg-background text-foreground selection:bg-primary/30">
+                <div className="flex w-full min-h-[100dvh] bg-background text-foreground selection:bg-primary/30">
                     <CoptellerSidebar />
                     <SidebarInset className="flex-1 flex flex-col bg-background relative min-w-0">
                         
                         {/* Top sticky header for Portal navigation / theme toggle */}
                         <header className="sticky top-0 z-40 flex h-14 sm:h-16 shrink-0 items-center justify-between gap-2 sm:gap-4 border-b border-border/70 bg-background/85 px-3 sm:px-6 backdrop-blur-xl transition-all duration-300">
-                            <div className="flex items-center gap-2 sm:gap-4 min-w-0">
+                            <div className="flex items-center gap-2 sm:gap-4 min-w-0 flex-1">
                                 <SidebarTrigger className="h-9 w-9 sm:h-8 sm:w-8 -ml-1 text-muted-foreground hover:bg-accent/40 hover:text-foreground transition-colors shrink-0" />
-                                <div className="h-5 w-px bg-border hidden sm:block" />
+                                <div className="h-5 w-px bg-border hidden md:block" />
                                 
                                 {/* Dynamic Breadcrumbs */}
-                                <nav className="hidden sm:flex items-center gap-1.5 text-[11px] font-black tracking-wide text-muted-foreground uppercase min-w-0">
+                                <nav className="hidden md:flex items-center gap-1.5 text-[11px] font-black tracking-wide text-muted-foreground uppercase min-w-0">
                                     {segments.map((segment, index) => {
                                         const path = `/${segments.slice(0, index + 1).join('/')}`
                                         const isLast = index === segments.length - 1
@@ -350,9 +354,9 @@ export default function CoptellerPortalLayout({
                                             <React.Fragment key={path}>
                                                 {index > 0 && <ChevronRight className="h-3 w-3 text-muted-foreground/45 shrink-0" />}
                                                 {isLast ? (
-                                                    <span className="text-foreground truncate max-w-[140px]">{formatSegment(segment)}</span>
+                                                    <span className="text-foreground truncate max-w-[160px]">{formatSegment(segment)}</span>
                                                 ) : (
-                                                    <Link href={path} className="hover:text-foreground transition-colors truncate max-w-[140px]">
+                                                    <Link href={path} className="hover:text-foreground transition-colors truncate max-w-[160px]">
                                                         {formatSegment(segment)}
                                                     </Link>
                                                 )}
@@ -362,9 +366,9 @@ export default function CoptellerPortalLayout({
                                 </nav>
 
                                 {/* Mobile Simple Label */}
-                                <div className="sm:hidden flex items-center gap-1.5 min-w-0">
+                                <div className="md:hidden flex items-center gap-1.5 min-w-0">
                                     <Cpu className="h-3.5 w-3.5 text-emerald-500 shrink-0" />
-                                    <span className="text-xs font-black uppercase tracking-wider text-foreground truncate max-w-[110px] sm:max-w-none">
+                                    <span className="text-xs font-black uppercase tracking-wider text-foreground truncate max-w-[155px] sm:max-w-[260px]">
                                         {segments.length > 0 ? formatSegment(segments[segments.length - 1]) : "Portal"}
                                     </span>
                                 </div>
@@ -378,7 +382,7 @@ export default function CoptellerPortalLayout({
                         </header>
 
                         {/* Dashboard content wrapper */}
-                        <main className="flex-1 overflow-auto relative pb-20 sm:pb-0">
+                        <main className="flex-1 overflow-x-hidden overflow-y-auto relative pb-24 md:pb-6">
                             {children}
                         </main>
 

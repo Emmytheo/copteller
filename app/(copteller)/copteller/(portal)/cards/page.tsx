@@ -177,7 +177,7 @@ export default function CoptellerMemberCardsPage() {
     }
 
     return (
-        <div className="min-h-screen bg-background text-foreground font-sans">
+        <div className="min-h-[100dvh] bg-background text-foreground font-sans">
             {/* Ambient subtle glow */}
             <div className="pointer-events-none fixed inset-0 z-0 overflow-hidden">
                 <div className="absolute top-0 right-[20%] w-[400px] h-[400px] bg-primary/5 rounded-full blur-[120px]" />

@@ -11,7 +11,7 @@ export default function OnboardingLayout({
     children: React.ReactNode
 }) {
     return (
-        <div className="min-h-screen bg-background text-foreground flex flex-col font-sans selection:bg-emerald-500/30">
+        <div className="min-h-[100dvh] bg-background text-foreground flex flex-col font-sans selection:bg-emerald-500/30">
             {/* Onboarding global utility bar */}
             <header className="sticky top-0 z-40 w-full border-b border-emerald-500/10 dark:border-emerald-500/5 bg-background/80 backdrop-blur-xl shrink-0">
                 <div className="max-w-7xl mx-auto flex h-16 items-center justify-between px-4 sm:px-6 md:px-8">

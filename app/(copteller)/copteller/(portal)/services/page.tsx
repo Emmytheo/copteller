@@ -164,7 +164,7 @@ export default function UniversalServicesHubPage() {
     const totalDebit = principalAmount + calculatedFee
 
     return (
-        <div className="min-h-screen bg-background text-foreground">
+        <div className="min-h-[100dvh] bg-background text-foreground">
             {/* Ambient glow */}
             <div className="pointer-events-none fixed inset-0 z-0 overflow-hidden">
                 <div className="absolute top-0 right-[20%] w-[400px] h-[400px] bg-emerald-500/3 dark:bg-emerald-500/5 rounded-full blur-[120px]" />
@@ -353,7 +353,7 @@ export default function UniversalServicesHubPage() {
                                 initial={{ scale: 0.95, opacity: 0 }}
                                 animate={{ scale: 1, opacity: 1 }}
                                 exit={{ scale: 0.95, opacity: 0 }}
-                                className="w-full max-w-lg bg-card text-card-foreground border border-border rounded-3xl p-6 sm:p-8 shadow-2xl space-y-6 max-h-[90vh] flex flex-col"
+                                className="w-full max-w-lg bg-card text-card-foreground border border-border rounded-3xl p-6 sm:p-8 shadow-2xl space-y-6 max-h-[90dvh] flex flex-col"
                             >
                                 {/* Modal Header */}
                                 <div className="flex items-center justify-between border-b border-border/70 pb-4">

@@ -546,7 +546,7 @@ export default function SubsidizedServicesPage() {
                                     </div>
 
                                     {/* Pricing Breakdown Grid */}
-                                    <div className="grid grid-cols-3 gap-2 p-3 rounded-2xl bg-muted/40 border border-border/50 text-[11px]">
+                                    <div className="grid grid-cols-1 sm:grid-cols-3 gap-2.5 sm:gap-2 p-3 rounded-2xl bg-muted/40 border border-border/50 text-[11px]">
                                         <div>
                                             <span className="text-[9px] uppercase tracking-wider font-black text-muted-foreground block">Wholesale</span>
                                             <span className="font-bold text-foreground">{fmt(svc.wholesaleCost)}</span>

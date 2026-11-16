@@ -240,7 +240,7 @@ function MemberDashboardContent() {
 
     if (loading) {
         return (
-            <div className="min-h-screen bg-background flex flex-col items-center justify-center space-y-4">
+            <div className="min-h-[100dvh] bg-background flex flex-col items-center justify-center space-y-4">
                 <RefreshCw className="h-8 w-8 text-emerald-500 animate-spin" />
                 <p className="text-xs font-black text-muted-foreground uppercase tracking-widest">Loading Member Workspace...</p>
             </div>
@@ -248,7 +248,7 @@ function MemberDashboardContent() {
     }
 
     return (
-        <div className="min-h-screen bg-background font-sans selection:bg-emerald-500/30">
+        <div className="min-h-[100dvh] bg-background font-sans selection:bg-emerald-500/30">
             {/* Ambient background */}
             <div className="pointer-events-none fixed inset-0 overflow-hidden z-0">
                 <div className="absolute top-0 right-[20%] w-[400px] h-[400px] bg-emerald-500/4 dark:bg-emerald-500/5 rounded-full blur-[120px]" />
@@ -593,7 +593,7 @@ function MemberDashboardContent() {
                             </div>
 
                             {primaryHp ? (
-                                <div className="grid grid-cols-3 gap-3">
+                                <div className="grid grid-cols-1 sm:grid-cols-3 gap-2.5 sm:gap-3">
                                     {[
                                         { label: "Paid", val: `₦${((primaryHp.total_paid || 0) / 100).toLocaleString()}`, color: "emerald" },
                                         { label: "Remaining", val: `₦${Math.max(0, (primaryHp.total_obligation || 0) - (primaryHp.total_paid || 0) / 100).toLocaleString()}`, color: "amber" },
@@ -630,7 +630,7 @@ function MemberDashboardContent() {
                                 initial={{ scale: 0.95, opacity: 0 }}
                                 animate={{ scale: 1, opacity: 1 }}
                                 exit={{ scale: 0.95, opacity: 0 }}
-                                className="w-full max-w-lg bg-background border border-border rounded-3xl p-6 sm:p-8 shadow-2xl space-y-6 max-h-[90vh] flex flex-col"
+                                className="w-full max-w-lg bg-background border border-border rounded-3xl p-4 sm:p-8 shadow-2xl space-y-5 sm:space-y-6 max-h-[90dvh] flex flex-col"
                             >
                                 <div className="flex items-center justify-between border-b border-border pb-4">
                                     <div className="flex items-center gap-3">

@@ -80,7 +80,7 @@ export default function CooperativeProductRegistryPage() {
     }
 
     return (
-        <div className="bg-background text-foreground min-h-screen py-16 px-6 md:px-8 relative overflow-hidden font-sans">
+        <div className="bg-background text-foreground min-h-[100dvh] py-16 px-6 md:px-8 relative overflow-hidden font-sans">
             {/* Ambient background glows */}
             <div className="absolute top-0 right-1/4 w-[500px] h-[500px] bg-emerald-600/5 dark:bg-emerald-600/10 rounded-full blur-[100px] pointer-events-none" />
             <div className="absolute bottom-0 left-1/4 w-[500px] h-[500px] bg-amber-600/5 dark:bg-amber-600/10 rounded-full blur-[100px] pointer-events-none" />
@@ -235,7 +235,7 @@ export default function CooperativeProductRegistryPage() {
                                 animate={{ opacity: 1, scale: 1, y: 0 }}
                                 exit={{ opacity: 0, scale: 0.95, y: 15 }}
                                 transition={{ type: "spring", duration: 0.3, bounce: 0 }}
-                                className="relative w-full max-w-lg bg-card text-card-foreground border border-border rounded-3xl shadow-2xl p-6 md:p-8 space-y-6 overflow-y-auto max-h-[90vh] z-10"
+                                className="relative w-full max-w-lg bg-card text-card-foreground border border-border rounded-3xl shadow-2xl p-6 md:p-8 space-y-6 overflow-y-auto max-h-[90dvh] z-10"
                             >
                                 <div className="flex justify-between items-start border-b border-border/60 pb-4">
                                     <div className="space-y-1">

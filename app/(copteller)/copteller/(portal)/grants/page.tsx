@@ -160,7 +160,7 @@ export default function MemberGrantsPage() {
         : simAmount
 
     return (
-        <div className="min-h-screen bg-background text-foreground font-sans relative selection:bg-emerald-500/20 pb-16">
+        <div className="min-h-[100dvh] bg-background text-foreground font-sans relative selection:bg-emerald-500/20 pb-16">
             {/* Ambient Lighting */}
             <div className="pointer-events-none fixed inset-0 overflow-hidden z-0">
                 <div className="absolute -top-40 right-1/4 w-[600px] h-[600px] bg-emerald-500/5 dark:bg-emerald-500/8 rounded-full blur-[140px]" />
@@ -345,7 +345,7 @@ export default function MemberGrantsPage() {
                                         </div>
 
                                         {/* 4-Step Stepper */}
-                                        <div className="pt-2 border-t border-border/60 grid grid-cols-4 gap-2 text-center text-[9px] font-black uppercase">
+                                        <div className="pt-2 border-t border-border/60 grid grid-cols-2 sm:grid-cols-4 gap-2 text-center text-[9px] font-black uppercase">
                                             <div className="space-y-1 text-emerald-600">
                                                 <div className="h-1 bg-emerald-500 rounded-full" />
                                                 <span>1. Submitted</span>
@@ -467,7 +467,7 @@ export default function MemberGrantsPage() {
                                                 <span>Duration (Months)</span>
                                                 <span className="text-foreground">{simMonths} Months</span>
                                             </div>
-                                            <div className="grid grid-cols-4 gap-1.5">
+                                            <div className="grid grid-cols-2 sm:grid-cols-4 gap-1.5">
                                                 {[3, 6, 9, 12].map(m => (
                                                     <button
                                                         key={m}

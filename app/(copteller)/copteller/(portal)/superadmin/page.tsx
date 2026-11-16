@@ -104,7 +104,7 @@ export default function CoptellerSuperadminPage() {
     ]
 
     return (
-        <div className="min-h-screen bg-background font-sans selection:bg-rose-500/20">
+        <div className="min-h-[100dvh] bg-background font-sans selection:bg-rose-500/20">
             <div className="pointer-events-none fixed inset-0 z-0 overflow-hidden">
                 <div className="absolute top-0 right-[20%] w-[400px] h-[400px] bg-rose-500/3 dark:bg-rose-500/4 rounded-full blur-[120px]" />
                 <div className="absolute bottom-0 left-[15%] w-[350px] h-[350px] bg-emerald-500/3 dark:bg-emerald-500/4 rounded-full blur-[120px]" />

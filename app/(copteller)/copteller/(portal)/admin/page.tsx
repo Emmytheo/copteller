@@ -347,7 +347,7 @@ export default function CooperativeAdminConsole() {
 
     if (loading) {
         return (
-            <div className="min-h-screen bg-background flex flex-col items-center justify-center space-y-4">
+            <div className="min-h-[100dvh] bg-background flex flex-col items-center justify-center space-y-4">
                 <RefreshCw className="h-8 w-8 text-amber-500 animate-spin" />
                 <p className="text-xs font-black text-muted-foreground uppercase tracking-widest">Loading Admin Console...</p>
             </div>
@@ -355,7 +355,7 @@ export default function CooperativeAdminConsole() {
     }
 
     return (
-        <div className="min-h-screen bg-background font-sans selection:bg-amber-500/20">
+        <div className="min-h-[100dvh] bg-background font-sans selection:bg-amber-500/20">
             <div className="pointer-events-none fixed inset-0 overflow-hidden z-0">
                 <div className="absolute top-0 left-[25%] w-[400px] h-[400px] bg-amber-500/3 dark:bg-amber-500/5 rounded-full blur-[120px]" />
             </div>

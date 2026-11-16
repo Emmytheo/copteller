@@ -217,7 +217,7 @@ export default function CoptellerLandingPage() {
                             initial={{ opacity: 0, scale: 0.92, y: 40 }}
                             animate={{ opacity: 1, scale: 1, y: 0 }}
                             transition={{ duration: 0.9, delay: 0.2, ease: "easeOut" }}
-                            className="w-[300px] bg-[#0a0a0a] rounded-[3.5rem] overflow-hidden shadow-[0_40px_120px_rgba(0,0,0,0.6)] relative border-[7px] border-[#1a1a1a] z-10 hover:scale-[1.03] hover:shadow-[0_50px_140px_rgba(16,185,129,0.15)] transition-all duration-700"
+                            className="w-full max-w-[300px] bg-[#0a0a0a] rounded-[3.5rem] overflow-hidden shadow-[0_40px_120px_rgba(0,0,0,0.6)] relative border-[7px] border-[#1a1a1a] z-10 hover:scale-[1.03] hover:shadow-[0_50px_140px_rgba(16,185,129,0.15)] transition-all duration-700"
                         >
                             {/* Dynamic Island */}
                             <div className="flex justify-center pt-3 pb-1">

@@ -253,9 +253,14 @@
   }
 
   html, body {
-    overflow-x: hidden;
+    overflow-x: clip;
     width: 100%;
     position: relative;
+    -webkit-tap-highlight-color: transparent;
+  }
+
+  button, a, select, input, textarea {
+    touch-action: manipulation;
   }
 
   body {
@@ -405,6 +410,9 @@
 }
 
 @layer utilities {
+  .safe-area-pb {
+    padding-bottom: max(0.375rem, env(safe-area-inset-bottom));
+  }
   .no-scrollbar::-webkit-scrollbar {
     display: none;
   }

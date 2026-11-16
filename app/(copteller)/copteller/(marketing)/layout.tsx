@@ -58,10 +58,10 @@ export default function CoptellerLayout({
     }, [])
 
     return (
-        <div className="bg-background text-foreground min-h-screen flex flex-col font-sans overflow-x-hidden selection:bg-emerald-500/30">
+        <div className="bg-background text-foreground min-h-[100dvh] flex flex-col font-sans overflow-x-clip selection:bg-emerald-500/30">
             {/* Custom Copteller Glass Navbar */}
-            <header className="sticky top-0 z-50 w-full border-b border-emerald-500/10 dark:border-emerald-500/5 bg-background/80 backdrop-blur-xl">
-                <div className="max-w-7xl mx-auto flex h-16 items-center justify-between px-6 md:px-8">
+            <header className="sticky top-0 z-50 w-full border-b border-emerald-500/10 dark:border-emerald-500/5 bg-background/85 backdrop-blur-xl">
+                <div className="max-w-7xl mx-auto flex h-16 items-center justify-between px-4 sm:px-6 md:px-8">
                     
                     {/* Logo */}
                     <Link href="/copteller" className="flex items-center gap-2 group">
@@ -116,21 +116,21 @@ export default function CoptellerLayout({
                             animate={{ opacity: 1, height: "auto" }}
                             exit={{ opacity: 0, height: 0 }}
                             transition={{ duration: 0.2 }}
-                            className="lg:hidden border-b border-emerald-500/10 bg-background/95 backdrop-blur-xl absolute top-16 left-0 right-0 z-40 overflow-hidden"
+                            className="lg:hidden border-b border-emerald-500/10 bg-background/95 backdrop-blur-xl absolute top-16 left-0 right-0 z-40 max-h-[calc(100dvh-4rem)] overflow-y-auto shadow-2xl"
                         >
-                            <nav className="flex flex-col p-6 space-y-4 text-xs font-black text-muted-foreground uppercase tracking-widest border-t dark:border-slate-900">
-                                <Link href="/copteller/features" className="hover:text-emerald-500 transition-colors py-2 border-b border-slate-100 dark:border-slate-900">Features</Link>
-                                <Link href="/copteller/products" className="hover:text-emerald-500 transition-colors py-2 border-b border-slate-100 dark:border-slate-900">Registry</Link>
-                                <Link href="/copteller/simulator" className="hover:text-emerald-500 transition-colors py-2 border-b border-slate-100 dark:border-slate-900">Simulator</Link>
-                                <Link href="/copteller/investment" className="hover:text-amber-500 transition-colors py-2 border-b border-slate-100 dark:border-slate-900">Investment</Link>
-                                <Link href="/copteller/mobility" className="hover:text-orange-500 transition-colors py-2 border-b border-slate-100 dark:border-slate-900">Mobility</Link>
-                                <Link href="/copteller/governance" className="hover:text-emerald-500 transition-colors py-2 border-b border-slate-100 dark:border-slate-900">Governance</Link>
+                            <nav className="flex flex-col p-4 sm:p-6 space-y-2 text-xs font-black text-muted-foreground uppercase tracking-widest border-t dark:border-slate-900">
+                                <Link href="/copteller/features" className="hover:text-emerald-500 transition-colors py-3 border-b border-slate-100 dark:border-slate-900">Features</Link>
+                                <Link href="/copteller/products" className="hover:text-emerald-500 transition-colors py-3 border-b border-slate-100 dark:border-slate-900">Registry</Link>
+                                <Link href="/copteller/simulator" className="hover:text-emerald-500 transition-colors py-3 border-b border-slate-100 dark:border-slate-900">Simulator</Link>
+                                <Link href="/copteller/investment" className="hover:text-amber-500 transition-colors py-3 border-b border-slate-100 dark:border-slate-900">Investment</Link>
+                                <Link href="/copteller/mobility" className="hover:text-orange-500 transition-colors py-3 border-b border-slate-100 dark:border-slate-900">Mobility</Link>
+                                <Link href="/copteller/governance" className="hover:text-emerald-500 transition-colors py-3 border-b border-slate-100 dark:border-slate-900">Governance</Link>
                                 
-                                <div className="flex gap-3 pt-4">
-                                    <Button asChild variant="outline" className="flex-1 text-xs font-black h-10 rounded-xl">
+                                <div className="flex flex-col xs:flex-row sm:flex-row gap-3 pt-4">
+                                    <Button asChild variant="outline" className="flex-1 text-xs font-black h-11 rounded-xl">
                                         <Link href={loginPath}>{loginText}</Link>
                                     </Button>
-                                    <Button asChild className="flex-1 bg-gradient-to-r from-emerald-500 to-amber-500 hover:from-emerald-400 hover:to-amber-400 text-black font-black h-10 rounded-xl text-xs border-none">
+                                    <Button asChild className="flex-1 bg-gradient-to-r from-emerald-500 to-amber-500 hover:from-emerald-400 hover:to-amber-400 text-black font-black h-11 rounded-xl text-xs border-none">
                                         <Link href={portalPath}>{isLoggedIn ? "Dashboard" : "Launch Portal"}</Link>
                                     </Button>
                                 </div>

@@ -1,4 +1,4 @@
-﻿"use client"
+"use client"
 
 import * as React from "react"
 import { motion, AnimatePresence } from "framer-motion"
@@ -252,51 +252,55 @@ export default function SuperadminEndpointsPage() {
                         </div>
 
                         {/* Table */}
-                        <div className="bg-white dark:bg-slate-950/60 border border-slate-200 dark:border-slate-900 rounded-3xl overflow-hidden shadow-sm">
-                            <div className="grid grid-cols-5 px-6 py-3 bg-slate-50 dark:bg-slate-900/50 text-[10px] font-black text-muted-foreground uppercase tracking-widest border-b border-slate-100 dark:border-slate-800">
-                                <span>Method</span>
-                                <span className="col-span-2">Specs Endpoint</span>
-                                <span>Scope</span>
-                                <span>Status</span>
-                            </div>
+                        <div className="bg-white dark:bg-slate-950/60 border border-slate-200 dark:border-slate-900 rounded-2xl sm:rounded-3xl overflow-hidden shadow-sm">
+                            <div className="overflow-x-auto">
+                                <div className="min-w-[560px]">
+                                    <div className="grid grid-cols-5 px-4 sm:px-6 py-3 bg-slate-50 dark:bg-slate-900/50 text-[10px] font-black text-muted-foreground uppercase tracking-widest border-b border-slate-100 dark:border-slate-800">
+                                        <span>Method</span>
+                                        <span className="col-span-2">Specs Endpoint</span>
+                                        <span>Scope</span>
+                                        <span>Status</span>
+                                    </div>
 
-                            {filtered.length === 0 ? (
-                                <div className="py-12 text-center text-muted-foreground text-xs font-semibold">No API endpoints match the selected filters.</div>
-                            ) : (
-                                <div className="divide-y divide-slate-100 dark:divide-slate-800">
-                                    {filtered.map((ep) => {
-                                        const coopObj = cooperatives.find(c => String(c.id) === String(ep.cooperative))
-                                        return (
-                                            <div
-                                                key={ep.id}
-                                                onClick={() => {
-                                                    setSelectedEp(ep)
-                                                    setPanelMode('details')
-                                                }}
-                                                className={`grid grid-cols-5 px-6 py-4 items-center cursor-pointer transition-colors ${selectedEp?.id === ep.id ? "bg-rose-50/50 dark:bg-rose-950/20 font-bold" : "hover:bg-slate-50/50 dark:hover:bg-slate-900/30"}`}
-                                            >
-                                                <span className={`font-mono text-xs font-black ${ep.method === 'POST' ? 'text-emerald-500' : 'text-blue-500'}`}>
-                                                    {ep.method}
-                                                </span>
-                                                <div className="col-span-2 pr-2">
-                                                    <p className="text-sm font-black text-foreground truncate">{ep.name}</p>
-                                                    <p className="text-[10px] text-muted-foreground font-mono mt-0.5 truncate">{ep.path}</p>
-                                                </div>
-                                                <div className="truncate pr-2">
-                                                    <Badge variant="outline" className={`text-[8px] font-bold py-0.5 px-2 ${!ep.cooperative ? 'border-slate-200 text-muted-foreground' : 'border-emerald-500/20 text-emerald-600 dark:text-emerald-400 bg-emerald-500/5'}`}>
-                                                        {!ep.cooperative ? 'Global' : coopObj?.name || 'Scoped'}
-                                                    </Badge>
-                                                </div>
-                                                <div>
-                                                    <Badge variant={ep.status === 'active' ? 'default' : 'secondary'} className="text-[9px] uppercase font-bold">
-                                                        {ep.status}
-                                                    </Badge>
-                                                </div>
-                                            </div>
-                                        )
-                                    })}
+                                    {filtered.length === 0 ? (
+                                        <div className="py-12 text-center text-muted-foreground text-xs font-semibold">No API endpoints match the selected filters.</div>
+                                    ) : (
+                                        <div className="divide-y divide-slate-100 dark:divide-slate-800">
+                                            {filtered.map((ep) => {
+                                                const coopObj = cooperatives.find(c => String(c.id) === String(ep.cooperative))
+                                                return (
+                                                    <div
+                                                        key={ep.id}
+                                                        onClick={() => {
+                                                            setSelectedEp(ep)
+                                                            setPanelMode('details')
+                                                        }}
+                                                        className={`grid grid-cols-5 px-4 sm:px-6 py-4 items-center cursor-pointer transition-colors ${selectedEp?.id === ep.id ? "bg-rose-50/50 dark:bg-rose-950/20 font-bold" : "hover:bg-slate-50/50 dark:hover:bg-slate-900/30"}`}
+                                                    >
+                                                        <span className={`font-mono text-xs font-black ${ep.method === 'POST' ? 'text-emerald-500' : 'text-blue-500'}`}>
+                                                            {ep.method}
+                                                        </span>
+                                                        <div className="col-span-2 pr-2">
+                                                            <p className="text-sm font-black text-foreground truncate">{ep.name}</p>
+                                                            <p className="text-[10px] text-muted-foreground font-mono mt-0.5 truncate">{ep.path}</p>
+                                                        </div>
+                                                        <div className="truncate pr-2">
+                                                            <Badge variant="outline" className={`text-[8px] font-bold py-0.5 px-2 ${!ep.cooperative ? 'border-slate-200 text-muted-foreground' : 'border-emerald-500/20 text-emerald-600 dark:text-emerald-400 bg-emerald-500/5'}`}>
+                                                                {!ep.cooperative ? 'Global' : coopObj?.name || 'Scoped'}
+                                                            </Badge>
+                                                        </div>
+                                                        <div>
+                                                            <Badge variant={ep.status === 'active' ? 'default' : 'secondary'} className="text-[9px] uppercase font-bold">
+                                                                {ep.status}
+                                                            </Badge>
+                                                        </div>
+                                                    </div>
+                                                )
+                                            })}
+                                        </div>
+                                    )}
                                 </div>
-                            )}
+                            </div>
                         </div>
                     </div>
 
@@ -414,7 +418,7 @@ export default function SuperadminEndpointsPage() {
                                                 ))}
                                             </select>
                                         </div>
-                                        <div className="grid grid-cols-3 gap-2">
+                                        <div className="grid grid-cols-1 sm:grid-cols-3 gap-2">
                                             <div className="col-span-1 space-y-1">
                                                 <label className="text-[9px] font-bold text-slate-500 uppercase">Method</label>
                                                 <select

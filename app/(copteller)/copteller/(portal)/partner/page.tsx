@@ -416,7 +416,7 @@ export default function InstitutionalPartnerDashboard() {
                                         </div>
 
                                         {/* Unit Economics Pill */}
-                                        <div className="grid grid-cols-3 gap-2 p-3 rounded-2xl bg-slate-50 dark:bg-slate-900/50 border border-border/50 text-xs">
+                                        <div className="grid grid-cols-1 sm:grid-cols-3 gap-2.5 sm:gap-2 p-3 rounded-2xl bg-slate-50 dark:bg-slate-900/50 border border-border/50 text-xs">
                                             <div>
                                                 <span className="text-[9px] text-muted-foreground uppercase font-black block">Wholesale Bulk Paid</span>
                                                 <span className="font-black text-foreground">{fmt(prog.wholesalePerUnit / 100)}</span>

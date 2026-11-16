@@ -171,7 +171,7 @@ export default function DisbursementCampaignsPage() {
     })
 
     return (
-        <div className="min-h-screen bg-background text-foreground font-sans">
+        <div className="min-h-[100dvh] bg-background text-foreground font-sans">
             {/* Ambient subtle glow */}
             <div className="pointer-events-none fixed inset-0 z-0 overflow-hidden">
                 <div className="absolute top-0 right-[25%] w-[450px] h-[450px] bg-primary/5 rounded-full blur-[130px]" />
@@ -533,7 +533,7 @@ export default function DisbursementCampaignsPage() {
                                 initial={{ opacity: 0, scale: 0.95 }}
                                 animate={{ opacity: 1, scale: 1 }}
                                 exit={{ opacity: 0, scale: 0.95 }}
-                                className="relative w-full max-w-3xl bg-card text-card-foreground border border-border rounded-3xl shadow-2xl p-6 md:p-8 space-y-6 max-h-[90vh] overflow-y-auto"
+                                className="relative w-full max-w-3xl bg-card text-card-foreground border border-border rounded-3xl p-4 sm:p-6 md:p-8 space-y-5 sm:space-y-6 max-h-[90dvh] overflow-y-auto shadow-2xl"
                             >
                                 <div className="flex justify-between items-start border-b border-border/70 pb-4">
                                     <div>
@@ -551,7 +551,7 @@ export default function DisbursementCampaignsPage() {
                                     </button>
                                 </div>
 
-                                <div className="grid grid-cols-3 gap-3 bg-muted/40 border border-border/60 p-4 rounded-2xl text-xs font-bold text-center">
+                                <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 bg-muted/40 border border-border/60 p-4 rounded-2xl text-xs font-bold text-center">
                                     <div>
                                         <p className="text-[10px] text-muted-foreground uppercase font-black">Total Budget</p>
                                         <p className="text-base font-black text-foreground mt-0.5 font-mono">₦{Number(selectedCampaign.total_disbursed).toLocaleString()}</p>
@@ -634,7 +634,7 @@ export default function DisbursementCampaignsPage() {
                                 initial={{ opacity: 0, scale: 0.95 }}
                                 animate={{ opacity: 1, scale: 1 }}
                                 exit={{ opacity: 0, scale: 0.95 }}
-                                className="relative w-full max-w-xl bg-card text-card-foreground border border-border rounded-3xl shadow-2xl p-6 md:p-8 space-y-6 max-h-[90vh] overflow-y-auto"
+                                className="relative w-full max-w-xl bg-card text-card-foreground border border-border rounded-3xl shadow-2xl p-6 md:p-8 space-y-6 max-h-[90dvh] overflow-y-auto"
                             >
                                 <div className="flex justify-between items-start border-b border-border/70 pb-3">
                                     <div>

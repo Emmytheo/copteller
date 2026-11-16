@@ -519,6 +519,14 @@ export function CoptellerSidebar() {
                         {currentRole.badge}
                     </div>
                 </div>
+                <Link
+                    href="/copteller/select-profile?force=true"
+                    onClick={() => isMobile && setOpenMobile(false)}
+                    className="flex items-center gap-3 h-9 px-3 rounded-xl text-xs font-semibold text-muted-foreground hover:text-foreground hover:bg-accent/40 transition-colors group-data-[collapsible=icon]:!justify-center group-data-[collapsible=icon]:px-0"
+                >
+                    <Users className="h-4 w-4 shrink-0" />
+                    <span className="group-data-[collapsible=icon]:hidden">Switch / Manage Profiles</span>
+                </Link>
                 <Button
                     variant="ghost"
                     onClick={handleSignOut}

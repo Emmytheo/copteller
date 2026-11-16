@@ -48,7 +48,7 @@ export default function SavingsFinanceSimulatorPage() {
     const fmt = (n: number) => `₦${Math.round(n).toLocaleString()}`
 
     return (
-        <div className="bg-background text-foreground min-h-screen py-16 px-6 md:px-8 relative overflow-hidden font-sans">
+        <div className="bg-background text-foreground min-h-[100dvh] py-16 px-6 md:px-8 relative overflow-hidden font-sans">
             {/* Ambient background glows */}
             <div className="absolute top-0 right-1/4 w-[500px] h-[500px] bg-emerald-600/5 dark:bg-emerald-600/10 rounded-full blur-[100px] pointer-events-none" />
             <div className="absolute bottom-0 left-1/4 w-[500px] h-[500px] bg-amber-600/5 dark:bg-amber-600/10 rounded-full blur-[100px] pointer-events-none" />

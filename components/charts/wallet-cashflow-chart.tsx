@@ -135,7 +135,7 @@ export function WalletCashflowChart({
             </div>
 
             {/* Quick Metrics */}
-            <div className="grid grid-cols-3 gap-2 text-center">
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-2 text-center">
                 <div className="p-2.5 rounded-2xl bg-muted/30 border border-border/80">
                     <span className="text-[9px] font-black uppercase tracking-wider text-emerald-600 dark:text-emerald-400">Total Inflows</span>
                     <p className="text-sm sm:text-base font-black text-foreground mt-0.5">{fmt(totalInflow)}</p>

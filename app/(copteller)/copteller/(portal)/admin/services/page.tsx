@@ -95,7 +95,7 @@ export default function CoopAdminServicesPage() {
     const totalVolume = services.reduce((acc, s) => acc + (s.unionEnabled ? s.monthlyVolume : 0), 0)
 
     return (
-        <div className="min-h-screen bg-background text-foreground">
+        <div className="min-h-[100dvh] bg-background text-foreground">
             {/* Ambient glow */}
             <div className="pointer-events-none fixed inset-0 z-0 overflow-hidden">
                 <div className="absolute top-0 left-[25%] w-[400px] h-[400px] bg-amber-500/3 dark:bg-amber-500/5 rounded-full blur-[120px]" />

@@ -415,7 +415,7 @@ export default function TwoTrackThriftHubPage() {
     const myTotalCirclesSaved = circles.reduce((sum, c) => sum + Number(c.my_contribution || 0), 0)
 
     return (
-        <div className="min-h-screen bg-background text-foreground font-sans relative selection:bg-emerald-500/20 pb-16">
+        <div className="min-h-[100dvh] bg-background text-foreground font-sans relative selection:bg-emerald-500/20 pb-16">
             {/* Ambient Lighting */}
             <div className="pointer-events-none fixed inset-0 overflow-hidden z-0">
                 <div className="absolute -top-40 right-1/4 w-[600px] h-[600px] bg-emerald-500/5 dark:bg-emerald-500/8 rounded-full blur-[140px]" />
@@ -948,7 +948,7 @@ export default function TwoTrackThriftHubPage() {
                             <motion.div
                                 initial={{ scale: 0.95, opacity: 0 }}
                                 animate={{ scale: 1, opacity: 1 }}
-                                className="w-full max-w-lg bg-card border border-border rounded-3xl p-6 sm:p-8 shadow-2xl relative max-h-[90vh] overflow-y-auto"
+                                className="w-full max-w-lg bg-card border border-border rounded-3xl p-6 sm:p-8 shadow-2xl relative max-h-[90dvh] overflow-y-auto"
                             >
                                 <button
                                     onClick={() => setShowEnrollUnionModal(false)}
@@ -1004,7 +1004,7 @@ export default function TwoTrackThriftHubPage() {
                             <motion.div
                                 initial={{ scale: 0.95, opacity: 0 }}
                                 animate={{ scale: 1, opacity: 1 }}
-                                className="w-full max-w-lg bg-card border border-border rounded-3xl p-6 sm:p-8 shadow-2xl relative max-h-[90vh] overflow-y-auto"
+                                className="w-full max-w-lg bg-card border border-border rounded-3xl p-6 sm:p-8 shadow-2xl relative max-h-[90dvh] overflow-y-auto"
                             >
                                 <button
                                     onClick={() => setIsCreateCircleOpen(false)}
@@ -1107,7 +1107,7 @@ export default function TwoTrackThriftHubPage() {
                             <motion.div
                                 initial={{ scale: 0.95, opacity: 0 }}
                                 animate={{ scale: 1, opacity: 1 }}
-                                className="w-full max-w-2xl bg-card border border-border rounded-3xl p-6 sm:p-8 shadow-2xl relative max-h-[90vh] overflow-y-auto"
+                                className="w-full max-w-2xl bg-card border border-border rounded-3xl p-6 sm:p-8 shadow-2xl relative max-h-[90dvh] overflow-y-auto"
                             >
                                 <button
                                     onClick={() => setSelectedCircleDetail(null)}

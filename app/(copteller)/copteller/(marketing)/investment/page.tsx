@@ -94,7 +94,7 @@ export default function CoptellerInvestmentPage() {
     const fillPercent = Math.floor((currentScheme.filled / currentScheme.target) * 100)
 
     return (
-        <div className="bg-background text-foreground min-h-screen font-sans selection:bg-emerald-500/30 overflow-x-hidden relative">
+        <div className="bg-background text-foreground min-h-[100dvh] font-sans selection:bg-emerald-500/30 overflow-x-hidden relative">
             <div className="pointer-events-none fixed inset-0 overflow-hidden z-0">
                 <div className="absolute top-0 left-[20%] w-[600px] h-[600px] bg-emerald-600/4 dark:bg-emerald-500/7 rounded-full blur-[160px]" />
                 <div className="absolute bottom-0 right-[10%] w-[500px] h-[500px] bg-amber-600/4 dark:bg-amber-500/6 rounded-full blur-[150px]" />
@@ -145,7 +145,7 @@ export default function CoptellerInvestmentPage() {
                             initial={{ opacity: 0, y: 20 }}
                             animate={{ opacity: 1, y: 0 }}
                             transition={{ delay: 0.3 }}
-                            className="grid grid-cols-3 gap-4 pt-2"
+                            className="grid grid-cols-1 sm:grid-cols-3 gap-3 sm:gap-4 pt-2"
                         >
                             {[
                                 { val: "₦2.4B+", label: "Total AUM" },

@@ -227,7 +227,7 @@ export default function SuperadminServicesPage() {
     const totalSandbox = services.filter(s => s.sandbox_enabled).length
 
     return (
-        <div className="min-h-screen bg-background text-foreground">
+        <div className="min-h-[100dvh] bg-background text-foreground">
             {/* Ambient glow — theme-aware */}
             <div className="pointer-events-none fixed inset-0 z-0 overflow-hidden">
                 <div className="absolute top-0 right-[20%] w-[400px] h-[400px] bg-rose-500/3 dark:bg-rose-500/5 rounded-full blur-[120px]" />

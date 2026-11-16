@@ -652,7 +652,7 @@ export default function PartnerSchemesPage() {
 
             {/* ── UNDERWRITE SCHEME MODAL ────────────────────────────────────── */}
             <Dialog open={isCreateModalOpen} onOpenChange={setIsCreateModalOpen}>
-                <DialogContent className="sm:max-w-xl rounded-3xl font-sans max-h-[90vh] overflow-y-auto">
+                <DialogContent className="sm:max-w-xl rounded-3xl font-sans max-h-[90dvh] overflow-y-auto">
                     <form onSubmit={handleCreateScheme} className="space-y-4">
                         <DialogHeader>
                             <DialogTitle className="text-xl font-black flex items-center gap-2">

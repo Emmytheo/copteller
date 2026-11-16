@@ -246,7 +246,7 @@ export default function InvestorDashboard() {
                                                     {scheme.status}
                                                 </span>
                                             </div>
-                                            <div className="grid grid-cols-3 gap-1.5 sm:gap-3 text-center text-[9px] sm:text-[10px]">
+                                            <div className="grid grid-cols-1 sm:grid-cols-3 gap-2 sm:gap-3 text-center text-[10px]">
                                                 <div className="bg-slate-50 dark:bg-slate-900 rounded-xl p-2 sm:p-2.5">
                                                     <p className="text-slate-400 font-bold truncate">Target</p>
                                                     <p className="font-black text-xs sm:text-sm mt-0.5 truncate">{fmt(scheme.target_capital / 100)}</p>

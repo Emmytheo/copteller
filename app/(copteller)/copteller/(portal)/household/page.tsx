@@ -534,7 +534,7 @@ export default function HouseholdCompanionPage() {
     const fmt = (num: number) => `₦${num.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`
 
     return (
-        <div className="min-h-screen bg-background text-foreground font-sans relative selection:bg-primary/20">
+        <div className="min-h-[100dvh] bg-background text-foreground font-sans relative selection:bg-primary/20">
             {/* Ambient Radial Mesh Background */}
             <div className="pointer-events-none fixed inset-0 overflow-hidden z-0">
                 <div className="absolute -top-40 right-1/4 w-[600px] h-[600px] bg-primary/5 dark:bg-primary/10 rounded-full blur-[140px]" />
@@ -1271,7 +1271,7 @@ export default function HouseholdCompanionPage() {
                         <motion.div
                             initial={{ scale: 0.95, opacity: 0 }}
                             animate={{ scale: 1, opacity: 1 }}
-                            className="w-full max-w-md bg-card border border-border rounded-3xl p-6 sm:p-8 shadow-2xl relative max-h-[90vh] overflow-y-auto"
+                            className="w-full max-w-md bg-card border border-border rounded-3xl p-6 sm:p-8 shadow-2xl relative max-h-[90dvh] overflow-y-auto"
                         >
                             <button
                                 onClick={() => setIsCreatePocketOpen(false)}
@@ -1499,7 +1499,7 @@ export default function HouseholdCompanionPage() {
                         <motion.div
                             initial={{ scale: 0.95, opacity: 0 }}
                             animate={{ scale: 1, opacity: 1 }}
-                            className="w-full max-w-lg bg-card border border-border rounded-3xl p-6 sm:p-8 shadow-2xl relative max-h-[90vh] overflow-y-auto"
+                            className="w-full max-w-lg bg-card border border-border rounded-3xl p-6 sm:p-8 shadow-2xl relative max-h-[90dvh] overflow-y-auto"
                         >
                             <button
                                 onClick={() => setIsCreateSplitOpen(false)}

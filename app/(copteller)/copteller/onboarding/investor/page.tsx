@@ -130,7 +130,7 @@ export default function InvestorOnboardingPage() {
     }
 
     return (
-        <div className="min-h-screen bg-background text-foreground font-sans selection:bg-orange-500/20">
+        <div className="min-h-[100dvh] bg-background text-foreground font-sans selection:bg-orange-500/20">
             <div className="pointer-events-none fixed inset-0 overflow-hidden z-0">
                 <div className="absolute top-0 right-0 w-[500px] h-[500px] bg-orange-500/5 rounded-full blur-[120px]" />
                 <div className="absolute bottom-0 left-0 w-[400px] h-[400px] bg-amber-500/4 rounded-full blur-[120px]" />

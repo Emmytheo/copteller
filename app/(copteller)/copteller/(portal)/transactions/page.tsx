@@ -166,7 +166,7 @@ export default function MemberTransactionsPage() {
             </div>
 
             {/* Summary */}
-            <div className="grid grid-cols-3 gap-4">
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 sm:gap-4">
                 {[
                     { label: 'Total Inflows', val: fmt(totalCredit), icon: ArrowDownLeft, cls: 'text-emerald-600 dark:text-emerald-400' },
                     { label: 'Total Outflows', val: fmt(totalDebit), icon: ArrowUpRight, cls: 'text-rose-500' },

@@ -125,7 +125,7 @@ function SimulatorContent() {
     }
 
     return (
-        <div className="min-h-screen bg-background text-foreground">
+        <div className="min-h-[100dvh] bg-background text-foreground">
             {/* Ambient glow */}
             <div className="pointer-events-none fixed inset-0 z-0 overflow-hidden">
                 <div className="absolute top-0 right-[20%] w-[400px] h-[400px] bg-rose-500/3 dark:bg-rose-500/5 rounded-full blur-[120px]" />
@@ -187,7 +187,7 @@ function SimulatorContent() {
 
                             <div>
                                 <Label className="text-xs font-black uppercase tracking-wider text-muted-foreground block mb-2">2. Simulate As Persona</Label>
-                                <div className="grid grid-cols-3 gap-2 text-xs">
+                                <div className="grid grid-cols-1 sm:grid-cols-3 gap-2 text-xs">
                                     {[
                                         { id: "member", label: "Member" },
                                         { id: "coop_admin", label: "Coop Admin" },
@@ -343,7 +343,7 @@ export default function SuperadminServiceSimulatorPage() {
     return (
         <React.Suspense
             fallback={
-                <div className="min-h-screen flex items-center justify-center">
+                <div className="min-h-[100dvh] flex items-center justify-center">
                     <RefreshCw className="h-6 w-6 animate-spin text-emerald-500" />
                 </div>
             }

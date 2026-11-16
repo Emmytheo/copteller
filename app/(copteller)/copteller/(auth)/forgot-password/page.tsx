@@ -33,7 +33,7 @@ export default function CoptellerForgotPasswordPage() {
     }
 
     return (
-        <div className="bg-background text-foreground min-h-screen flex flex-col justify-center items-center p-6 relative selection:bg-emerald-500/30 overflow-hidden">
+        <div className="bg-background text-foreground min-h-[100dvh] flex flex-col justify-center items-center p-6 relative selection:bg-emerald-500/30 overflow-hidden">
             <div className="absolute top-0 right-0 w-96 h-96 bg-emerald-600/5 dark:bg-emerald-600/10 rounded-full blur-[100px] pointer-events-none" />
             <div className="absolute bottom-0 left-0 w-96 h-96 bg-amber-600/5 dark:bg-amber-600/10 rounded-full blur-[100px] pointer-events-none" />
 

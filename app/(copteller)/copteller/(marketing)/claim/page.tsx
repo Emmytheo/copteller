@@ -30,7 +30,7 @@ const NIGERIAN_BANKS = [
 
 export default function PublicClaimPage() {
     return (
-        <React.Suspense fallback={<div className="min-h-screen flex items-center justify-center text-xs font-semibold">Loading claim...</div>}>
+        <React.Suspense fallback={<div className="min-h-[100dvh] flex items-center justify-center text-xs font-semibold">Loading claim...</div>}>
             <ClaimContent />
         </React.Suspense>
     )
@@ -127,7 +127,7 @@ function ClaimContent() {
 
     if (loading) {
         return (
-            <div className="min-h-screen flex flex-col items-center justify-center p-6 text-center space-y-4">
+            <div className="min-h-[100dvh] flex flex-col items-center justify-center p-6 text-center space-y-4">
                 <div className="p-4 bg-emerald-500/10 rounded-2xl animate-pulse">
                     <Gift className="h-10 w-10 text-emerald-500" />
                 </div>
@@ -139,7 +139,7 @@ function ClaimContent() {
 
     if (errorMsg || !claimData) {
         return (
-            <div className="min-h-screen flex flex-col items-center justify-center p-6 text-center space-y-4">
+            <div className="min-h-[100dvh] flex flex-col items-center justify-center p-6 text-center space-y-4">
                 <div className="p-4 bg-destructive/10 rounded-2xl">
                     <AlertCircle className="h-10 w-10 text-destructive" />
                 </div>
@@ -156,7 +156,7 @@ function ClaimContent() {
     const isAlreadyClaimed = recipient.status === 'claimed'
 
     return (
-        <div className="min-h-screen bg-slate-50 dark:bg-slate-950 py-12 px-4 sm:px-6 flex items-center justify-center font-sans">
+        <div className="min-h-[100dvh] bg-slate-50 dark:bg-slate-950 py-12 px-4 sm:px-6 flex items-center justify-center font-sans">
             <div className="w-full max-w-lg space-y-6">
 
                 {/* Brand Header */}

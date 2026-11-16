@@ -402,7 +402,7 @@ export default function MemberCreditPage() {
 
                                 {/* Cooperative Standing Details */}
                                 <div className="space-y-3 pt-2">
-                                    <div className="grid grid-cols-3 gap-2 text-center">
+                                    <div className="grid grid-cols-1 sm:grid-cols-3 gap-2 text-center">
                                         <div className="bg-slate-50 dark:bg-slate-950 p-2.5 rounded-xl border border-slate-100 dark:border-slate-800">
                                             <p className="text-[9px] font-black text-muted-foreground uppercase">Standing</p>
                                             <p className="text-xs font-black text-emerald-600 dark:text-emerald-400 mt-0.5">Tier 1 Prime</p>

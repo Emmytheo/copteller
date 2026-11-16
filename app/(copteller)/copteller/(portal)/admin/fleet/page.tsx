@@ -276,7 +276,7 @@ export default function FleetPage() {
     const maintCount = assets.filter(a => a.gps.toLowerCase().includes('maintenance')).length
 
     return (
-        <div className="min-h-screen bg-background text-foreground font-sans relative selection:bg-amber-500/20 pb-16">
+        <div className="min-h-[100dvh] bg-background text-foreground font-sans relative selection:bg-amber-500/20 pb-16">
             {/* Ambient Lighting */}
             <div className="pointer-events-none fixed inset-0 overflow-hidden z-0">
                 <div className="absolute -top-40 right-1/4 w-[600px] h-[600px] bg-amber-500/5 dark:bg-amber-500/8 rounded-full blur-[140px]" />
@@ -789,7 +789,7 @@ export default function FleetPage() {
                             <motion.div
                                 initial={{ scale: 0.95, opacity: 0 }}
                                 animate={{ scale: 1, opacity: 1 }}
-                                className="w-full max-w-2xl bg-card border border-border rounded-3xl p-5 sm:p-7 shadow-2xl relative max-h-[92vh] flex flex-col font-sans"
+                                className="w-full max-w-2xl bg-card border border-border rounded-3xl p-4 sm:p-7 shadow-2xl relative max-h-[92dvh] flex flex-col font-sans"
                             >
                                 <button
                                     onClick={() => setSelectedAssetForDossier(null)}
@@ -985,7 +985,7 @@ export default function FleetPage() {
                                     {dossierTab === 'finance' && (
                                         <div className="space-y-4 text-xs">
                                             {/* Summary Cards */}
-                                            <div className="grid grid-cols-3 gap-2.5">
+                                            <div className="grid grid-cols-1 sm:grid-cols-3 gap-2.5">
                                                 <div className="p-3 rounded-2xl bg-muted/40 border border-border">
                                                     <span className="text-[10px] text-muted-foreground font-bold uppercase">Total Obligation</span>
                                                     <p className="font-mono font-black text-sm text-foreground mt-1">₦{selectedAssetForDossier.total.toLocaleString()}</p>
@@ -1208,7 +1208,7 @@ export default function FleetPage() {
                             <motion.div
                                 initial={{ scale: 0.95, opacity: 0 }}
                                 animate={{ scale: 1, opacity: 1 }}
-                                className="w-full max-w-2xl bg-card border border-border rounded-3xl p-5 sm:p-7 shadow-2xl relative max-h-[92vh] flex flex-col font-sans"
+                                className="w-full max-w-2xl bg-card border border-border rounded-3xl p-4 sm:p-7 shadow-2xl relative max-h-[92dvh] flex flex-col font-sans"
                             >
                                 <button
                                     onClick={() => setRegisterOpen(false)}
@@ -1228,7 +1228,7 @@ export default function FleetPage() {
                                 </div>
 
                                 {/* Step Navigation Pills */}
-                                <div className="grid grid-cols-4 gap-1 p-1 bg-muted/50 rounded-2xl mb-4 text-xs font-bold">
+                                <div className="grid grid-cols-2 sm:grid-cols-4 gap-1.5 p-1.5 bg-muted/50 rounded-2xl mb-4 text-xs font-bold">
                                     {[
                                         { id: 'identity', label: '1. Specs' },
                                         { id: 'finance', label: '2. Lease' },

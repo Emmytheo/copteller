@@ -215,22 +215,22 @@ export default function SelectProfilePage() {
 
     if (loading) {
         return (
-            <div className="min-h-screen bg-background flex items-center justify-center">
+            <div className="min-h-[100dvh] bg-background flex items-center justify-center">
                 <RefreshCw className="h-6 w-6 animate-spin text-emerald-500" />
             </div>
         )
     }
 
     return (
-        <div className="bg-background text-foreground min-h-screen flex flex-col justify-center items-center p-6 relative selection:bg-emerald-500/30 overflow-hidden">
+        <div className="bg-background text-foreground min-h-[100dvh] flex flex-col justify-center items-center p-4 sm:p-6 relative selection:bg-emerald-500/30 overflow-x-clip">
             {/* Ambient orbs */}
             <div className="absolute top-[-10%] left-[20%] w-[500px] h-[500px] bg-emerald-500/4 dark:bg-emerald-500/6 rounded-full blur-[160px] pointer-events-none" />
             <div className="absolute bottom-[-5%] right-[10%] w-[400px] h-[400px] bg-amber-500/3 dark:bg-amber-500/5 rounded-full blur-[140px] pointer-events-none" />
 
-            <div className="w-full max-w-lg space-y-6 relative z-10">
+            <div className="w-full max-w-lg space-y-5 sm:space-y-6 relative z-10">
                 {/* Logo */}
                 <div className="text-center space-y-3 pb-2">
-                    <div className="flex items-center justify-center gap-2 mb-4">
+                    <div className="flex items-center justify-center gap-2 mb-3 sm:mb-4">
                         <div className="p-2 bg-gradient-to-br from-emerald-500 to-amber-500 rounded-xl shadow-lg">
                             <Cpu className="h-5 w-5 text-black" />
                         </div>
@@ -238,10 +238,10 @@ export default function SelectProfilePage() {
                             COPTELLER
                         </span>
                     </div>
-                    <h1 className="text-3xl md:text-4xl font-black tracking-tight">
+                    <h1 className="text-2xl sm:text-3xl md:text-4xl font-black tracking-tight">
                         Choose Your Workspace
                     </h1>
-                    <p className="text-sm text-muted-foreground font-semibold">
+                    <p className="text-xs sm:text-sm text-muted-foreground font-semibold break-words">
                         You have <span className="text-foreground font-black">{profiles.length} profiles</span> under{" "}
                         <span className="text-foreground font-black">{userEmail}</span>. Select one to continue.
                     </p>
@@ -263,13 +263,13 @@ export default function SelectProfilePage() {
                                     transition={{ delay: i * 0.08 }}
                                     onClick={() => selectProfile(profile)}
                                     disabled={!!selectingId}
-                                    className="w-full group relative bg-white dark:bg-slate-950/40 border border-slate-200 dark:border-slate-800 hover:border-emerald-500/40 dark:hover:border-emerald-700/40 rounded-2xl p-5 flex items-center gap-5 transition-all duration-300 hover:shadow-xl hover:shadow-emerald-950/10 text-left disabled:opacity-60"
+                                    className="w-full group relative bg-white dark:bg-slate-950/40 border border-slate-200 dark:border-slate-800 hover:border-emerald-500/40 dark:hover:border-emerald-700/40 rounded-2xl p-4 sm:p-5 flex items-center gap-3.5 sm:gap-5 transition-all duration-300 hover:shadow-xl hover:shadow-emerald-950/10 text-left disabled:opacity-60"
                                 >
                                     {/* Role icon */}
-                                    <div className={`w-14 h-14 rounded-2xl bg-gradient-to-br ${cfg?.gradient || 'from-slate-400 to-slate-500'} flex items-center justify-center shrink-0 shadow-lg group-hover:scale-105 transition-transform duration-300`}>
+                                    <div className={`w-11 h-11 sm:w-14 sm:h-14 rounded-xl sm:rounded-2xl bg-gradient-to-br ${cfg?.gradient || 'from-slate-400 to-slate-500'} flex items-center justify-center shrink-0 shadow-lg group-hover:scale-105 transition-transform duration-300`}>
                                         {isSelecting
-                                            ? <RefreshCw className="h-6 w-6 text-white animate-spin" />
-                                            : <Icon className="h-6 w-6 text-white" />
+                                            ? <RefreshCw className="h-5 w-5 sm:h-6 sm:w-6 text-white animate-spin" />
+                                            : <Icon className="h-5 w-5 sm:h-6 sm:w-6 text-white" />
                                         }
                                     </div>
 

@@ -444,7 +444,7 @@ export default function AdminMembersPage() {
                     }
                 >
                     {selected && (
-                        <div className="bg-white dark:bg-slate-950/60 border border-slate-200 dark:border-slate-900 rounded-2xl sm:rounded-3xl p-5 sm:p-6 shadow-sm space-y-5 max-h-[80vh] overflow-y-auto active-sidepanel-card">
+                        <div className="bg-white dark:bg-slate-950/60 border border-slate-200 dark:border-slate-900 rounded-2xl sm:rounded-3xl p-5 sm:p-6 shadow-sm space-y-5 max-h-[80dvh] overflow-y-auto active-sidepanel-card">
                             <div className="flex justify-between items-start">
                                 <div className="flex items-center gap-3">
                                     <div className="h-10 w-10 rounded-full bg-gradient-to-br from-amber-500 to-emerald-500 flex items-center justify-center text-xs font-black text-black">
@@ -560,7 +560,7 @@ export default function AdminMembersPage() {
                                 initial={{ opacity: 0, y: 20 }}
                                 animate={{ opacity: 1, y: 0 }}
                                 exit={{ opacity: 0, y: 20 }}
-                                className="relative bg-background border-t sm:border border-slate-200 dark:border-slate-800 rounded-t-[28px] sm:rounded-3xl max-w-md w-full p-5 sm:p-6 shadow-2xl font-sans max-h-[88vh] flex flex-col z-10"
+                                className="relative bg-background border-t sm:border border-slate-200 dark:border-slate-800 rounded-t-[28px] sm:rounded-3xl max-w-md w-full p-5 sm:p-6 shadow-2xl font-sans max-h-[88dvh] flex flex-col z-10"
                             >
                                 {/* Mobile pull handle indicator */}
                                 <div className="sm:hidden w-10 h-1 bg-slate-200 dark:bg-slate-800 rounded-full mx-auto -mt-1 mb-3 shrink-0" />

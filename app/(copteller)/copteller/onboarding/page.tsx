@@ -313,7 +313,7 @@ export default function OnboardingPage() {
     }
 
     return (
-        <div className="bg-background text-foreground min-h-screen font-sans selection:bg-emerald-500/30 overflow-x-hidden relative">
+        <div className="bg-background text-foreground min-h-[100dvh] font-sans selection:bg-emerald-500/30 overflow-x-hidden relative">
             {/* Ambient orbs */}
             <div className="pointer-events-none fixed inset-0 overflow-hidden z-0">
                 <div className="absolute top-[-5%] left-[10%] w-[600px] h-[600px] bg-emerald-500/4 dark:bg-emerald-500/6 rounded-full blur-[160px]" />

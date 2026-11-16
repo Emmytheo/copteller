@@ -654,7 +654,7 @@ export default function UnionApprovalsPage() {
                                 initial={{ opacity: 0, y: 40 }}
                                 animate={{ opacity: 1, y: 0 }}
                                 exit={{ opacity: 0, y: 40 }}
-                                className="relative bg-background border border-slate-200 dark:border-slate-800 rounded-t-[32px] sm:rounded-3xl max-w-md w-full p-5 sm:p-6 space-y-4 shadow-2xl font-sans max-h-[85vh] overflow-y-auto z-10"
+                                className="relative bg-background border border-slate-200 dark:border-slate-800 rounded-t-[32px] sm:rounded-3xl max-w-md w-full p-5 sm:p-6 space-y-4 shadow-2xl font-sans max-h-[85dvh] overflow-y-auto z-10"
                             >
                                 <div className="flex justify-between items-start">
                                     <div>
