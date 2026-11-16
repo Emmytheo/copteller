@@ -12,8 +12,7 @@ import Link from "next/link"
 import { Button } from "@/components/ui/button"
 import { toast } from "sonner"
 import { useRouter } from "next/navigation"
-import { PrintableForm } from "@/components/copteller/printable-form"
-import { createPortal } from "react-dom"
+import { PrintableFormDialog } from "@/components/copteller/printable-form"
 
 const STEPS = [
     { id: 1, icon: Building2, title: "Cooperative Details", desc: "Register your group" },
@@ -76,10 +75,8 @@ export default function AdminOnboardingPage() {
     const [authLoading, setAuthLoading] = React.useState(true)
     const [authenticated, setAuthenticated] = React.useState(false)
     const [showPrintModal, setShowPrintModal] = React.useState(false)
-    const [mounted, setMounted] = React.useState(false)
 
     React.useEffect(() => {
-        setMounted(true)
         const checkAuth = async () => {
             try {
                 const res = await fetch('/api/copteller/profile')
@@ -548,60 +545,14 @@ export default function AdminOnboardingPage() {
                 </div>
             </div>
             
-            {/* Print Preview Modal */}
-            <AnimatePresence>
-                {showPrintModal && (
-                    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/70 backdrop-blur-sm print:hidden">
-                        <motion.div 
-                            initial={{ opacity: 0, scale: 0.95 }}
-                            animate={{ opacity: 1, scale: 1 }}
-                            exit={{ opacity: 0, scale: 0.95 }}
-                            className="bg-slate-900 border border-slate-800 rounded-3xl w-full max-w-4xl h-[90vh] flex flex-col overflow-hidden shadow-2xl"
-                        >
-                            {/* Modal Header */}
-                            <div className="p-6 border-b border-slate-800 flex justify-between items-center bg-slate-950/45">
-                                <div>
-                                    <h3 className="text-base font-black text-white">Application Form Print Preview</h3>
-                                    <p className="text-[10px] text-slate-400 font-semibold mt-0.5">Prints perfectly on standard A4 paper size.</p>
-                                </div>
-                                <div className="flex items-center gap-3">
-                                    <Button onClick={() => window.print()} className="bg-amber-500 hover:bg-amber-600 text-black font-black text-xs px-4 h-9 rounded-xl border-0 flex items-center gap-1.5 shadow-lg">
-                                        <Printer className="h-4 w-4" /> Print / Save PDF
-                                    </Button>
-                                    <button onClick={() => setShowPrintModal(false)} className="p-2 text-slate-400 hover:text-white transition-colors bg-slate-800 hover:bg-slate-700 rounded-xl">
-                                        <X className="h-4 w-4" />
-                                    </button>
-                                </div>
-                            </div>
-                            
-                            {/* Modal Content - scrollable form preview */}
-                            <div className="flex-1 overflow-auto p-6 md:p-12 bg-slate-950/80">
-                                <div className="shadow-2xl rounded-xl overflow-hidden bg-white">
-                                    <PrintableForm roleType="admin" coopName={coopName} sector={sector} />
-                                </div>
-                            </div>
-                        </motion.div>
-                    </div>
-                )}
-            </AnimatePresence>
-
-            {/* Printable Form wrapper - invisible on screen, displayed only during browser print. Rendered directly on body via Portal to bypass Layout wrappers display:none print styling */}
-            {mounted && createPortal(
-                <div id="copteller-print-area-wrapper" className="print-root hidden print:block bg-white text-black">
-                    <div style={{ padding: "15mm" }}>
-                        <PrintableForm roleType="admin" coopName={coopName} sector={sector} />
-                    </div>
-                </div>,
-                document.body
-            )}
-
-            {/* Global style override to only print the form target */}
-            <style>{`
-                @page {
-                    size: auto;
-                    margin: 0mm;
-                }
-            `}</style>
+            <PrintableFormDialog
+                open={showPrintModal}
+                onClose={() => setShowPrintModal(false)}
+                roleType="admin"
+                coopName={coopName}
+                sector={sector}
+                accentClassName="bg-amber-500 hover:bg-amber-600 text-black"
+            />
         </div>
     )
 }

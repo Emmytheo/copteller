@@ -13,7 +13,7 @@ import {
 } from "lucide-react"
 import Link from "next/link"
 import { Button } from "@/components/ui/button"
-import { PrintableForm } from "@/components/copteller/printable-form"
+import { PrintableFormDialog } from "@/components/copteller/printable-form"
 
 // â”€â”€â”€ Types â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 type UserClass = "member" | "admin" | "investor"
@@ -752,7 +752,7 @@ export default function OnboardingPage() {
                             </Button>
                         </div>
                     </div>
-                    <div className="w-full md:w-[260px] border border-slate-250 dark:border-slate-800 p-4 rounded-2xl bg-white dark:bg-slate-950 shadow-inner flex flex-col items-center select-none scale-95 opacity-85 hover:opacity-100 hover:scale-100 transition-all">
+                    <div className="w-full md:w-[260px] border border-slate-200 dark:border-slate-800 p-4 rounded-2xl bg-white dark:bg-slate-950 shadow-inner flex flex-col items-center select-none scale-95 opacity-85 hover:opacity-100 hover:scale-100 transition-all">
                         <div className="w-full aspect-[1/1.4] bg-slate-50 dark:bg-slate-900 border border-dashed border-slate-300 dark:border-slate-800 rounded-lg flex flex-col items-center justify-center text-center p-3">
                             <div className="w-10 h-10 border border-dashed border-slate-400 flex items-center justify-center rounded text-[8px] font-bold text-slate-400 mb-2">Photo</div>
                             <p className="text-[10px] font-black uppercase text-foreground">A4 Member Form</p>
@@ -762,62 +762,11 @@ export default function OnboardingPage() {
                 </div>
             </section>
 
-            {/* Form Preview Modal Dialog */}
-            <AnimatePresence>
-                {showPrintModal && (
-                    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/70 backdrop-blur-sm print:hidden">
-                        <motion.div
-                            initial={{ opacity: 0, scale: 0.95 }}
-                            animate={{ opacity: 1, scale: 1 }}
-                            exit={{ opacity: 0, scale: 0.95 }}
-                            className="bg-slate-900 border border-slate-800 rounded-3xl w-full max-w-4xl h-[90vh] flex flex-col overflow-hidden shadow-2xl"
-                        >
-                            {/* Modal Header */}
-                            <div className="p-6 border-b border-slate-800 flex justify-between items-center bg-slate-950/45">
-                                <div>
-                                    <h3 className="text-base font-black text-white">Application Form Print Preview</h3>
-                                    <p className="text-[10px] text-slate-400 font-semibold mt-0.5">Prints perfectly on standard A4 paper size.</p>
-                                </div>
-                                <div className="flex items-center gap-3">
-                                    <Button onClick={() => window.print()} className="bg-emerald-500 hover:bg-emerald-600 text-black font-black text-xs px-4 h-9 rounded-xl border-0 flex items-center gap-1.5 shadow-lg">
-                                        <Printer className="h-4 w-4" /> Print / Save PDF
-                                    </Button>
-                                    <button onClick={() => setShowPrintModal(false)} className="p-2 text-slate-400 hover:text-white transition-colors bg-slate-800 hover:bg-slate-700 rounded-xl">
-                                        <X className="h-4 w-4" />
-                                    </button>
-                                </div>
-                            </div>
-
-                            {/* Modal Content - scrollable form preview */}
-                            <div className="flex-1 overflow-auto p-6 md:p-12 bg-slate-950/80">
-                                <div className="shadow-2xl rounded-xl overflow-hidden bg-white">
-                                    <PrintableForm roleType={activeClass} />
-                                </div>
-                            </div>
-                        </motion.div>
-                    </div>
-                )}
-            </AnimatePresence>
-
-            {/* Printable Form wrapper - invisible on screen, displayed only during browser print */}
-            <div id="copteller-print-area-wrapper" className="hidden print:block absolute top-0 left-0 w-full z-[9999] bg-white text-black p-0">
-                <PrintableForm roleType={activeClass} />
-            </div>
-
-            {/* Global style override to only print the form target */}
-            <style>{`
-                @media print {
-                    body > *:not(#copteller-print-area-wrapper) {
-                        display: none !important;
-                    }
-                    html, body {
-                        background: white !important;
-                        color: black !important;
-                        margin: 0 !important;
-                        padding: 0 !important;
-                    }
-                }
-            `}</style>
+            <PrintableFormDialog
+                open={showPrintModal}
+                onClose={() => setShowPrintModal(false)}
+                roleType={activeClass}
+            />
         </div>
     )
 }
