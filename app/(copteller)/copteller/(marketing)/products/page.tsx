@@ -108,7 +108,7 @@ export default function CooperativeProductRegistryPage() {
                             value={searchQuery}
                             onChange={(e) => setSearchQuery(e.target.value)}
                             placeholder="Search schemes, assets, or loan criteria..."
-                            className="w-full h-11 pl-10 pr-4 rounded-xl border border-slate-200 dark:border-slate-805 bg-background text-xs font-semibold focus:outline-none focus:ring-2 focus:ring-emerald-500/30"
+                            className="w-full h-11 pl-10 pr-4 rounded-xl border border-slate-200 dark:border-slate-800 bg-background text-xs font-semibold focus:outline-none focus:ring-2 focus:ring-emerald-500/30"
                         />
                     </div>
                     <div className="flex gap-2 overflow-x-auto w-full md:w-auto pb-1 md:pb-0 scrollbar-none">
@@ -118,7 +118,7 @@ export default function CooperativeProductRegistryPage() {
                                 onClick={() => setSelectedCategory(cat.value)}
                                 className={`px-4 h-11 rounded-xl text-xs font-black shrink-0 transition-all border ${
                                     selectedCategory === cat.value
-                                        ? 'bg-emerald-650 border-emerald-600 text-white dark:text-black shadow-md'
+                                        ? 'bg-emerald-600 border-emerald-600 text-white shadow-md'
                                         : 'border-slate-200 dark:border-slate-800 bg-background text-muted-foreground hover:text-foreground'
                                 }`}
                             >
@@ -157,7 +157,7 @@ export default function CooperativeProductRegistryPage() {
                                 >
                                     <div className="space-y-4">
                                         <div className="flex justify-between items-start">
-                                            <div className="p-3 bg-slate-100 dark:bg-slate-900/60 border border-slate-200 dark:border-slate-800 text-slate-650 dark:text-emerald-450 rounded-2xl">
+                                            <div className="p-3 bg-slate-100 dark:bg-slate-900/60 border border-slate-200 dark:border-slate-800 text-slate-700 dark:text-emerald-400 rounded-2xl">
                                                 {getIcon(p.product_type)}
                                             </div>
                                             {getCategoryBadge(p.product_type)}

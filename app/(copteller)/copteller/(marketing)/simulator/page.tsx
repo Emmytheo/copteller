@@ -32,13 +32,13 @@ export default function SavingsFinanceSimulatorPage() {
     const ajoTotalPool = ajoContrib * ajoMembers
     const ajoDays = ajoMembers * (ajoFreq === "daily" ? 1 : ajoFreq === "weekly" ? 7 : 30)
 
-    const hpVehiclePrice = 1400000 // cost of a tricycle in ₦
+    const hpVehiclePrice = 1400000 // sample asset cost in ₦
     const hpTotalCapital = hpFleet * hpVehiclePrice
     const hpWeeklyPool = hpFleet * hpRate
     const hpTotalWeeks = Math.round((hpMonths * 30.4) / 7)
     const hpTotalContractReturn = hpWeeklyPool * hpTotalWeeks
     const hpAnnualReturn = (hpWeeklyPool * 52)
-    const hpROI = ((hpAnnualReturn / hpTotalCapital) * 100).toFixed(1)
+    const hpPaybackWeeks = Math.ceil(hpVehiclePrice / hpRate)
 
     const loanTotalInterest = (loanAmount * loanRate * (loanMonths / 12)) / 100
     const loanTotalRepay = loanAmount + loanTotalInterest
@@ -58,13 +58,13 @@ export default function SavingsFinanceSimulatorPage() {
                 {/* Header */}
                 <div className="text-center space-y-4 max-w-2xl mx-auto">
                     <span className="text-[10px] font-black bg-amber-500/10 text-amber-600 dark:text-amber-400 border border-amber-500/20 px-3 py-1.5 rounded-full uppercase tracking-widest">
-                        Interactive Projection Suite
+                        Illustrative Planning Model
                     </span>
                     <h1 className="text-4xl md:text-6xl font-black tracking-tight leading-none">
                         Savings & Finance Simulator
                     </h1>
                     <p className="text-sm text-muted-foreground leading-relaxed">
-                        Model your Ajo thrift cycles, fleet Hire Purchase returns, or micro loan installments. Adjust the variables to preview payment and payout timelines.
+                        Model Ajo rotation pools, fleet Hire-Purchase repayment timelines, or micro-loan installments before registering your cooperative program.
                     </p>
                 </div>
 
@@ -81,7 +81,7 @@ export default function SavingsFinanceSimulatorPage() {
                                 onClick={() => setActiveTab(t.id as any)}
                                 className={`flex-1 py-3 px-2 rounded-xl text-xs font-black transition-all flex items-center justify-center gap-1.5 ${
                                     activeTab === t.id
-                                        ? 'bg-white dark:bg-slate-900 text-foreground border border-slate-205 dark:border-slate-800 shadow-sm'
+                                        ? 'bg-white dark:bg-slate-900 text-foreground border border-slate-200 dark:border-slate-800 shadow-sm'
                                         : 'text-muted-foreground hover:text-foreground'
                                 }`}
                             >
@@ -93,14 +93,14 @@ export default function SavingsFinanceSimulatorPage() {
                 </div>
 
                 {/* Simulator Content Grid */}
-                <div className="bg-slate-50/50 dark:bg-slate-955/10 border border-slate-200 dark:border-slate-900 rounded-[32px] p-6 md:p-10 grid grid-cols-1 lg:grid-cols-12 gap-8 items-stretch backdrop-blur-md">
+                <div className="bg-slate-50/70 dark:bg-slate-950/40 border border-slate-200 dark:border-slate-900 rounded-[32px] p-6 md:p-10 grid grid-cols-1 lg:grid-cols-12 gap-8 items-stretch backdrop-blur-md">
                     
                     {/* Left: Inputs & Sliders */}
                     <div className="lg:col-span-7 flex flex-col justify-between space-y-8">
                         <div className="space-y-6">
                             <div>
                                 <h3 className="text-xl md:text-2xl font-black">Configure Parameters</h3>
-                                <p className="text-xs text-muted-foreground mt-1 leading-relaxed font-semibold">Adjust the sliders to view real-time changes on the output ledger ledger ledger.</p>
+                                <p className="text-xs text-muted-foreground mt-1 leading-relaxed font-semibold">Adjust the sliders to preview how contributions and repayment schedules scale across cycles.</p>
                             </div>
 
                             <AnimatePresence mode="wait">
@@ -167,7 +167,7 @@ export default function SavingsFinanceSimulatorPage() {
                                         <div className="space-y-2">
                                             <div className="flex justify-between text-xs font-black">
                                                 <span className="text-muted-foreground">Loan Principal Volume</span>
-                                                <span className="text-blue-605 dark:text-blue-405 font-extrabold">{fmt(loanAmount)}</span>
+                                                <span className="text-blue-600 dark:text-blue-400 font-extrabold">{fmt(loanAmount)}</span>
                                             </div>
                                             <input type="range" min={20000} max={1000000} step={10000} value={loanAmount} onChange={(e) => setLoanAmount(Number(e.target.value))}
                                                 className="w-full h-1.5 bg-slate-200 dark:bg-slate-900 rounded-lg appearance-none cursor-pointer accent-blue-500" />
@@ -175,7 +175,7 @@ export default function SavingsFinanceSimulatorPage() {
                                         <div className="space-y-2">
                                             <div className="flex justify-between text-xs font-black">
                                                 <span className="text-muted-foreground">Repayment Term</span>
-                                                <span className="text-blue-605 dark:text-blue-405 font-extrabold">{loanMonths} Months</span>
+                                                <span className="text-blue-600 dark:text-blue-400 font-extrabold">{loanMonths} Months</span>
                                             </div>
                                             <input type="range" min={3} max={18} step={3} value={loanMonths} onChange={(e) => setLoanMonths(Number(e.target.value))}
                                                 className="w-full h-1.5 bg-slate-200 dark:bg-slate-900 rounded-lg appearance-none cursor-pointer accent-blue-500" />
@@ -183,7 +183,7 @@ export default function SavingsFinanceSimulatorPage() {
                                         <div className="space-y-2">
                                             <div className="flex justify-between text-xs font-black">
                                                 <span className="text-muted-foreground">Interest Rate (Flat p.a.)</span>
-                                                <span className="text-blue-605 dark:text-blue-405 font-extrabold">{loanRate}%</span>
+                                                <span className="text-blue-600 dark:text-blue-400 font-extrabold">{loanRate}%</span>
                                             </div>
                                             <input type="range" min={5} max={30} step={1} value={loanRate} onChange={(e) => setLoanRate(Number(e.target.value))}
                                                 className="w-full h-1.5 bg-slate-200 dark:bg-slate-900 rounded-lg appearance-none cursor-pointer accent-blue-500" />
@@ -210,7 +210,7 @@ export default function SavingsFinanceSimulatorPage() {
                                     <motion.div key="ajo-res" initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }} exit={{ opacity: 0, scale: 0.95 }} className="space-y-6">
                                         <div className="text-center pb-4 border-b">
                                             <p className="text-[10px] text-muted-foreground uppercase tracking-widest">Total Rotation Pool Payout</p>
-                                            <p className="text-4xl font-black text-emerald-650 dark:text-emerald-450 mt-1">{fmt(ajoTotalPool)}</p>
+                                            <p className="text-4xl font-black text-emerald-600 dark:text-emerald-400 mt-1">{fmt(ajoTotalPool)}</p>
                                             <p className="text-[9px] text-muted-foreground mt-1.5">Disbursed to one member at the end of each {ajoFreq === "monthly" ? "month" : ajoFreq === "weekly" ? "week" : "day"}</p>
                                         </div>
                                         <div className="space-y-3.5 text-xs text-muted-foreground">
@@ -233,22 +233,22 @@ export default function SavingsFinanceSimulatorPage() {
                                 {activeTab === "hp" && (
                                     <motion.div key="hp-res" initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }} exit={{ opacity: 0, scale: 0.95 }} className="space-y-6">
                                         <div className="text-center pb-4 border-b">
-                                            <p className="text-[10px] text-muted-foreground uppercase tracking-widest">Projected Annual Revenue</p>
-                                            <p className="text-4xl font-black text-amber-650 dark:text-amber-450 mt-1">{fmt(hpAnnualReturn)}</p>
-                                            <p className="text-[9px] text-muted-foreground mt-1.5">Across {hpFleet} tricycles leased on Hire Purchase</p>
+                                            <p className="text-[10px] text-muted-foreground uppercase tracking-widest">Sample Annual Collection Pool</p>
+                                            <p className="text-4xl font-black text-amber-600 dark:text-amber-400 mt-1">{fmt(hpAnnualReturn)}</p>
+                                            <p className="text-[9px] text-muted-foreground mt-1.5">Across {hpFleet} units financed on Hire Purchase</p>
                                         </div>
                                         <div className="space-y-3.5 text-xs text-muted-foreground">
                                             <div className="flex justify-between items-center">
-                                                <span>Capital Deployed</span>
+                                                <span>Capital Outlay</span>
                                                 <span className="text-foreground font-black">{fmt(hpTotalCapital)}</span>
                                             </div>
                                             <div className="flex justify-between items-center">
-                                                <span>Total Contract Return</span>
+                                                <span>Total Contract Collection</span>
                                                 <span className="text-foreground font-black">{fmt(hpTotalContractReturn)}</span>
                                             </div>
                                             <div className="flex justify-between items-center">
-                                                <span>Estimated Underwriter Yield</span>
-                                                <span className="text-emerald-600 dark:text-emerald-400 font-extrabold">~{hpROI}% ROI p.a.</span>
+                                                <span>Principal Break-Even Horizon</span>
+                                                <span className="text-emerald-600 dark:text-emerald-400 font-extrabold">{hpPaybackWeeks} weeks</span>
                                             </div>
                                         </div>
                                     </motion.div>
@@ -258,7 +258,7 @@ export default function SavingsFinanceSimulatorPage() {
                                     <motion.div key="loans-res" initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }} exit={{ opacity: 0, scale: 0.95 }} className="space-y-6">
                                         <div className="text-center pb-4 border-b">
                                             <p className="text-[10px] text-muted-foreground uppercase tracking-widest">Est. Monthly Repayment</p>
-                                            <p className="text-4xl font-black text-blue-650 dark:text-blue-450 mt-1">{fmt(loanMonthlyInstallment)}</p>
+                                            <p className="text-4xl font-black text-blue-600 dark:text-blue-400 mt-1">{fmt(loanMonthlyInstallment)}</p>
                                             <p className="text-[9px] text-muted-foreground mt-1.5">Payable in equal installments over {loanMonths} months</p>
                                         </div>
                                         <div className="space-y-3.5 text-xs text-muted-foreground">
@@ -284,7 +284,7 @@ export default function SavingsFinanceSimulatorPage() {
                             </AnimatePresence>
 
                             <div className="pt-6 border-t">
-                                <Button asChild className="w-full h-12 bg-gradient-to-r from-emerald-500 to-amber-500 hover:from-emerald-450 hover:to-amber-450 text-black font-black rounded-xl text-xs border-none shadow-lg">
+                                <Button asChild className="w-full h-12 bg-gradient-to-r from-emerald-500 to-amber-500 hover:from-emerald-400 hover:to-amber-400 text-black font-black rounded-xl text-xs border-none shadow-lg">
                                     <Link href="/copteller/onboarding/member">Onboard & Submit Application</Link>
                                 </Button>
                             </div>

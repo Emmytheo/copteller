@@ -44,13 +44,13 @@ export default function CoptellerGovernancePage() {
         setDeployLog([])
         const logs = [
             "Initializing Copteller vault security context...",
-            "Retrieving cooperative society metadata from CAC registry...",
-            "Creating digital Escrow accounts under partner MFB vaults...",
-            "Validating bylaws: Rotation max limit set to 30 days...",
-            "Deploying TVS King HP dynamic split executors...",
-            "Reserve requirement check: 10% cash backing verified...",
-            "Handshake completed: Digital ledger verified by regulator...",
-            "Deployment Successful! Escrow Vault ID: CT-8294-ABA active."
+            "Validating cooperative society registration metadata...",
+            "Provisioning segregated Escrow sub-ledger at Partner MFB...",
+            "Loading union bylaws: maximum rotation & guarantor bounds...",
+            "Binding Hire-Purchase split rules to active asset class...",
+            "Verifying reserve & NIBSS settlement routing checks...",
+            "Double-entry reconciliation check passed...",
+            "Blueprint Ready! Sample Vault ID: CT-VAULT-PREVIEW."
         ]
         
         logs.forEach((log, index) => {
@@ -74,14 +74,14 @@ export default function CoptellerGovernancePage() {
                 
                 {/* Header */}
                 <div className="text-center space-y-4">
-                    <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full border border-emerald-500/30 bg-emerald-505/10 dark:bg-emerald-950/20 text-emerald-600 dark:text-emerald-400 text-[10px] font-black uppercase tracking-widest">
+                    <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full border border-emerald-500/30 bg-emerald-500/10 dark:bg-emerald-950/20 text-emerald-600 dark:text-emerald-400 text-[10px] font-black uppercase tracking-widest">
                         Union Regulation
                     </div>
                     <h1 className="text-4xl md:text-6xl font-black tracking-tight leading-none">
                         Cooperative Governance
                     </h1>
                     <p className="text-sm text-muted-foreground max-w-xl mx-auto leading-relaxed">
-                        Copteller operates under trade guild governance parameters, audited by partner MFB compliance standards. Read rules or configure your union vault parameters below.
+                        Copteller operates under trade guild governance parameters audited against Partner Microfinance Bank compliance standards. Inspect custody principles or step through our union setup blueprint below.
                     </p>
                 </div>
 
@@ -93,26 +93,26 @@ export default function CoptellerGovernancePage() {
                         </div>
                         <h3 className="text-2xl font-black">MFB Deposit Auditing</h3>
                         <p className="text-xs text-muted-foreground font-semibold leading-relaxed">
-                            Copteller is not a standalone credit registry. All deposits and thrift balances are wrapped inside bank accounts held at partner MFBs, insuring union member capital up to NDIC thresholds.
+                            Copteller is not a standalone credit registry. All deposits and thrift balances sit inside segregated accounts held at licensed partner MFBs under regulatory deposit protections.
                         </p>
                     </div>
 
-                    <div className="bg-slate-50 dark:bg-slate-955/40 border border-slate-200 dark:border-slate-900 rounded-3xl p-8 space-y-4 backdrop-blur-md">
-                        <div className="p-3 bg-slate-105/50 border border-slate-200 dark:border-slate-800 rounded-2xl w-fit">
+                    <div className="bg-slate-50 dark:bg-slate-950/40 border border-slate-200 dark:border-slate-900 rounded-3xl p-8 space-y-4 backdrop-blur-md">
+                        <div className="p-3 bg-slate-100/80 dark:bg-slate-900/50 border border-slate-200 dark:border-slate-800 rounded-2xl w-fit">
                             <FileText className="h-6 w-6 text-amber-600 dark:text-amber-400" />
                         </div>
                         <h3 className="text-2xl font-black">Bylaws Frameworks</h3>
                         <p className="text-xs text-muted-foreground font-semibold leading-relaxed">
-                            Every registered cooperative society submits a digitized copy of their Bylaws and Rules. Dynamic workflows use these variables to enforce maximum rotation timeouts and target default interest margins.
+                            Every registered cooperative society submits verified bylaws and executive mandates. Role-scoped workflows enforce rotation intervals, approval thresholds, and default covenants.
                         </p>
                     </div>
                 </div>
 
                 {/* Onboarding Wizard Segment */}
-                <section className="bg-slate-50/50 dark:bg-slate-955/10 border border-slate-200 dark:border-slate-900 rounded-[32px] p-8 md:p-12 space-y-8 backdrop-blur-md">
+                <section className="bg-slate-50/50 dark:bg-slate-950/40 border border-slate-200 dark:border-slate-900 rounded-[32px] p-8 md:p-12 space-y-8 backdrop-blur-md">
                     <div className="text-center space-y-2">
-                        <h3 className="text-2xl md:text-3xl font-black">Interactive Union Setup Wizard</h3>
-                        <p className="text-xs text-muted-foreground font-semibold">Simulate how a trade group sets up their digital cooperative profile in less than 5 minutes.</p>
+                        <h3 className="text-2xl md:text-3xl font-black">Interactive Governance Blueprint</h3>
+                        <p className="text-xs text-muted-foreground font-semibold">Walk through how a cooperative configures its society profile and escrow structure before live MFB onboarding.</p>
                     </div>
 
                     {/* Progress indicators */}
@@ -145,15 +145,15 @@ export default function CoptellerGovernancePage() {
                                         <div className="space-y-1.5">
                                             <label className="text-[10px] font-black text-slate-500 uppercase tracking-widest">Cooperative Society Name</label>
                                             <input 
-                                                type="text" placeholder="e.g. Aba Transport Operator Union" value={coopName} onChange={(e) => setCoopName(e.target.value)}
-                                                className="w-full h-10 px-3 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-900 rounded-xl text-xs font-semibold focus:outline-none focus:border-emerald-555"
+                                                type="text" placeholder="e.g. Metro Commercial Riders Union" value={coopName} onChange={(e) => setCoopName(e.target.value)}
+                                                className="w-full h-10 px-3 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-900 rounded-xl text-xs font-semibold focus:outline-none focus:border-emerald-500"
                                             />
                                         </div>
                                         <div className="space-y-1.5">
                                             <label className="text-[10px] font-black text-slate-500 uppercase tracking-widest">Guild Sector</label>
                                             <select 
                                                 value={coopSector} onChange={(e) => setCoopSector(e.target.value)}
-                                                className="w-full h-10 px-3 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-900 rounded-xl text-xs font-semibold focus:outline-none focus:border-emerald-555"
+                                                className="w-full h-10 px-3 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-900 rounded-xl text-xs font-semibold focus:outline-none focus:border-emerald-500"
                                             >
                                                 <option value="transport">Transport (Keke/Tricycles)</option>
                                                 <option value="retail">Retail Market Guilds</option>
@@ -189,9 +189,9 @@ export default function CoptellerGovernancePage() {
                                         className="border border-dashed border-slate-300 dark:border-slate-800 rounded-2xl p-8 hover:bg-slate-50 dark:hover:bg-slate-950/20 transition-colors cursor-pointer flex flex-col items-center justify-center gap-2"
                                     >
                                         {uploading ? (
-                                            <Loader2 className="h-8 w-8 text-emerald-555 animate-spin" />
+                                            <Loader2 className="h-8 w-8 text-emerald-500 animate-spin" />
                                         ) : uploadCompleted ? (
-                                            <CheckCircle2 className="h-8 w-8 text-emerald-600 dark:text-emerald-450" />
+                                            <CheckCircle2 className="h-8 w-8 text-emerald-600 dark:text-emerald-400" />
                                         ) : (
                                             <Upload className="h-8 w-8 text-slate-400" />
                                         )}
@@ -245,16 +245,16 @@ export default function CoptellerGovernancePage() {
                                                     <span className="text-foreground font-black">{coopName}</span>
                                                 </div>
                                                 <div className="flex justify-between px-4 py-2.5">
-                                                    <span className="text-muted-foreground">Vault ID</span>
-                                                    <span className="font-mono text-emerald-650 dark:text-emerald-450 font-extrabold">CT-8294-ABA</span>
+                                                    <span className="text-muted-foreground">Sample Vault ID</span>
+                                                    <span className="font-mono text-emerald-600 dark:text-emerald-400 font-extrabold">CT-VAULT-PREVIEW</span>
                                                 </div>
                                                 <div className="flex justify-between px-4 py-2.5">
                                                     <span className="text-muted-foreground">Clearing Fee</span>
-                                                    <span className="text-foreground font-black">1.5% at source</span>
+                                                    <span className="text-foreground font-black">Configured per MFB mandate</span>
                                                 </div>
                                                 <div className="flex justify-between px-4 py-2.5">
                                                     <span className="text-muted-foreground">Reserves Backing</span>
-                                                    <span className="text-foreground font-black">1:1 Escrow Reserves</span>
+                                                    <span className="text-foreground font-black">1:1 Escrow Custody</span>
                                                 </div>
                                             </div>
 
@@ -279,7 +279,7 @@ export default function CoptellerGovernancePage() {
                                             </Button>
 
                                             {deployLog.length > 0 && (
-                                                <div className="bg-slate-950 border border-slate-900 rounded-xl p-4 font-mono text-[9px] text-emerald-450 space-y-1.5 h-36 overflow-y-auto">
+                                                <div className="bg-slate-950 border border-slate-900 rounded-xl p-4 font-mono text-[9px] text-emerald-400 space-y-1.5 h-36 overflow-y-auto">
                                                     {deployLog.map((log, idx) => (
                                                         <div key={idx} className="flex gap-1.5">
                                                             <span className="text-slate-500 shrink-0">&gt;</span>
