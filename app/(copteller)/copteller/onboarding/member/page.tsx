@@ -13,6 +13,7 @@ import { Button } from "@/components/ui/button"
 import { toast } from "sonner"
 import { useRouter } from "next/navigation"
 import { PrintableFormDialog } from "@/components/copteller/printable-form"
+import { PRESET_REGISTERED_COOPS, type RegisteredCoopDirectoryItem } from "@/lib/copteller/coop-form-specs"
 
 const fmt = (n: number) => `₦${n.toLocaleString()}`
 
@@ -109,55 +110,30 @@ export default function MemberOnboardingPage() {
     const pinRefs = React.useRef<(HTMLInputElement | null)[]>([])
 
     // Live Cooperatives
-    const [dbCoops, setDbCoops] = React.useState<any[]>([])
-
-    const [coopDetails, setCoopDetails] = React.useState<any>(null)
-    const [loadingCoopDetails, setLoadingCoopDetails] = React.useState(false)
+    const [dbCoops, setDbCoops] = React.useState<RegisteredCoopDirectoryItem[]>(PRESET_REGISTERED_COOPS)
     const [selectedProduct, setSelectedProduct] = React.useState<any>(null)
     const [formAnswers, setFormAnswers] = React.useState<Record<string, string>>({})
+    const [coopSpecAnswers, setCoopSpecAnswers] = React.useState<Record<string, string>>({})
 
     React.useEffect(() => {
-        fetch('/api/copteller/admin/cooperatives?status=active')
-            .then(r => r.json())
+        fetch('/api/copteller/cooperatives?status=active')
+            .then(r => (r.ok ? r.json() : null))
             .then(res => {
-                if (res.data) setDbCoops(res.data)
+                if (res?.data && Array.isArray(res.data) && res.data.length > 0) {
+                    setDbCoops(res.data)
+                }
             })
             .catch(err => console.warn("Failed to fetch active cooperatives", err))
     }, [])
 
-    React.useEffect(() => {
-        if (selectedCoop) {
-            setLoadingCoopDetails(true)
-            fetch(`/api/copteller/admin/cooperatives/${selectedCoop.id}`)
-                .then(r => r.json())
-                .then(res => {
-                    if (res.data) {
-                        setCoopDetails(res.data)
-                    }
-                })
-                .catch(err => console.warn("Failed to fetch coop details", err))
-                .finally(() => setLoadingCoopDetails(false))
-        } else {
-            setCoopDetails(null)
-            setSelectedProduct(null)
-            setFormAnswers({})
-        }
-    }, [selectedCoop])
+    const handleSelectCoop = (c: RegisteredCoopDirectoryItem) => {
+        setSelectedCoop(c)
+        setSelectedProduct(null)
+        setFormAnswers({})
+        setCoopSpecAnswers({})
+    }
 
-    const finalCoops = dbCoops.length > 0 ? dbCoops.map((c: any) => ({
-        id: String(c.id),
-        name: c.name,
-        sector: c.sector || 'commerce',
-        members: c.members_count || 12,
-        admin: c.union_leader?.firstName ? `${c.union_leader.firstName} ${c.union_leader.lastName || ''}` : 'Admin'
-    })) : [
-        { id: "1", name: "Aba Tricycle Operators Guild", sector: "transport", members: 142, admin: "Chukwuemeka Obi" },
-        { id: "2", name: "Ariaria Market Women Cooperative", sector: "commerce", members: 89, admin: "Ngozi Eze" },
-        { id: "3", name: "Umuahia Farmers Alliance", sector: "agriculture", members: 67, admin: "Emmanuel Nwosu" },
-        { id: "4", name: "Aba Tailors & Garment Guild", sector: "artisan", members: 45, admin: "Adaeze Okafor" },
-    ]
-
-    const filteredCoops = finalCoops.filter(c =>
+    const filteredCoops = dbCoops.filter(c =>
         (!sector || c.sector === sector) &&
         (!coopSearch || c.name.toLowerCase().includes(coopSearch.toLowerCase()))
     )
@@ -232,7 +208,9 @@ export default function MemberOnboardingPage() {
                     role: 'member',
                     metadata: {
                         selectedProduct: selectedProduct ? { id: selectedProduct.id, name: selectedProduct.name } : null,
-                        applicationAnswers: formAnswers
+                        applicationAnswers: formAnswers,
+                        coopSpecAnswers,
+                        declarationPurpose: selectedCoop?.memberFormSpec?.declarationPurpose || newCoopName || "Copteller Cooperative System",
                     }
                 })
             })
@@ -256,8 +234,17 @@ export default function MemberOnboardingPage() {
         if (step === 2) {
             if (coopMode === "join" && !selectedCoop) { toast.error("Please select a cooperative"); return }
             if (coopMode === "create" && !newCoopName) { toast.error("Please enter a cooperative name"); return }
-            
-            // If dynamic form fields are rendered, make sure required fields are filled!
+
+            if (coopMode === "join" && selectedCoop?.memberFormSpec?.customFields) {
+                for (const cf of selectedCoop.memberFormSpec.customFields) {
+                    if (cf.required && !coopSpecAnswers[cf.id]?.trim()) {
+                        toast.error(`Please complete cooperative field: ${cf.label}`)
+                        return
+                    }
+                }
+            }
+
+            // If dynamic product form fields are rendered, make sure required fields are filled!
             if (coopMode === "join" && selectedProduct?.form_schema) {
                 for (const f of selectedProduct.form_schema) {
                     if (f.required && !formAnswers[f.id]) {
@@ -449,14 +436,16 @@ export default function MemberOnboardingPage() {
                                                     <input value={coopSearch} onChange={e => setCoopSearch(e.target.value)} placeholder="Type cooperative name..."
                                                         className="w-full h-10 px-3 rounded-xl border border-slate-200 dark:border-slate-805 bg-background text-xs font-semibold focus:outline-none focus:ring-2 focus:ring-emerald-500/30 focus:border-emerald-500/50 transition-all" />
                                                 </div>
-                                                <div className="space-y-2 max-h-48 overflow-y-auto">
+                                                <div className="space-y-2 max-h-56 overflow-y-auto pr-1">
                                                     {filteredCoops.map(c => (
-                                                        <button key={c.id} type="button" onClick={() => setSelectedCoop(c)}
+                                                        <button key={c.id} type="button" onClick={() => handleSelectCoop(c)}
                                                             className={`w-full text-left p-3 rounded-xl border transition-all ${selectedCoop?.id === c.id ? 'border-emerald-500/50 bg-emerald-500/8' : 'border-slate-200 dark:border-slate-800 hover:border-slate-300'}`}>
-                                                            <div className="flex items-start justify-between">
+                                                            <div className="flex items-start justify-between gap-2">
                                                                 <div>
                                                                     <p className="text-xs font-black">{c.name}</p>
-                                                                    <p className="text-[10px] text-muted-foreground font-semibold mt-0.5">{c.members} members &bull; Admin: {c.admin}</p>
+                                                                    <p className="text-[10px] text-muted-foreground font-semibold mt-0.5">
+                                                                        {c.membersCount} members &bull; {c.regNumber || c.sector} &bull; {c.memberFormSpec.requireUnionClearance ? "Union Clearance" : "Voluntary / Direct"}
+                                                                    </p>
                                                                 </div>
                                                                 {selectedCoop?.id === c.id && <CheckCircle2 className="h-4 w-4 text-emerald-500 shrink-0 mt-0.5" />}
                                                             </div>
@@ -469,14 +458,66 @@ export default function MemberOnboardingPage() {
 
                                                 {selectedCoop && (
                                                     <div className="space-y-4 pt-4 border-t border-slate-200 dark:border-slate-900">
+                                                        {/* Cooperative Specifications Banner & Custom Member Fields */}
+                                                        <div className="p-3.5 rounded-2xl bg-emerald-500/5 border border-emerald-500/20 space-y-3">
+                                                            <div className="flex flex-wrap items-center justify-between gap-2">
+                                                                <p className="text-[10px] font-black text-emerald-600 dark:text-emerald-400 uppercase tracking-wider">
+                                                                    Cooperative Member Form Specifications
+                                                                </p>
+                                                                <span className="text-[9px] font-black px-2 py-0.5 rounded-full bg-white dark:bg-slate-900 border border-emerald-500/30 text-emerald-600 dark:text-emerald-400">
+                                                                    {selectedCoop.memberFormSpec.requireUnionClearance ? "Union Leader Clearance Required" : "Voluntary • No Union Clearance"}
+                                                                </span>
+                                                            </div>
+                                                            <p className="text-[10px] text-muted-foreground font-semibold leading-relaxed">
+                                                                Declaration covers: <strong className="text-foreground">{selectedCoop.memberFormSpec.declarationPurpose}</strong>
+                                                                {selectedCoop.memberFormSpec.defaultContributionNaira ? ` • Standard cycle: ${selectedCoop.memberFormSpec.defaultFrequency} (₦${selectedCoop.memberFormSpec.defaultContributionNaira.toLocaleString()})` : ""}
+                                                            </p>
+
+                                                            {selectedCoop.memberFormSpec.customFields?.length > 0 && (
+                                                                <div className="space-y-2.5 pt-1">
+                                                                    {selectedCoop.memberFormSpec.customFields.map((cf: any) => (
+                                                                        <div key={cf.id} className="space-y-1">
+                                                                            <label className="text-[9px] font-bold text-slate-600 dark:text-slate-400 uppercase">
+                                                                                {cf.label} {cf.required ? "*" : "(Optional)"}
+                                                                            </label>
+                                                                            {cf.type === "select" ? (
+                                                                                <select
+                                                                                    value={coopSpecAnswers[cf.id] || ""}
+                                                                                    onChange={e => setCoopSpecAnswers(prev => ({ ...prev, [cf.id]: e.target.value }))}
+                                                                                    className="w-full h-9 px-2.5 rounded-xl border border-slate-200 dark:border-slate-800 bg-background text-xs font-semibold focus:outline-none"
+                                                                                >
+                                                                                    <option value="">Select option...</option>
+                                                                                    {String(cf.options || "").split(",").map(o => <option key={o.trim()} value={o.trim()}>{o.trim()}</option>)}
+                                                                                </select>
+                                                                            ) : cf.type === "textarea" ? (
+                                                                                <textarea
+                                                                                    value={coopSpecAnswers[cf.id] || ""}
+                                                                                    onChange={e => setCoopSpecAnswers(prev => ({ ...prev, [cf.id]: e.target.value }))}
+                                                                                    placeholder={cf.placeholder || ""}
+                                                                                    rows={2}
+                                                                                    className="w-full px-2.5 py-1.5 rounded-xl border border-slate-200 dark:border-slate-800 bg-background text-xs font-semibold focus:outline-none resize-none"
+                                                                                />
+                                                                            ) : (
+                                                                                <input
+                                                                                    type={cf.type || "text"}
+                                                                                    value={coopSpecAnswers[cf.id] || ""}
+                                                                                    onChange={e => setCoopSpecAnswers(prev => ({ ...prev, [cf.id]: e.target.value }))}
+                                                                                    placeholder={cf.placeholder || ""}
+                                                                                    className="w-full h-9 px-2.5 rounded-xl border border-slate-200 dark:border-slate-800 bg-background text-xs font-semibold focus:outline-none focus:border-emerald-500"
+                                                                                />
+                                                                            )}
+                                                                        </div>
+                                                                    ))}
+                                                                </div>
+                                                            )}
+                                                        </div>
+
                                                         <p className="text-[10px] font-black text-muted-foreground uppercase tracking-wider">Available Scheme Products</p>
-                                                        {loadingCoopDetails ? (
-                                                            <div className="flex justify-center py-4"><Loader2 className="h-5 w-5 animate-spin text-emerald-500" /></div>
-                                                        ) : !coopDetails?.authorized_product_types || coopDetails.authorized_product_types.length === 0 ? (
-                                                            <p className="text-xs text-muted-foreground italic font-semibold">No active schemes authorized for this cooperative yet.</p>
+                                                        {!selectedCoop.authorizedProducts || selectedCoop.authorizedProducts.length === 0 ? (
+                                                            <p className="text-xs text-muted-foreground italic font-semibold">General cooperative thrift membership enabled. No extra scheme product required.</p>
                                                         ) : (
                                                             <div className="space-y-2.5">
-                                                                {coopDetails.authorized_product_types.map((p: any) => {
+                                                                {selectedCoop.authorizedProducts.map((p: any) => {
                                                                     const isProdSelected = selectedProduct?.id === p.id
                                                                     return (
                                                                         <div key={p.id} onClick={() => { setSelectedProduct(p); setFormAnswers({}) }}
@@ -738,6 +779,15 @@ export default function MemberOnboardingPage() {
                 open={showPrintModal}
                 onClose={() => setShowPrintModal(false)}
                 roleType="member"
+                selectedCoopId={selectedCoop?.id}
+                registeredCoops={dbCoops}
+                coopName={coopMode === "create" ? newCoopName : selectedCoop?.name}
+                sector={coopMode === "create" ? newCoopSector : selectedCoop?.sector}
+                regNumber={coopMode === "create" ? newCoopReg : selectedCoop?.regNumber}
+                state={coopMode === "create" ? newCoopState : selectedCoop?.state}
+                lga={coopMode === "create" ? newCoopLga : selectedCoop?.lga}
+                formSpec={selectedCoop?.memberFormSpec}
+                customAnswers={coopSpecAnswers}
                 formData={{ firstName, lastName, phone, bvn, dob }}
             />
         </div>

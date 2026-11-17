@@ -187,11 +187,54 @@ export async function POST(req: NextRequest) {
     // Generate a simple membership number
     const membershipNumber = `CPT-${Date.now().toString(36).toUpperCase()}`
 
+    // Resolve preset cooperative IDs (e.g. "preset_keke_operators") into persisted DB cooperative IDs
+    let resolvedCooperativeId = String(cooperative)
+    if (resolvedCooperativeId.startsWith('preset_')) {
+        try {
+            const { PRESET_REGISTERED_COOPS } = await import('@/lib/copteller/coop-form-specs')
+            const preset = PRESET_REGISTERED_COOPS.find((p) => p.id === resolvedCooperativeId)
+            if (preset) {
+                const existing = await payload.find({
+                    collection: 'cooperatives',
+                    where: { name: { equals: preset.name } },
+                    limit: 1,
+                    overrideAccess: true,
+                })
+                if (existing.docs.length > 0) {
+                    resolvedCooperativeId = String(existing.docs[0].id)
+                } else {
+                    const createdCoop = await payload.create({
+                        collection: 'cooperatives',
+                        data: {
+                            name: preset.name,
+                            description: preset.description,
+                            union_leader: memberId,
+                            cooperative_type: (preset.cooperativeType as any) || 'multipurpose',
+                            sector: (preset.sector as any) || 'transport',
+                            segment: preset.segment,
+                            registration_number: preset.regNumber,
+                            state: preset.state,
+                            lga: preset.lga,
+                            status: 'active',
+                            cycleFrequency: preset.cycleFrequency || 'weekly',
+                            defaultContributionAmount: (preset.defaultContributionNaira || 10000) * 100,
+                            metadata: { memberFormSpec: preset.memberFormSpec },
+                        },
+                        overrideAccess: true,
+                    })
+                    resolvedCooperativeId = String(createdCoop.id)
+                }
+            }
+        } catch (err) {
+            console.warn('[POST /api/copteller/memberships] Could not auto-provision preset cooperative:', err)
+        }
+    }
+
     try {
         const membership = await createMembership({
             membership_number: membershipNumber,
             member: memberId,
-            cooperative,
+            cooperative: resolvedCooperativeId,
             role: (auth.role === 'member' ? 'member' : role) ?? 'member',
             // Members self-apply → pending; admins adding → active
             status: auth.role === 'member' ? 'pending' : 'active',
@@ -209,8 +252,8 @@ export async function POST(req: NextRequest) {
             action: 'member.joined_coop',
             entity_type: 'membership',
             entity_id: String(membership.id),
-            after_state: membership,
-            cooperative,
+            after_state: { membership, submittedMetadata: body.metadata || null },
+            cooperative: resolvedCooperativeId,
         })
 
         // Auto-create Copteller Profile for the newly registered member (so they can log in next time)
@@ -223,13 +266,13 @@ export async function POST(req: NextRequest) {
                 if (!hasMemberProfile) {
                     const coop = await payload.findByID({
                         collection: 'cooperatives',
-                        id: cooperative,
+                        id: resolvedCooperativeId,
                         overrideAccess: true,
                     })
                     
                     await createProfileForUser(auth.userId, 'member', {
                         display_name: auth.displayName,
-                        cooperative_id: cooperative,
+                        cooperative_id: resolvedCooperativeId,
                         cooperative_name: coop?.name || null,
                         onboarding_done: true
                     })

@@ -14,6 +14,7 @@ import {
 import Link from "next/link"
 import { Button } from "@/components/ui/button"
 import { PrintableFormDialog } from "@/components/copteller/printable-form"
+import { PRESET_REGISTERED_COOPS, type RegisteredCoopDirectoryItem } from "@/lib/copteller/coop-form-specs"
 
 // â”€â”€â”€ Types â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 type UserClass = "member" | "admin" | "investor"
@@ -299,6 +300,26 @@ export default function OnboardingPage() {
         setDoneSteps(newDone)
         if (activeStep < data.steps.length - 1) setActiveStep(s => s + 1)
     }
+
+    const [registeredCoops, setRegisteredCoops] = React.useState<RegisteredCoopDirectoryItem[]>(PRESET_REGISTERED_COOPS)
+    const [selectedOfflineCoopId, setSelectedOfflineCoopId] = React.useState<string>(PRESET_REGISTERED_COOPS[0].id)
+
+    React.useEffect(() => {
+        fetch("/api/copteller/cooperatives?status=active")
+            .then((r) => (r.ok ? r.json() : null))
+            .then((res) => {
+                if (res?.data && Array.isArray(res.data) && res.data.length > 0) {
+                    setRegisteredCoops(res.data)
+                    setSelectedOfflineCoopId(res.data[0].id)
+                }
+            })
+            .catch(() => {})
+    }, [])
+
+    const selectedOfflineCoop = React.useMemo(
+        () => registeredCoops.find((c) => c.id === selectedOfflineCoopId) || registeredCoops[0],
+        [registeredCoops, selectedOfflineCoopId]
+    )
 
     // Reset wizard when class changes
     React.useEffect(() => {
@@ -737,9 +758,35 @@ export default function OnboardingPage() {
                         <div className="space-y-2">
                             <h3 className="text-xl sm:text-2xl font-black">Offline Guild Onboarding</h3>
                             <p className="text-xs sm:text-sm text-muted-foreground leading-relaxed">
-                                Operating in transport hubs or markets with limited internet? Download and print official paper application forms to gather details from your operators physically. Aggregate data offline, then upload it here.
+                                Operating in transport hubs or markets with limited internet? Choose a registered cooperative below to generate an official A4 paper application form tailored with its exact declaration and member field specifications.
                             </p>
                         </div>
+
+                        <div className="space-y-2 pt-1">
+                            <label className="text-[10px] font-black uppercase tracking-wider text-muted-foreground block">
+                                Registered Cooperative Form Specification
+                            </label>
+                            <select
+                                value={selectedOfflineCoopId}
+                                onChange={(e) => setSelectedOfflineCoopId(e.target.value)}
+                                className="w-full h-11 px-3 rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-950 text-xs font-bold text-foreground focus:outline-none focus:border-emerald-500"
+                            >
+                                {registeredCoops.map((c) => (
+                                    <option key={c.id} value={c.id}>
+                                        {c.name}
+                                    </option>
+                                ))}
+                            </select>
+                            {selectedOfflineCoop && (
+                                <p className="text-[10px] font-semibold text-emerald-600 dark:text-emerald-400">
+                                    Declaration: &ldquo;...for the purposes of {selectedOfflineCoop.memberFormSpec.declarationPurpose}&rdquo; &bull;{" "}
+                                    {selectedOfflineCoop.memberFormSpec.requireUnionClearance
+                                        ? "Includes Union Leader Clearance signature"
+                                        : "Voluntary engagement (No Union Leader Clearance required)"}
+                                </p>
+                            )}
+                        </div>
+
                         <div className="flex flex-col-reverse sm:flex-row gap-2.5 sm:gap-3 pt-2">
                             <Button onClick={() => setShowPrintModal(true)} variant="outline" className="w-full sm:w-auto border-emerald-500/30 hover:bg-emerald-500/5 text-emerald-600 dark:text-emerald-400 font-bold h-10 sm:h-11 px-5 rounded-xl text-xs">
                                 Preview Form Layout
@@ -756,7 +803,9 @@ export default function OnboardingPage() {
                         <div className="w-full aspect-[1/1.4] bg-slate-50 dark:bg-slate-900 border border-dashed border-slate-300 dark:border-slate-800 rounded-lg flex flex-col items-center justify-center text-center p-3">
                             <div className="w-10 h-10 border border-dashed border-slate-400 flex items-center justify-center rounded text-[8px] font-bold text-slate-400 mb-2">Photo</div>
                             <p className="text-[10px] font-black uppercase text-foreground">A4 Member Form</p>
-                            <p className="text-[8px] text-muted-foreground mt-1">Official signature blocks & BVN clearance guidelines</p>
+                            <p className="text-[8px] text-muted-foreground mt-1">
+                                {selectedOfflineCoop?.name || "Tailored cooperative specs & BVN clearance guidelines"}
+                            </p>
                         </div>
                     </div>
                 </div>
@@ -766,6 +815,8 @@ export default function OnboardingPage() {
                 open={showPrintModal}
                 onClose={() => setShowPrintModal(false)}
                 roleType={activeClass}
+                selectedCoopId={selectedOfflineCoopId}
+                registeredCoops={registeredCoops}
             />
         </div>
     )

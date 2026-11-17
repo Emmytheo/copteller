@@ -3,13 +3,24 @@
 import * as React from "react"
 import { createPortal } from "react-dom"
 import { motion, AnimatePresence } from "framer-motion"
-import { ShieldCheck, Printer, CheckSquare, Square, Download, X } from "lucide-react"
+import { ShieldCheck, Printer, CheckSquare, Square, Download, X, Building2 } from "lucide-react"
 import { Button } from "@/components/ui/button"
+import {
+    PRESET_REGISTERED_COOPS,
+    resolveMemberFormSpec,
+    type CoopMemberFormSpec,
+    type RegisteredCoopDirectoryItem,
+} from "@/lib/copteller/coop-form-specs"
 
 export interface PrintableFormProps {
     roleType?: "member" | "admin" | "investor"
     coopName?: string
     sector?: string
+    regNumber?: string
+    state?: string
+    lga?: string
+    formSpec?: Partial<CoopMemberFormSpec> | null
+    customAnswers?: Record<string, string>
     formData?: {
         firstName?: string
         lastName?: string
@@ -22,7 +33,24 @@ export interface PrintableFormProps {
     }
 }
 
-export function PrintableForm({ roleType = "member", coopName = "", sector = "", formData = {} }: PrintableFormProps) {
+export function PrintableForm({
+    roleType = "member",
+    coopName = "",
+    sector = "",
+    regNumber = "",
+    state = "",
+    lga = "",
+    formSpec = null,
+    customAnswers = {},
+    formData = {},
+}: PrintableFormProps) {
+    const resolvedSpec = resolveMemberFormSpec(coopName, formSpec, sector || "commerce")
+    const displayAmount =
+        formData.schemeAmount ||
+        (resolvedSpec.defaultContributionNaira
+            ? `₦${resolvedSpec.defaultContributionNaira.toLocaleString()}`
+            : "_________________________")
+
     const f = {
         firstName: formData.firstName || "_________________________",
         lastName: formData.lastName || "_________________________",
@@ -31,8 +59,12 @@ export function PrintableForm({ roleType = "member", coopName = "", sector = "",
         bvn: formData.bvn || "_________________________",
         dob: formData.dob || "_________________________",
         address: formData.address || "_________________________________________________________",
-        schemeAmount: formData.schemeAmount || "_________________________",
+        schemeAmount: displayAmount,
     }
+
+    const customFields = resolvedSpec.customFields || []
+    const requireUnionClearance = Boolean(resolvedSpec.requireUnionClearance)
+    const showPassportBox = resolvedSpec.requirePassportPhoto !== false
 
     return (
         <div
@@ -40,20 +72,29 @@ export function PrintableForm({ roleType = "member", coopName = "", sector = "",
             style={{ WebkitPrintColorAdjust: "exact", printColorAdjust: "exact" }}
         >
             {/* Header branding */}
-            <div className="flex justify-between items-start border-b-2 border-black pb-4">
+            <div className="flex justify-between items-start border-b-2 border-black pb-4 gap-4">
                 <div className="space-y-1">
                     <h2 className="text-xl font-extrabold uppercase tracking-tight">COPTELLER SYSTEM</h2>
                     <p className="text-xs font-bold text-slate-700 uppercase">OFFICIAL COOPERATIVE APPLICATION FORM</p>
+                    {coopName && (
+                        <p className="text-[11px] font-black text-black uppercase tracking-wide pt-0.5">
+                            {coopName}
+                        </p>
+                    )}
                     <div className="flex items-center gap-1 text-[10px] font-bold text-slate-500">
                         <ShieldCheck className="h-3.5 w-3.5 text-black" />
                         <span>Partner Microfinance Bank Cleared Escrow Network</span>
                     </div>
                 </div>
-                
+
                 {/* Passport photo box */}
-                <div className="w-[110px] h-[110px] border-2 border-dashed border-slate-400 flex flex-col items-center justify-center text-center p-2 rounded bg-slate-50 shrink-0">
-                    <span className="text-[9px] font-bold text-slate-500 uppercase leading-tight">Attach Passport<br />Photo Here<br />(2" x 2")</span>
-                </div>
+                {showPassportBox && (
+                    <div className="w-[105px] h-[105px] border-2 border-dashed border-slate-400 flex flex-col items-center justify-center text-center p-2 rounded bg-slate-50 shrink-0">
+                        <span className="text-[9px] font-bold text-slate-500 uppercase leading-tight">
+                            Attach Passport<br />Photo Here<br />(2&quot; x 2&quot;)
+                        </span>
+                    </div>
+                )}
             </div>
 
             {/* Scheme Type Indicators */}
@@ -61,15 +102,15 @@ export function PrintableForm({ roleType = "member", coopName = "", sector = "",
                 <div className="flex items-center gap-2">
                     {roleType === "member" ? <CheckSquare className="h-4 w-4 shrink-0" /> : <Square className="h-4 w-4 shrink-0" />}
                     <div>
-                        <p className="text-xs font-extrabold uppercase">Member / Driver</p>
-                        <p className="text-[9px] text-slate-500 font-bold">Ajo thrift & HP fleet</p>
+                        <p className="text-xs font-extrabold uppercase">Member / Operator</p>
+                        <p className="text-[9px] text-slate-500 font-bold">Ajo thrift &amp; asset fleet</p>
                     </div>
                 </div>
                 <div className="flex items-center gap-2">
                     {roleType === "admin" ? <CheckSquare className="h-4 w-4 shrink-0" /> : <Square className="h-4 w-4 shrink-0" />}
                     <div>
                         <p className="text-xs font-extrabold uppercase">Cooperative Admin</p>
-                        <p className="text-[9px] text-slate-500 font-bold">Union registry vault</p>
+                        <p className="text-[9px] text-slate-500 font-bold">Registry vault steward</p>
                     </div>
                 </div>
                 <div className="flex items-center gap-2">
@@ -106,7 +147,9 @@ export function PrintableForm({ roleType = "member", coopName = "", sector = "",
                 </div>
                 <div className="grid grid-cols-2 gap-4">
                     <div className="space-y-1">
-                        <label className="text-[9px] font-black text-slate-500 uppercase">BVN (Bank Verification No.)</label>
+                        <label className="text-[9px] font-black text-slate-500 uppercase">
+                            BVN (Bank Verification No.){resolvedSpec.requireBvn === false ? " (Optional)" : ""}
+                        </label>
                         <p className="font-mono font-bold border-b border-slate-300 pb-1 h-6 text-xs">{f.bvn}</p>
                     </div>
                     <div className="space-y-1">
@@ -126,27 +169,48 @@ export function PrintableForm({ roleType = "member", coopName = "", sector = "",
                 <div className="grid grid-cols-2 gap-4">
                     <div className="space-y-1">
                         <label className="text-[9px] font-black text-slate-500 uppercase">Cooperative Society Name</label>
-                        <p className="font-bold border-b border-slate-300 pb-1 h-6 text-xs">{coopName || "_________________________"}</p>
+                        <p className="font-bold border-b border-slate-300 pb-1 min-h-6 text-xs">{coopName || "_________________________"}</p>
                     </div>
                     <div className="space-y-1">
-                        <label className="text-[9px] font-black text-slate-500 uppercase">Union Sector</label>
-                        <p className="font-bold border-b border-slate-300 pb-1 h-6 text-xs capitalize">{sector || "_________________________"}</p>
+                        <label className="text-[9px] font-black text-slate-500 uppercase">Cooperative Sector</label>
+                        <p className="font-bold border-b border-slate-300 pb-1 min-h-6 text-xs capitalize">{sector || "_________________________"}</p>
                     </div>
                 </div>
                 <div className="grid grid-cols-3 gap-3">
                     <div className="space-y-1">
                         <label className="text-[9px] font-black text-slate-500 uppercase">CAC / State Registration ID</label>
-                        <p className="font-bold border-b border-slate-300 pb-1 h-6 text-xs">_________________________</p>
+                        <p className="font-bold border-b border-slate-300 pb-1 min-h-6 text-xs">{regNumber || "_________________________"}</p>
                     </div>
                     <div className="space-y-1">
                         <label className="text-[9px] font-black text-slate-500 uppercase">State</label>
-                        <p className="font-bold border-b border-slate-300 pb-1 h-6 text-xs">Abia State</p>
+                        <p className="font-bold border-b border-slate-300 pb-1 min-h-6 text-xs">{state || "_________________________"}</p>
                     </div>
                     <div className="space-y-1">
                         <label className="text-[9px] font-black text-slate-500 uppercase">Local Govt Area (LGA)</label>
-                        <p className="font-bold border-b border-slate-300 pb-1 h-6 text-xs">_________________________</p>
+                        <p className="font-bold border-b border-slate-300 pb-1 min-h-6 text-xs">{lga || "_________________________"}</p>
                     </div>
                 </div>
+
+                {/* Cooperative-specific form fields */}
+                {customFields.length > 0 && (
+                    <div className="pt-2 space-y-2">
+                        <p className="text-[9px] font-black text-slate-600 uppercase tracking-wider">
+                            Cooperative Member Specifications
+                        </p>
+                        <div className="grid grid-cols-2 gap-4">
+                            {customFields.map((field) => (
+                                <div key={field.id} className="space-y-1">
+                                    <label className="text-[9px] font-black text-slate-500 uppercase">
+                                        {field.label} {field.required ? "*" : "(Optional)"}
+                                    </label>
+                                    <p className="font-bold border-b border-slate-300 pb-1 min-h-6 text-xs">
+                                        {customAnswers[field.id] || "_________________________"}
+                                    </p>
+                                </div>
+                            ))}
+                        </div>
+                    </div>
+                )}
             </div>
 
             {/* Part C: Financial Options Selection */}
@@ -159,10 +223,18 @@ export function PrintableForm({ roleType = "member", coopName = "", sector = "",
                     </div>
                     <div className="space-y-1">
                         <label className="text-[9px] font-black text-slate-500 uppercase">Contribution Target Frequency</label>
-                        <div className="flex gap-4 pt-1 text-xs">
-                            <span className="flex items-center gap-1.5"><Square className="h-3.5 w-3.5" /> Daily</span>
-                            <span className="flex items-center gap-1.5"><Square className="h-3.5 w-3.5" /> Weekly</span>
-                            <span className="flex items-center gap-1.5"><Square className="h-3.5 w-3.5" /> Monthly</span>
+                        <div className="flex gap-4 pt-1 text-xs capitalize">
+                            {(["daily", "weekly", "monthly"] as const)
+                                .filter((freq) => resolvedSpec.allowedFrequencies.includes(freq))
+                                .map((freq) => {
+                                    const isDefault = resolvedSpec.defaultFrequency === freq
+                                    return (
+                                        <span key={freq} className="flex items-center gap-1.5 font-semibold">
+                                            {isDefault && coopName ? <CheckSquare className="h-3.5 w-3.5" /> : <Square className="h-3.5 w-3.5" />}
+                                            {freq}
+                                        </span>
+                                    )
+                                })}
                         </div>
                     </div>
                 </div>
@@ -170,19 +242,22 @@ export function PrintableForm({ roleType = "member", coopName = "", sector = "",
 
             {/* Part D: Verification handshake / Signatures */}
             <div className="space-y-3">
-                <h3 className="text-xs font-black uppercase bg-slate-900 text-white px-2 py-1 tracking-wider">Part D: Declaration & Off-line Signatures</h3>
+                <h3 className="text-xs font-black uppercase bg-slate-900 text-white px-2 py-1 tracking-wider">Part D: Declaration &amp; Off-line Signatures</h3>
                 <p className="text-[10px] text-slate-600 font-semibold leading-relaxed">
-                    I hereby declare that all information provided above is correct. I authorize the partner Microfinance Bank to clear contributions and HP rentals from my linked escrow vault according to cooperative union bylaws.
+                    I hereby declare that all information given above is correct for the purposes of{" "}
+                    <span className="font-extrabold text-black">{resolvedSpec.declarationPurpose}</span>. I authorize the partner Microfinance Bank to clear contributions and scheduled repayments from my linked escrow vault in accordance with applicable cooperative terms.
                 </p>
-                <div className="grid grid-cols-3 gap-6 pt-6 text-center text-[10px] font-bold">
+                <div className={`grid ${requireUnionClearance ? "grid-cols-3" : "grid-cols-2"} gap-8 pt-6 text-center text-[10px] font-bold`}>
                     <div className="space-y-1">
                         <p className="border-b border-black pb-1"> </p>
-                        <p className="text-slate-500 uppercase">Applicant Signature & Date</p>
+                        <p className="text-slate-500 uppercase">Applicant Signature &amp; Date</p>
                     </div>
-                    <div className="space-y-1">
-                        <p className="border-b border-black pb-1"> </p>
-                        <p className="text-slate-500 uppercase">Union Leader Clearance</p>
-                    </div>
+                    {requireUnionClearance && (
+                        <div className="space-y-1">
+                            <p className="border-b border-black pb-1"> </p>
+                            <p className="text-slate-500 uppercase">Union Leader Clearance</p>
+                        </div>
+                    )}
                     <div className="space-y-1">
                         <p className="border-b border-black pb-1"> </p>
                         <p className="text-slate-500 uppercase">Bank Auditor Approver</p>
@@ -203,30 +278,104 @@ export interface PrintableFormDialogProps extends PrintableFormProps {
     open: boolean
     onClose: () => void
     accentClassName?: string
+    selectedCoopId?: string
+    registeredCoops?: RegisteredCoopDirectoryItem[]
 }
 
 /**
  * Shared modal + body-portaled print root for Copteller A4 application forms.
- * Keeps screen preview, browser Print/Save-PDF, and downloadable HTML visually identical.
+ * Supports picking any registered cooperative to apply its member form specifications,
+ * declaration scope, and signature requirements (e.g., voluntary cooperatives omit Union Leader Clearance).
  */
 export function PrintableFormDialog({
     open,
     onClose,
     accentClassName = "bg-emerald-500 hover:bg-emerald-600 text-black",
+    selectedCoopId,
+    registeredCoops,
     ...formProps
 }: PrintableFormDialogProps) {
     const [mounted, setMounted] = React.useState(false)
+    const [coops, setCoops] = React.useState<RegisteredCoopDirectoryItem[]>(
+        registeredCoops && registeredCoops.length > 0 ? registeredCoops : PRESET_REGISTERED_COOPS
+    )
+    const [activeCoopId, setActiveCoopId] = React.useState<string>(
+        selectedCoopId ||
+            (formProps.coopName ? "__custom__" : PRESET_REGISTERED_COOPS[0].id)
+    )
     const previewRef = React.useRef<HTMLDivElement>(null)
 
     React.useEffect(() => {
         setMounted(true)
     }, [])
 
+    React.useEffect(() => {
+        if (registeredCoops && registeredCoops.length > 0) {
+            setCoops(registeredCoops)
+        }
+    }, [registeredCoops])
+
+    React.useEffect(() => {
+        if (selectedCoopId) {
+            setActiveCoopId(selectedCoopId)
+        } else if (formProps.coopName) {
+            setActiveCoopId("__custom__")
+        }
+    }, [selectedCoopId, formProps.coopName])
+
+    React.useEffect(() => {
+        if (!open || (registeredCoops && registeredCoops.length > 0)) return
+        fetch("/api/copteller/cooperatives?status=active")
+            .then((r) => (r.ok ? r.json() : null))
+            .then((res) => {
+                if (res?.data && Array.isArray(res.data) && res.data.length > 0) {
+                    setCoops(res.data)
+                    if (!selectedCoopId && !formProps.coopName) {
+                        setActiveCoopId(res.data[0].id)
+                    }
+                }
+            })
+            .catch(() => {})
+    }, [open, registeredCoops, selectedCoopId, formProps.coopName])
+
+    const chosenCoop = React.useMemo(
+        () => coops.find((c) => c.id === activeCoopId) || null,
+        [coops, activeCoopId]
+    )
+
+    const effectiveProps: PrintableFormProps =
+        activeCoopId === "__custom__"
+            ? formProps
+            : activeCoopId === "__blank__"
+            ? {
+                  ...formProps,
+                  coopName: "",
+                  sector: "",
+                  regNumber: "",
+                  state: "",
+                  lga: "",
+                  formSpec: {
+                      declarationPurpose: "Copteller Cooperative System",
+                      requireUnionClearance: false,
+                      customFields: [],
+                  },
+              }
+            : chosenCoop
+            ? {
+                  ...formProps,
+                  coopName: chosenCoop.name,
+                  sector: chosenCoop.sector,
+                  regNumber: chosenCoop.regNumber || "",
+                  state: chosenCoop.state || "",
+                  lga: chosenCoop.lga || "",
+                  formSpec: chosenCoop.memberFormSpec,
+              }
+            : formProps
+
     const handleDownloadHtml = () => {
         const node = previewRef.current?.querySelector(".printable-a4-form")
         if (!node) return
 
-        // Capture active same-origin stylesheet rules so the downloaded file stays visually identical offline
         const collectedCss: string[] = []
         for (const sheet of Array.from(document.styleSheets)) {
             try {
@@ -237,13 +386,18 @@ export function PrintableFormDialog({
             }
         }
 
-        const roleLabel = formProps.roleType || "member"
+        const roleLabel = effectiveProps.roleType || "member"
+        const coopSlug = (effectiveProps.coopName || "copteller")
+            .toLowerCase()
+            .replace(/[^a-z0-9]+/g, "-")
+            .replace(/(^-|-$)/g, "")
+
         const htmlDoc = `<!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Copteller ${roleLabel.toUpperCase()} Application Form</title>
+  <title>${effectiveProps.coopName || "Copteller"} ${roleLabel.toUpperCase()} Application Form</title>
   <style>
     ${collectedCss.join("\n")}
     @page { size: A4 portrait; margin: 10mm; }
@@ -292,7 +446,7 @@ export function PrintableFormDialog({
         const url = URL.createObjectURL(blob)
         const a = document.createElement("a")
         a.href = url
-        a.download = `copteller-${roleLabel}-application-form.html`
+        a.download = `${coopSlug}-${roleLabel}-application-form.html`
         document.body.appendChild(a)
         a.click()
         document.body.removeChild(a)
@@ -310,10 +464,12 @@ export function PrintableFormDialog({
                             exit={{ opacity: 0, scale: 0.95 }}
                             className="bg-slate-900 border border-slate-800 rounded-2xl sm:rounded-3xl w-full max-w-4xl h-[90dvh] flex flex-col overflow-hidden shadow-2xl"
                         >
-                            <div className="p-4 sm:p-6 border-b border-slate-800 flex flex-wrap justify-between items-center gap-3 bg-slate-950/45">
+                            <div className="p-4 sm:p-5 border-b border-slate-800 flex flex-wrap justify-between items-center gap-3 bg-slate-950/60">
                                 <div>
                                     <h3 className="text-base font-black text-white">Application Form Print Preview</h3>
-                                    <p className="text-[10px] text-slate-400 font-semibold mt-0.5">Formatted for A4 paper. Use Save as PDF in the print dialog or download the standalone file.</p>
+                                    <p className="text-[10px] text-slate-400 font-semibold mt-0.5">
+                                        Formatted for A4 paper. Form fields &amp; declaration adapt to the selected registered cooperative.
+                                    </p>
                                 </div>
                                 <div className="flex items-center gap-2 sm:gap-3">
                                     <Button
@@ -341,9 +497,32 @@ export function PrintableFormDialog({
                                 </div>
                             </div>
 
+                            {/* Registered Cooperative Selector Strip */}
+                            <div className="px-4 sm:px-5 py-3 bg-slate-900/90 border-b border-slate-800 flex flex-col sm:flex-row sm:items-center justify-between gap-2.5">
+                                <div className="flex items-center gap-2 text-xs text-slate-300 font-bold shrink-0">
+                                    <Building2 className="h-4 w-4 text-emerald-400 shrink-0" />
+                                    <span>Registered Cooperative Spec:</span>
+                                </div>
+                                <select
+                                    value={activeCoopId}
+                                    onChange={(e) => setActiveCoopId(e.target.value)}
+                                    className="w-full sm:max-w-md h-9 px-3 rounded-xl border border-slate-700 bg-slate-950 text-white text-xs font-bold focus:outline-none focus:border-emerald-500"
+                                >
+                                    {formProps.coopName && (
+                                        <option value="__custom__">Current Selection: {formProps.coopName}</option>
+                                    )}
+                                    {coops.map((c) => (
+                                        <option key={c.id} value={c.id}>
+                                            {c.name} ({c.memberFormSpec.requireUnionClearance ? "Union Clearance" : "Voluntary / Direct"})
+                                        </option>
+                                    ))}
+                                    <option value="__blank__">Generic Blank Cooperative Form</option>
+                                </select>
+                            </div>
+
                             <div className="flex-1 overflow-auto p-4 sm:p-6 md:p-10 bg-slate-950/80">
                                 <div ref={previewRef} className="shadow-2xl rounded-xl overflow-hidden bg-white">
-                                    <PrintableForm {...formProps} />
+                                    <PrintableForm {...effectiveProps} />
                                 </div>
                             </div>
                         </motion.div>
@@ -353,7 +532,7 @@ export function PrintableFormDialog({
 
             {mounted && createPortal(
                 <div id="copteller-print-area-wrapper" className="print-root hidden print:block bg-white text-black">
-                    <PrintableForm {...formProps} />
+                    <PrintableForm {...effectiveProps} />
                 </div>,
                 document.body
             )}

@@ -19,6 +19,7 @@ const COPTELLER_PUBLIC_PATTERNS = [
     "/sitemap.xml",
     "/api/health",
     "/api/copteller/auth",
+    "/api/copteller/cooperatives",
     "/api/copteller/products",
     "/api/copteller/campaigns/claim",
     "/api/copteller/sector-products",

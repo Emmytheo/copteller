@@ -1,9 +1,10 @@
 "use client"
 
 import * as React from "react"
-import { Settings, Save, RefreshCw } from "lucide-react"
+import { Settings, Save, RefreshCw, FileText } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { toast } from "sonner"
+import type { CoopCustomField, CoopMemberFormSpec } from "@/lib/copteller/coop-form-specs"
 
 export default function AdminSettingsPage() {
     const [loading, setLoading] = React.useState(true)
@@ -16,12 +17,25 @@ export default function AdminSettingsPage() {
         maxPoolSize: 50000000
     })
 
+    const [coopName, setCoopName] = React.useState("Cooperative")
+    const [formSpec, setFormSpec] = React.useState<CoopMemberFormSpec>({
+        declarationPurpose: "Copteller Cooperative",
+        requireUnionClearance: false,
+        requirePassportPhoto: true,
+        requireBvn: true,
+        allowedFrequencies: ["daily", "weekly", "monthly"],
+        defaultFrequency: "weekly",
+        customFields: [],
+    })
+
     const fetchSettings = React.useCallback(async () => {
         try {
             setLoading(true)
             const res = await fetch('/api/copteller/admin/settings')
             if (!res.ok) throw new Error('Failed to load settings')
             const data = await res.json()
+            if (data?.cooperativeName) setCoopName(data.cooperativeName)
+            if (data?.memberFormSpec) setFormSpec(data.memberFormSpec)
             if (data?.settings) {
                 setSettings({
                     weeklyContribution: data.settings.weeklyContribution ?? 20000,
@@ -52,7 +66,7 @@ export default function AdminSettingsPage() {
             const res = await fetch('/api/copteller/admin/settings', {
                 method: 'PATCH',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify(settings)
+                body: JSON.stringify({ ...settings, memberFormSpec: formSpec })
             })
             const data = await res.json()
             if (!res.ok) throw new Error(data.error || 'Failed to update settings')
@@ -143,6 +157,106 @@ export default function AdminSettingsPage() {
                             <input type="checkbox" name="enableAutoDeductions" checked={settings.enableAutoDeductions} onChange={handleChange} className="sr-only peer" />
                             <div className="w-11 h-6 bg-slate-200 peer-focus:outline-none rounded-full peer dark:bg-slate-800 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-slate-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all dark:border-slate-600 peer-checked:bg-emerald-500"></div>
                         </label>
+                    </div>
+                </div>
+
+                {/* Member Form & Paper Application Specifications */}
+                <div className="pt-4 border-t border-slate-100 dark:border-slate-900/50 space-y-4">
+                    <div>
+                        <h3 className="text-base font-black flex items-center gap-2"><FileText className="h-5 w-5 text-emerald-500" /> Member Application Form Specifications</h3>
+                        <p className="text-[10px] text-muted-foreground mt-1 font-semibold">
+                            Customize declaration wording, voluntary/clearance signature policy, and extra member fields for {coopName}.
+                        </p>
+                    </div>
+
+                    <div className="space-y-1.5">
+                        <label className="text-[10px] font-black text-muted-foreground uppercase tracking-wider">Declaration Scope (&ldquo;...for the purposes of ...&rdquo;)</label>
+                        <input
+                            type="text"
+                            value={formSpec.declarationPurpose}
+                            onChange={e => setFormSpec(prev => ({ ...prev, declarationPurpose: e.target.value }))}
+                            className="w-full h-10 px-3 rounded-xl border border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-900/50 font-semibold text-xs focus:outline-none focus:border-amber-500"
+                        />
+                    </div>
+
+                    <div className="flex justify-between items-center py-3 border-b border-slate-100 dark:border-slate-900/50 gap-4">
+                        <div className="max-w-md">
+                            <p className="font-bold text-sm">Require Union Leader Clearance Signature</p>
+                            <p className="text-[10px] text-slate-500 font-medium mt-0.5 leading-relaxed">
+                                Keep disabled for personal &amp; voluntary engagements so members aren&apos;t encumbered by third-party union sign-off.
+                            </p>
+                        </div>
+                        <label className="relative inline-flex items-center cursor-pointer shrink-0">
+                            <input
+                                type="checkbox"
+                                checked={formSpec.requireUnionClearance}
+                                onChange={e => setFormSpec(prev => ({ ...prev, requireUnionClearance: e.target.checked }))}
+                                className="sr-only peer"
+                            />
+                            <div className="w-11 h-6 bg-slate-200 peer-focus:outline-none rounded-full peer dark:bg-slate-800 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-slate-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all dark:border-slate-600 peer-checked:bg-amber-500"></div>
+                        </label>
+                    </div>
+
+                    <div className="space-y-2.5">
+                        <div className="flex items-center justify-between">
+                            <span className="text-[10px] font-black uppercase tracking-wider text-muted-foreground">Cooperative Custom Member Fields ({formSpec.customFields.length})</span>
+                            <button
+                                type="button"
+                                onClick={() => setFormSpec(prev => ({ ...prev, customFields: [...prev.customFields, { id: `cf_${Date.now()}`, label: "New Field", type: "text", required: false }] }))}
+                                className="text-xs font-black text-emerald-600 dark:text-emerald-400 hover:underline"
+                            >
+                                + Add Form Field
+                            </button>
+                        </div>
+                        <div className="space-y-2">
+                            {formSpec.customFields.map((cf: CoopCustomField, idx: number) => (
+                                <div key={cf.id} className="grid grid-cols-1 sm:grid-cols-12 gap-2 items-center p-2.5 rounded-xl bg-slate-50 dark:bg-slate-900/50 border border-slate-200 dark:border-slate-800">
+                                    <input
+                                        type="text"
+                                        value={cf.label}
+                                        onChange={e => setFormSpec(prev => ({
+                                            ...prev,
+                                            customFields: prev.customFields.map((f, i) => i === idx ? { ...f, label: e.target.value } : f)
+                                        }))}
+                                        className="sm:col-span-6 h-9 px-2.5 rounded-lg border border-slate-200 dark:border-slate-800 bg-background text-xs font-semibold"
+                                    />
+                                    <select
+                                        value={cf.type}
+                                        onChange={e => setFormSpec(prev => ({
+                                            ...prev,
+                                            customFields: prev.customFields.map((f, i) => i === idx ? { ...f, type: e.target.value as any } : f)
+                                        }))}
+                                        className="sm:col-span-3 h-9 px-2 rounded-lg border border-slate-200 dark:border-slate-800 bg-background text-xs font-bold"
+                                    >
+                                        <option value="text">Text</option>
+                                        <option value="tel">Phone</option>
+                                        <option value="number">Number</option>
+                                        <option value="textarea">Long Text</option>
+                                    </select>
+                                    <label className="sm:col-span-2 flex items-center gap-1.5 text-xs font-bold cursor-pointer">
+                                        <input
+                                            type="checkbox"
+                                            checked={Boolean(cf.required)}
+                                            onChange={e => setFormSpec(prev => ({
+                                                ...prev,
+                                                customFields: prev.customFields.map((f, i) => i === idx ? { ...f, required: e.target.checked } : f)
+                                            }))}
+                                        />
+                                        Required
+                                    </label>
+                                    <button
+                                        type="button"
+                                        onClick={() => setFormSpec(prev => ({
+                                            ...prev,
+                                            customFields: prev.customFields.filter((_, i) => i !== idx)
+                                        }))}
+                                        className="sm:col-span-1 text-xs font-black text-rose-500 hover:text-rose-600 text-right"
+                                    >
+                                        Remove
+                                    </button>
+                                </div>
+                            ))}
+                        </div>
                     </div>
                 </div>
 

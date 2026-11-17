@@ -11,6 +11,7 @@ import {
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
 import { toast } from "sonner"
+import { resolveMemberFormSpec, type CoopCustomField } from "@/lib/copteller/coop-form-specs"
 
 interface CooperativeUnion {
     id: string
@@ -88,6 +89,9 @@ export default function SuperadminUnionDetailPage({ params }: PageProps) {
     const [segment, setSegment] = React.useState("")
     const [customParam1, setCustomParam1] = React.useState("")
     const [customParam2, setCustomParam2] = React.useState("")
+    const [declarationPurpose, setDeclarationPurpose] = React.useState("")
+    const [requireUnionClearance, setRequireUnionClearance] = React.useState(false)
+    const [customFormFields, setCustomFormFields] = React.useState<CoopCustomField[]>([])
 
     // Authorized products state
     const [bankProducts, setBankProducts] = React.useState<any[]>([])
@@ -152,6 +156,10 @@ export default function SuperadminUnionDetailPage({ params }: PageProps) {
                     setCustomParam1(meta.guildChapter || "")
                     setCustomParam2(meta.toolSubsidyCap ? String(meta.toolSubsidyCap) : "")
                 }
+                const spec = resolveMemberFormSpec(mapped.name, meta.memberFormSpec, mapped.sector || 'transport')
+                setDeclarationPurpose(spec.declarationPurpose)
+                setRequireUnionClearance(spec.requireUnionClearance)
+                setCustomFormFields(spec.customFields)
                 // Load previously authorized products
                 const authIds = found.authorized_product_types
                     ? found.authorized_product_types.map((p: any) => typeof p === 'object' ? String(p.id) : String(p))
@@ -236,7 +244,18 @@ export default function SuperadminUnionDetailPage({ params }: PageProps) {
         setSaving(true)
         const tId = toast.loading("Updating cooperative parameters...")
 
-        const updatedMeta: Record<string, any> = {}
+        const existingSpec = resolveMemberFormSpec(name, union.metadata?.memberFormSpec, sector)
+        const updatedMeta: Record<string, any> = {
+            ...(union.metadata || {}),
+            memberFormSpec: {
+                ...existingSpec,
+                declarationPurpose: declarationPurpose.trim() || `the ${name}`,
+                requireUnionClearance,
+                defaultFrequency: cycleFrequency === 'biweekly' ? 'weekly' : cycleFrequency,
+                defaultContributionNaira: defaultContributionAmount,
+                customFields: customFormFields,
+            },
+        }
         if (sector === 'transport') {
             updatedMeta.route = customParam1
             updatedMeta.associationLevy = Number(customParam2)
@@ -585,6 +604,95 @@ export default function SuperadminUnionDetailPage({ params }: PageProps) {
                                     onChange={e => setCustomParam2(e.target.value)}
                                     className="w-full h-9 px-3 rounded-xl border border-slate-200 dark:border-slate-800 bg-background text-xs font-black focus:outline-none focus:border-rose-500"
                                 />
+                            </div>
+                        </div>
+
+                        {/* Member Form Specifications */}
+                        <div className="border-t border-slate-100 dark:border-slate-900 pt-4 space-y-4">
+                            <div className="flex flex-wrap items-center justify-between gap-2">
+                                <div>
+                                    <h4 className="text-xs font-black uppercase text-slate-400 tracking-wider">Member Form &amp; Declaration Specifications</h4>
+                                    <p className="text-[10px] text-muted-foreground mt-0.5">
+                                        Controls digital onboarding questions, declaration wording, and A4 printable form signatures.
+                                    </p>
+                                </div>
+                            </div>
+
+                            <div className="space-y-1">
+                                <label className="text-[9px] font-bold text-slate-500 uppercase">Declaration Scope (&ldquo;...for the purposes of ...&rdquo;)</label>
+                                <input
+                                    type="text"
+                                    value={declarationPurpose}
+                                    onChange={e => setDeclarationPurpose(e.target.value)}
+                                    placeholder={`e.g. Copteller's KEKE OWNERS and OPERATORS COOPERATIVE`}
+                                    className="w-full h-9 px-3 rounded-xl border border-slate-200 dark:border-slate-800 bg-background text-xs font-semibold focus:outline-none focus:border-rose-500"
+                                />
+                            </div>
+
+                            <div className="flex justify-between items-center bg-slate-50 dark:bg-slate-900 p-3.5 rounded-2xl gap-3">
+                                <div>
+                                    <p className="text-xs font-black">Require Union Leader Clearance Signature</p>
+                                    <p className="text-[9px] text-muted-foreground mt-0.5">
+                                        Leave off for personal &amp; voluntary engagements so members aren&apos;t encumbered by third-party union sign-off.
+                                    </p>
+                                </div>
+                                <input
+                                    type="checkbox"
+                                    checked={requireUnionClearance}
+                                    onChange={e => setRequireUnionClearance(e.target.checked)}
+                                    className="rounded border-slate-350 dark:border-slate-700 h-4 w-4 text-rose-500 accent-rose-500 cursor-pointer shrink-0"
+                                />
+                            </div>
+
+                            <div className="space-y-2">
+                                <div className="flex items-center justify-between">
+                                    <label className="text-[9px] font-bold text-slate-500 uppercase">Cooperative-Specific Member Fields ({customFormFields.length})</label>
+                                    <button
+                                        type="button"
+                                        onClick={() => setCustomFormFields(prev => [...prev, { id: `field_${Date.now()}`, label: "New Member Field", type: "text", required: false }])}
+                                        className="text-[10px] font-black text-rose-500 hover:underline"
+                                    >
+                                        + Add Field
+                                    </button>
+                                </div>
+                                <div className="space-y-2">
+                                    {customFormFields.map((cf, idx) => (
+                                        <div key={cf.id} className="grid grid-cols-1 sm:grid-cols-12 gap-2 items-center p-2.5 rounded-xl bg-slate-50 dark:bg-slate-900/60 border border-slate-200 dark:border-slate-800">
+                                            <input
+                                                type="text"
+                                                value={cf.label}
+                                                onChange={e => setCustomFormFields(prev => prev.map((f, i) => i === idx ? { ...f, label: e.target.value } : f))}
+                                                className="sm:col-span-6 h-8 px-2.5 rounded-lg border border-slate-200 dark:border-slate-800 bg-background text-xs font-semibold"
+                                                placeholder="Field label"
+                                            />
+                                            <select
+                                                value={cf.type}
+                                                onChange={e => setCustomFormFields(prev => prev.map((f, i) => i === idx ? { ...f, type: e.target.value as any } : f))}
+                                                className="sm:col-span-3 h-8 px-2 rounded-lg border border-slate-200 dark:border-slate-800 bg-background text-xs font-bold"
+                                            >
+                                                <option value="text">Text</option>
+                                                <option value="tel">Phone</option>
+                                                <option value="number">Number</option>
+                                                <option value="textarea">Long Text</option>
+                                            </select>
+                                            <label className="sm:col-span-2 flex items-center gap-1 text-[10px] font-bold cursor-pointer">
+                                                <input
+                                                    type="checkbox"
+                                                    checked={Boolean(cf.required)}
+                                                    onChange={e => setCustomFormFields(prev => prev.map((f, i) => i === idx ? { ...f, required: e.target.checked } : f))}
+                                                />
+                                                Req
+                                            </label>
+                                            <button
+                                                type="button"
+                                                onClick={() => setCustomFormFields(prev => prev.filter((_, i) => i !== idx))}
+                                                className="sm:col-span-1 text-[10px] font-black text-rose-500 hover:text-rose-600 text-right"
+                                            >
+                                                Del
+                                            </button>
+                                        </div>
+                                    ))}
+                                </div>
                             </div>
                         </div>
 
