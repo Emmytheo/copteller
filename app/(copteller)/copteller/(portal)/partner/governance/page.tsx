@@ -442,7 +442,7 @@ export default function PartnerGovernancePage() {
                                     <label className="font-bold text-foreground block mb-1">Government Email *</label>
                                     <Input
                                         type="email"
-                                        placeholder="e.g. nkalu@abshia.abia.gov.ng"
+                                        placeholder="e.g. officer@healthmutual.coop.ng"
                                         value={officerForm.email}
                                         onChange={(e) => setOfficerForm(prev => ({ ...prev, email: e.target.value }))}
                                         className="h-9 rounded-xl"

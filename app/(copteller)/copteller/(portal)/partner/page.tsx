@@ -48,7 +48,7 @@ export default function InstitutionalPartnerDashboard() {
     // Modal state for Float Injection
     const [isInjectModalOpen, setIsInjectModalOpen] = React.useState(false)
     const [injectAmount, setInjectAmount] = React.useState("50000000") // ₦50M default
-    const [injectSource, setInjectSource] = React.useState("Abia State Central Treasury / CBN Microfinance Facility")
+    const [injectSource, setInjectSource] = React.useState("Partner Microfinance Liquidity Facility")
     const [injecting, setInjecting] = React.useState(false)
 
     const fetchMetrics = async (slug: string, subscope: string) => {

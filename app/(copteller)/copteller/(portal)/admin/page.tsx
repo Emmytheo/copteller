@@ -30,8 +30,8 @@ function StatusBadge({ status }: { status: string }) {
 }
 
 const INITIAL_COOP = {
-    id: "ASTOA-01",
-    name: "Abia State Tricycle Operators Association (ASTOA)",
+    id: "MTOU-01",
+    name: "Metro Tricycle Operators Union (MTOU)",
     sector: "transport",
     description: "Central union governing commercial tricycle operators, route allocations, and asset-lease financing across Aba and Umuahia.",
     status: "active",
@@ -529,7 +529,7 @@ export default function CooperativeAdminConsole() {
                         <div className="p-4 rounded-2xl bg-rose-500/5 border border-rose-500/20 space-y-2">
                             <div className="flex items-center justify-between">
                                 <span className="text-[10px] font-black uppercase tracking-wider text-rose-600 dark:text-rose-400 flex items-center gap-1">
-                                    <HeartPulse className="h-3.5 w-3.5" /> ABSHIA Health Cover
+                                    <HeartPulse className="h-3.5 w-3.5" /> Cooperative Health Cover
                                 </span>
                                 <span className="text-xs font-black text-foreground">84% Enrolled</span>
                             </div>
@@ -537,7 +537,7 @@ export default function CooperativeAdminConsole() {
                                 <div className="bg-rose-500 h-full rounded-full" style={{ width: "84%" }} />
                             </div>
                             <p className="text-[10px] text-muted-foreground font-semibold">
-                                ₦300/week automated deduction &bull; Active at ABSUTH &amp; FMC
+                                ₦300/week automated deduction &bull; Active at Partner Medical Centres
                             </p>
                         </div>
 

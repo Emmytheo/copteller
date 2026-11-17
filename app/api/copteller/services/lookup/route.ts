@@ -36,7 +36,7 @@ export async function POST(req: NextRequest) {
                 let resolvedName = 'Verified Account'
 
                 if (acc.account_number === '9998887776' || (acc.user_id && acc.user_id.startsWith('system-coop'))) {
-                    resolvedName = 'Abia Tricycle Operators Association (Treasury & Collections)'
+                    resolvedName = 'Metro Tricycle Operators Union (Treasury & Collections)'
                 } else if (acc.customer) {
                     const custId = typeof acc.customer === 'object' ? acc.customer.id : acc.customer
                     const custDoc = await payload.findByID({ collection: 'customers', id: custId, overrideAccess: true }).catch(() => null)
@@ -63,7 +63,7 @@ export async function POST(req: NextRequest) {
                 'CHINEDU EMEKA OKAFOR',
                 'NGOZI BLESSING NWANNA',
                 'IBRAHIM MUSA GARBA',
-                'ABIA TRICYCLE OPERATORS COOP',
+                'METRO TRICYCLE OPERATORS COOP',
                 'KINGSLEY CHUKWUEMEKA',
                 'AMAKA FAVOUR EZENWA',
                 'CHIDI KALU MGBARAMUKO'
@@ -94,7 +94,7 @@ export async function POST(req: NextRequest) {
                 meterNumber,
                 disco: discoCode || 'EEDC_ENUGU_DISCO',
                 customerName: 'CHINEDU OKAFOR (ABA COMMERCIAL HUB)',
-                address: '14 Faulks Road, Aba, Abia State',
+                address: 'Central Commercial Hub',
                 meterType: 'PREPAID',
                 tariff: 'A-Commercial MD',
                 outstandingDebt: 0

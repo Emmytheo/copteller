@@ -23,7 +23,7 @@ const SCHEME_TYPES = [
 
 const SECTOR_FILTERS = [
     { id: "all", label: "All Sectors", icon: Sparkles },
-    { id: "health", label: "ABSHIA Health", icon: HeartPulse },
+    { id: "health", label: "Health Mutual", icon: HeartPulse },
     { id: "transport", label: "ATMA Mobility", icon: Truck },
     { id: "agriculture", label: "USAID Agro", icon: Wheat },
     { id: "commerce", label: "SMEDAN MSME", icon: Award },
@@ -33,8 +33,8 @@ export function getInstitutionalSponsor(s: any) {
     const text = `${s?.name || ''} ${s?.scheme_type || ''} ${s?.description || ''}`.toLowerCase()
     if (text.includes("health") || text.includes("abshia") || text.includes("medical") || text.includes("care")) {
         return {
-            name: "Abia State Health Insurance Agency (ABSHIA)",
-            short: "ABSHIA Health",
+            name: "National Artisans Health Mutual (NAHM)",
+            short: "Health Mutual",
             sector: "health",
             escrow: "Escrow Acct #3000881920",
             color: "text-rose-500 bg-rose-500/10 border-rose-500/20",

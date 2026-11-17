@@ -25,7 +25,7 @@ export default function DisbursementCampaignsPage() {
 
     // Form state
     const [title, setTitle] = React.useState("")
-    const [orgName, setOrgName] = React.useState("Abia State Ministry of Trade & Investment")
+    const [orgName, setOrgName] = React.useState("Cooperative Enterprise & Trade Directorate")
     const [category, setCategory] = React.useState("grant")
     const [description, setDescription] = React.useState("")
     const [recipientBatchText, setRecipientBatchText] = React.useState("")

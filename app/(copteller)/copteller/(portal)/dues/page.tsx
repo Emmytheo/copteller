@@ -37,7 +37,7 @@ export default function MemberDuesPage() {
     const [dues, setDues] = React.useState<Due[]>([])
     const [totalPaidVal, setTotalPaidVal] = React.useState(0)
     const [totalPendingVal, setTotalPendingVal] = React.useState(0)
-    const [coopName, setCoopName] = React.useState("Abia Cooperative Guild")
+    const [coopName, setCoopName] = React.useState("Regional Cooperative Guild")
     const [loading, setLoading] = React.useState(true)
     const [paying, setPaying] = React.useState<string | null>(null)
     const [activeFilter, setActiveFilter] = React.useState<string>('all')

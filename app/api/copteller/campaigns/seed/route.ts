@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { getCoptellerPool } from '@/lib/copteller/pg'
+import { requireCoptellerRole } from '@/lib/copteller/auth'
 
 export const dynamic = 'force-dynamic'
 
@@ -24,11 +25,11 @@ export async function seedCampaignsData() {
             category, funding_account_id, total_budget, total_disbursed, total_claimed,
             total_recipients, claimed_count, status, escrow_reference, created_at, updated_at
         ) VALUES (
-            $1, 'Abia State Ministry of Transport & Trade', 'Directorate of Cooperative Wealth Creation',
-            'Abia State Transport & Tricycle Welfare Grant',
+            $1, 'Partner Transport & Trade Directorate', 'Directorate of Cooperative Wealth Creation',
+            'Transport & Tricycle Operator Welfare Grant',
             'Zero-collateral fuel subsidy and spare parts maintenance grants for registered Keke and bus operators across Aba and Umuahia transit corridors.',
             'grant', $2, 5000000.00, 3200000.00, 2100000.00,
-            64, 42, 'active', 'ESC-ABIA-TRANS-2026', NOW(), NOW()
+            64, 42, 'active', 'ESC-TRANS-COOP-2026', NOW(), NOW()
         ) RETURNING id
     `, [creatorId, fundingAccountId])
 
@@ -78,7 +79,7 @@ export async function seedCampaignsData() {
             category, funding_account_id, total_budget, total_disbursed, total_claimed,
             total_recipients, claimed_count, status, escrow_reference, created_at, updated_at
         ) VALUES (
-            $1, 'Special Adviser on Youth Enterprise', 'Abia Innovation Hub & Digital Guild',
+            $1, 'Special Adviser on Youth Enterprise', 'Cooperative Tech & Apprentice Guild',
             'Aba Youth Tech & Apprentice Empowerment Fund',
             'Laptop grants, solar workstation toolkits, and software developer monthly stipends for youths enrolled in the Aba Made Tech Incubator.',
             'empowerment', $2, 3500000.00, 1800000.00, 900000.00,
@@ -99,6 +100,9 @@ export async function seedCampaignsData() {
 
 export async function POST(req: NextRequest) {
     try {
+        const auth = await requireCoptellerRole(req, ['superadmin', 'bank_staff'])
+        if (auth instanceof NextResponse) return auth
+
         await seedCampaignsData()
         return NextResponse.json({
             success: true,

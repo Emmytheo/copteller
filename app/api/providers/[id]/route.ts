@@ -1,9 +1,13 @@
-import { NextResponse } from 'next/server'
+import { NextRequest, NextResponse } from 'next/server'
 import { getPayload } from 'payload'
 import config from '@payload-config'
+import { requireCoptellerRole } from '@/lib/copteller/auth'
 
-export async function PATCH(req: Request, { params }: { params: Promise<{ id: string }> }) {
+export async function PATCH(req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
     try {
+        const auth = await requireCoptellerRole(req, ['superadmin', 'bank_staff'])
+        if (auth instanceof NextResponse) return auth
+
         const { id } = await params
         const payload = await getPayload({ config })
         const body = await req.json()
@@ -20,8 +24,11 @@ export async function PATCH(req: Request, { params }: { params: Promise<{ id: st
     }
 }
 
-export async function GET(_req: Request, { params }: { params: Promise<{ id: string }> }) {
+export async function GET(req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
     try {
+        const auth = await requireCoptellerRole(req, ['superadmin', 'bank_staff'])
+        if (auth instanceof NextResponse) return auth
+
         const { id } = await params
         const payload = await getPayload({ config })
 

@@ -101,7 +101,7 @@ export default function PartnerSchemesPage() {
         repaymentFrequency: "weekly",
         durationMonths: 12,
         maxCapacityBeneficiaries: 1000,
-        eligibleCooperatives: "All Registered Abia State Cooperatives",
+        eligibleCooperatives: "All Registered Trade Cooperatives",
         requiredProviderType: activeOrg.sector === "health" ? "Accredited Hospitals & PHCs" : "Accredited Inspection & Depot Facilities"
     })
 
@@ -173,7 +173,7 @@ export default function PartnerSchemesPage() {
                     repaymentFrequency: "weekly",
                     durationMonths: 12,
                     maxCapacityBeneficiaries: 1000,
-                    eligibleCooperatives: "All Abia State Cooperatives",
+                    eligibleCooperatives: "All Partner Cooperatives",
                     requiredProviderType: activeOrg.sector === "health" ? "Accredited Hospitals & PHCs" : "Accredited Facilities"
                 })
                 fetchSchemes()
@@ -343,7 +343,7 @@ export default function PartnerSchemesPage() {
                             className="px-4 pb-4 pt-1 border-t border-blue-500/10 space-y-3"
                         >
                             <p className="text-xs text-muted-foreground font-semibold leading-relaxed">
-                                Under this model, {activeOrg.name} and Copteller deploy wholesale capital upfront to service providers (e.g. ₦12,000 annual ABSHIA capitation directly to hospitals). Grassroots cooperative members receive immediate active coverage passes and amortize the cost at an affordable <strong>₦300/week</strong> automatically debited from their Ajo thrifts or digital wallets.
+                                Under this model, {activeOrg.name} and Copteller deploy wholesale capital upfront to service providers (e.g. ₦12,000 annual health mutual capitation directly to hospitals). Grassroots cooperative members receive immediate active coverage passes and amortize the cost at an affordable <strong>₦300/week</strong> automatically debited from their Ajo thrifts or digital wallets.
                             </p>
 
                             <div className="grid grid-cols-1 sm:grid-cols-3 gap-2 text-center text-xs pt-1">
@@ -787,7 +787,7 @@ export default function PartnerSchemesPage() {
                                 <div>
                                     <label className="font-bold text-foreground block mb-1">Required Provider Network</label>
                                     <Input
-                                        placeholder={activeOrg.sector === "health" ? "Accredited ABSHIA Hospitals & PHCs" : "Accredited Inspection Depots"}
+                                        placeholder={activeOrg.sector === "health" ? "Accredited Partner Hospitals & PHCs" : "Accredited Inspection Depots"}
                                         value={formData.requiredProviderType}
                                         onChange={(e) => setFormData(prev => ({ ...prev, requiredProviderType: e.target.value }))}
                                         className="h-9 rounded-xl"

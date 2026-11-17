@@ -545,7 +545,7 @@ export default function MemberOnboardingPage() {
                                                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
                                                     <div className="space-y-1.5">
                                                         <label className="text-[10px] font-black text-muted-foreground uppercase tracking-wider">State</label>
-                                                        <input value={newCoopState} onChange={e => setNewCoopState(e.target.value)} placeholder="e.g. Abia"
+                                                        <input value={newCoopState} onChange={e => setNewCoopState(e.target.value)} placeholder="e.g. Lagos"
                                                             className="w-full h-10 px-3 rounded-xl border border-slate-200 dark:border-slate-800 bg-background text-xs font-semibold focus:outline-none" />
                                                     </div>
                                                     <div className="space-y-1.5">

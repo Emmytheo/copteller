@@ -1,14 +1,11 @@
 import { getDb } from '@/lib/copteller/db'
-import { NextResponse } from 'next/server'
-import { createCoptellerServerClient } from '@/lib/copteller/supabase/server'
-export async function GET(req: Request) {
-    try {
-        const supabase = await createCoptellerServerClient()
-        const { data: { user }, error: authError } = await supabase.auth.getUser()
+import { NextRequest, NextResponse } from 'next/server'
+import { requireCoptellerRole } from '@/lib/copteller/auth'
 
-        if (authError || !user) {
-            return NextResponse.json({ error: 'Not authenticated' }, { status: 401 })
-        }
+export async function GET(req: NextRequest) {
+    try {
+        const auth = await requireCoptellerRole(req, ['coop_admin', 'superadmin', 'bank_staff'])
+        if (auth instanceof NextResponse) return auth
 
         const payload = await getDb()
 
@@ -27,14 +24,10 @@ export async function GET(req: Request) {
     }
 }
 
-export async function PATCH(req: Request) {
+export async function PATCH(req: NextRequest) {
     try {
-        const supabase = await createCoptellerServerClient()
-        const { data: { user }, error: authError } = await supabase.auth.getUser()
-
-        if (authError || !user) {
-            return NextResponse.json({ error: 'Not authenticated' }, { status: 401 })
-        }
+        const auth = await requireCoptellerRole(req, ['coop_admin', 'superadmin', 'bank_staff'])
+        if (auth instanceof NextResponse) return auth
 
         const body = await req.json().catch(() => ({}))
         const { loan_id, status } = body

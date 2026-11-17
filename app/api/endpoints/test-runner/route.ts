@@ -1,11 +1,15 @@
-import { NextResponse } from 'next/server'
+import { NextRequest, NextResponse } from 'next/server'
 import { getPayload } from 'payload'
 import config from '@payload-config'
 import { resolveSecret } from '@/lib/workflow/secrets/secretResolver'
 import { resolveQueryParams, applyAuthOverride } from '@/lib/workflow/utils/apiResolver'
+import { requireCoptellerRole } from '@/lib/copteller/auth'
 
-export async function POST(req: Request) {
+export async function POST(req: NextRequest) {
     try {
+        const auth = await requireCoptellerRole(req, ['superadmin', 'bank_staff'])
+        if (auth instanceof NextResponse) return auth
+
         const payload = await getPayload({ config })
         const body = await req.json()
         const { endpointConfig, query = {}, body: reqBody = {} } = body

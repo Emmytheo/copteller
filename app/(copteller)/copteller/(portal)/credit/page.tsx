@@ -69,7 +69,7 @@ const DEFAULT_FACTORS: CreditFactor[] = [
     { label: "Cooperative Participation Index", score: 76, maxScore: 100, trend: 'stable', icon: Shield, detail: "Active standing in guild with continuous dues clearance and verified meeting attendance." },
     { label: "Wallet Activity & Velocity", score: 82, maxScore: 100, trend: 'up', icon: Wallet, detail: "High velocity float and utility settlements maintained across multiple active pockets." },
     { label: "Loan History & Default Index", score: 98, maxScore: 100, trend: 'stable', icon: Award, detail: "Zero micro-credit or dues defaults on your cooperative guild record. 100% on-time clearance rate." },
-    { label: "Membership Duration & Standing", score: 72, maxScore: 100, trend: 'stable', icon: Star, detail: "Continuous verified tenure in Abia State Cooperatives Union registry." }
+    { label: "Membership Duration & Standing", score: 72, maxScore: 100, trend: 'stable', icon: Star, detail: "Continuous verified tenure in Regional Cooperatives Federation registry." }
 ]
 
 const DEFAULT_HISTORY: CreditHistory[] = [
@@ -126,7 +126,7 @@ const DEFAULT_ELIGIBILITY: LoanEligibility[] = [
     },
     {
         id: "govt-grant-voucher",
-        product: "Abia State Agricultural & Trade Grant",
+        product: "Regional Agricultural & Trade Grant",
         category: "Government Grant",
         limit: 500000,
         rate: "0% interest",
@@ -134,7 +134,7 @@ const DEFAULT_ELIGIBILITY: LoanEligibility[] = [
         eligible: false,
         reason: "Requires minimum 750 Tier 1 credit score threshold for state economic recovery vouchers.",
         description: "State-backed financial empowerment grant for certified farmers, food processors, and leather fabricators.",
-        requirements: ["Verified Business Premises in Abia State", "Minimum 750 Credit Score", "Tax Clearance Certificate"],
+        requirements: ["Verified Trade Premises with Cooperative", "Minimum 750 Credit Score", "Tax Clearance Certificate"],
         actionUrl: "/copteller/schemes"
     },
     {
@@ -429,7 +429,7 @@ export default function MemberCreditPage() {
                                             <span className="text-muted-foreground font-semibold flex items-center gap-1.5">
                                                 <ShieldCheck className="h-3.5 w-3.5 text-emerald-500" /> Cooperative Union
                                             </span>
-                                            <span className="font-black text-foreground">Abia Tricycle Union</span>
+                                            <span className="font-black text-foreground">Metro Tricycle Union</span>
                                         </div>
                                         <div className="flex items-center justify-between text-xs">
                                             <span className="text-muted-foreground font-semibold flex items-center gap-1.5">

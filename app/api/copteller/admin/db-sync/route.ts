@@ -1,14 +1,15 @@
 import { getDb } from '@/lib/copteller/db'
 import { NextRequest, NextResponse } from 'next/server'
 import { Client } from 'pg'
+import { requireCoptellerRole } from '@/lib/copteller/auth'
 
 export async function GET(req: NextRequest) {
-    const { searchParams } = req.nextUrl
-    const secret = searchParams.get('secret')
-    
-    // Simple protection
-    if (secret !== 'sync-copteller-123') {
-        return NextResponse.json({ error: 'Unauthorized.' }, { status: 401 })
+    const secret = req.headers.get('x-admin-secret') || req.nextUrl.searchParams.get('secret')
+    const hasValidSecret = Boolean(process.env.ADMIN_SECRET && secret === process.env.ADMIN_SECRET)
+
+    if (!hasValidSecret) {
+        const auth = await requireCoptellerRole(req, ['superadmin'])
+        if (auth instanceof NextResponse) return auth
     }
 
     const dbUri = process.env.COPTELLER_DATABASE_URI

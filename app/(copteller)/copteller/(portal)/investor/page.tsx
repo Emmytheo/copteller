@@ -171,7 +171,7 @@ export default function InvestorDashboard() {
                             Underwrite Institutional Expansion Tranches Protected by Dedicated Partner MFB Escrow
                         </p>
                         <p className="text-[11px] text-muted-foreground font-semibold max-w-3xl">
-                            Co-fund wholesale welfare and asset schemes sponsored by ABSHIA, Ministry of Transport (ATMA), USAID, and SMEDAN. Beneficiaries repay via automated weekly Ajo deductions with a 94.2% verified SLA.
+                            Co-fund wholesale welfare and asset schemes sponsored by Public Health Mutuals, Transit Directorates, USAID, and SMEDAN. Beneficiaries repay via automated weekly Ajo deductions with a 94.2% verified SLA.
                         </p>
                     </div>
                 </div>
@@ -220,7 +220,7 @@ export default function InvestorDashboard() {
                                     const progressPercent = Math.min(100, Math.floor(((scheme.funded_capital || 0) / (scheme.target_capital || 1)) * 100))
                                     const lower = (scheme.name || "").toLowerCase()
                                     const sponsor = lower.includes("health") || lower.includes("abshia") || lower.includes("medical")
-                                        ? { name: "Powered by ABSHIA Health", color: "text-rose-500 bg-rose-500/10 border-rose-500/20" }
+                                        ? { name: "Powered by Partner Health Mutual", color: "text-rose-500 bg-rose-500/10 border-rose-500/20" }
                                         : lower.includes("tricycle") || lower.includes("keke") || lower.includes("transport") || lower.includes("tvs")
                                         ? { name: "Ministry of Transport / ATMA", color: "text-blue-500 bg-blue-500/10 border-blue-500/20" }
                                         : lower.includes("farm") || lower.includes("agro") || lower.includes("feed")

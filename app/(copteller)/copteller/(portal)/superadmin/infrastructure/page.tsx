@@ -145,8 +145,8 @@ export default function SuperadminInfrastructurePage() {
         if (mode === 'deductions') {
             const steps = [
                 { delay: 0, msg: "Initializing Rotational Ajo Escrow Deductions Pipeline...", type: "cmd" as const },
-                { delay: 800, msg: "Fetching active cooperatives in Abia Multipurpose schema...", type: "info" as const },
-                { delay: 1500, msg: "Found Cooperative: 'Abia Tricycle Operators Association' (Active).", type: "success" as const },
+                { delay: 800, msg: "Fetching active cooperatives in Copteller Cooperative schema...", type: "info" as const },
+                { delay: 1500, msg: "Found Cooperative: 'Metro Tricycle Operators Union' (Active).", type: "success" as const },
                 { delay: 2200, msg: "Loading active member roster context. Resolving ledger accounts...", type: "info" as const },
                 { delay: 3000, msg: "Active account resolved: '3000392981' (Chinedu Okafor - Balance NGN 63,375.00).", type: "success" as const },
                 { delay: 3800, msg: "Evaluating weekly cycle contribution due: NGN 20,000.00.", type: "info" as const },

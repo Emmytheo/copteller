@@ -34,11 +34,11 @@ export interface PartnerSchemeItem {
 let DYNAMIC_PARTNER_SCHEMES: PartnerSchemeItem[] = [
     {
         id: "pschem_abshia_basic",
-        code: "ABSHIA-SCH-01",
-        name: "Abia Informal Sector Health Protection Float",
+        code: "NAHM-SCH-01",
+        name: "Cooperative Informal Health Protection Pool",
         partnerId: "partner_abshia",
         partnerSlug: "abshia",
-        partnerName: "Abia State Health Insurance Agency (ABSHIA)",
+        partnerName: "National Artisans Health Mutual (NAHM)",
         sector: "health",
         description: "Bulk annual statutory capitation pre-funded by MFB float. Enrolled cooperative members amortize at ₦300/week through daily Ajo thrifts.",
         allocatedCapitalKobo: 5000000000, // ₦50M
@@ -54,17 +54,17 @@ let DYNAMIC_PARTNER_SCHEMES: PartnerSchemeItem[] = [
         netSpreadMarginKobo: 68160000,    // ₦2,400 spread margin per enrolled
         repaymentStreakRate: 94.6,
         status: "active",
-        eligibleCooperatives: ["All Registered Abia Artisans & Market Cooperatives"],
-        requiredProviderType: "Accredited ABSHIA Hospitals & PHCs",
+        eligibleCooperatives: ["All Registered Artisan & Market Cooperatives"],
+        requiredProviderType: "Accredited Partner Hospitals & PHCs",
         createdAt: "2026-01-10T08:00:00Z"
     },
     {
         id: "pschem_abshia_family",
-        code: "ABSHIA-SCH-02",
+        code: "NAHM-SCH-02",
         name: "Cooperative Household Family Health Shield",
         partnerId: "partner_abshia",
         partnerSlug: "abshia",
-        partnerName: "Abia State Health Insurance Agency (ABSHIA)",
+        partnerName: "National Artisans Health Mutual (NAHM)",
         sector: "health",
         description: "Comprehensive primary & secondary healthcare coverage for 1 principal member, spouse, and up to 4 biological children under 18.",
         allocatedCapitalKobo: 3500000000, // ₦35M
@@ -90,7 +90,7 @@ let DYNAMIC_PARTNER_SCHEMES: PartnerSchemeItem[] = [
         name: "TVS King Commercial Tricycle Subvention Lease",
         partnerId: "partner_simba_tvs",
         partnerSlug: "simba-tvs",
-        partnerName: "Simba Group & Abia Ministry of Transport",
+        partnerName: "Simba Group & Partner Transit Directorate",
         sector: "transport",
         description: "OEM wholesale acquisition float with first-loss credit guarantee. Certified operators pay ₦18,000/week towards ownership over 18 months.",
         allocatedCapitalKobo: 25000000000, // ₦250M
@@ -116,7 +116,7 @@ let DYNAMIC_PARTNER_SCHEMES: PartnerSchemeItem[] = [
         name: "ATMA Roadworthiness & Digital Permit Micro-Financing",
         partnerId: "partner_abia_transport",
         partnerSlug: "abia-transport",
-        partnerName: "Abia State Ministry of Transport & ATMA",
+        partnerName: "Partner Mobility & Transit Directorate",
         sector: "transport",
         description: "Annual statutory vehicle roadworthiness test, emission tag, and digital transport levy bulk paid by MFB, micro-collected at ₦250/day.",
         allocatedCapitalKobo: 8000000000,  // ₦80M
@@ -159,7 +159,7 @@ let DYNAMIC_PARTNER_SCHEMES: PartnerSchemeItem[] = [
         repaymentStreakRate: 98.4,
         status: "active",
         eligibleCooperatives: ["Umuahia Cassava & Grain Farmers Alliance", "Ohafia Agro Producers Coop"],
-        requiredProviderType: "Abia ADP Central Seed & Fertilizer Depot",
+        requiredProviderType: "Regional Agro Seed & Fertilizer Depot",
         createdAt: "2026-03-01T08:00:00Z"
     },
     {
@@ -260,7 +260,7 @@ export async function POST(req: NextRequest) {
             repaymentFrequency = 'weekly',
             durationMonths = 12,
             maxCapacityBeneficiaries = 500,
-            eligibleCooperatives = ["All Abia State Cooperatives"],
+            eligibleCooperatives = ["All Partner Cooperatives"],
             requiredProviderType = "Accredited Facilities"
         } = body
 

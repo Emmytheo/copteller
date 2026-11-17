@@ -65,7 +65,7 @@ export const DEFAULT_UNION_SERVICES = [
     {
         id: "srv_cng_04",
         name: "Subsidized Clean Energy Fuel Voucher",
-        description: "Abia State Government subsidized CNG dispensing coupons at designated fuel stations.",
+        description: "Public Partner Agency subsidized CNG dispensing coupons at designated fuel stations.",
         icon: "CircleDollarSign",
         categoryName: "Energy & Utilities",
         categorySlug: "energy",
@@ -89,7 +89,7 @@ export async function GET(req: NextRequest) {
         if (auth instanceof NextResponse) return auth
 
         let coopSector = 'transport'
-        let coopName = auth.cooperativeName || 'Abia State Tricycle Operators Association (ASTOA)'
+        let coopName = auth.cooperativeName || 'Metro Tricycle Operators Union (MTOU)'
 
         const fetchServices = async () => {
             const payload = await getDb()
@@ -180,7 +180,7 @@ export async function GET(req: NextRequest) {
                 resolve(NextResponse.json({
                     success: true,
                     cooperative: {
-                        id: auth.cooperativeId || 'ASTOA-01',
+                        id: auth.cooperativeId || 'MTOU-01',
                         name: coopName,
                         sector: coopSector,
                     },
@@ -195,8 +195,8 @@ export async function GET(req: NextRequest) {
         return NextResponse.json({
             success: true,
             cooperative: {
-                id: 'ASTOA-01',
-                name: 'Abia State Tricycle Operators Association (ASTOA)',
+                id: 'MTOU-01',
+                name: 'Metro Tricycle Operators Union (MTOU)',
                 sector: 'transport',
             },
             services: DEFAULT_UNION_SERVICES,

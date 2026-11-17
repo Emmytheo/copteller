@@ -1,10 +1,14 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { getCoptellerPool } from '@/lib/copteller/pg'
+import { requireCoptellerRole } from '@/lib/copteller/auth'
 
 export const dynamic = 'force-dynamic'
 
 export async function POST(req: NextRequest) {
     try {
+        const auth = await requireCoptellerRole(req, ['superadmin', 'bank_staff'])
+        if (auth instanceof NextResponse) return auth
+
         const pool = getCoptellerPool()
 
         const custRes = await pool.query("SELECT * FROM copteller.customers WHERE first_name ILIKE '%Chinedu%' LIMIT 1")
@@ -54,7 +58,7 @@ export async function POST(req: NextRequest) {
                 frequency, target_amount, current_pool, total_collected, max_members, current_round,
                 status, invite_code, vault_account_id
             ) VALUES (
-                $1, 'Abia State University Alumni 2018 Cooperative Project Fund',
+                $1, 'University Alumni Cooperative Project Fund',
                 'Joint target vault toward co-funding the Aba youth tech hub expansion and end-of-year reunion welfare banquet.',
                 'target_vault', 'alumni', 25000.00,
                 'monthly', 2000000.00, 850000.00, 850000.00, 25, 1,

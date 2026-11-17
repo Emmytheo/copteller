@@ -125,7 +125,7 @@ export async function POST(req: NextRequest) {
             const accRes = await client.query(`
                 SELECT a.id, TRIM(COALESCE(c.first_name, '') || ' ' || COALESCE(c.last_name, '')) as full_name, c.phone_number
                 FROM copteller.accounts a
-                LEFT JOIN copteller.customers c ON c.i d = a.customer_id
+                LEFT JOIN copteller.customers c ON c.id = a.customer_id
                 WHERE a.user_id = $1 AND a.status = 'active'
                 ORDER BY a.created_at ASC LIMIT 1
             `, [auth.userId])

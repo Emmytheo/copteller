@@ -4,9 +4,11 @@ import { Toaster } from "@/components/ui/sonner";
 import { PaletteProvider } from "@/context/palette-context";
 import "./globals.css";
 
-const defaultUrl = process.env.VERCEL_URL
-    ? `https://${process.env.VERCEL_URL}`
-    : process.env.NEXT_PUBLIC_COPTELLER_APP_URL || "http://localhost:3001";
+const defaultUrl = process.env.VERCEL_PROJECT_PRODUCTION_URL
+    ? `https://${process.env.VERCEL_PROJECT_PRODUCTION_URL}`
+    : process.env.VERCEL_URL
+      ? `https://${process.env.VERCEL_URL}`
+      : process.env.NEXT_PUBLIC_COPTELLER_APP_URL || "https://copteller.vercel.app";
 
 export const viewport: Viewport = {
     width: "device-width",

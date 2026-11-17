@@ -1,10 +1,14 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { executeWorkflow } from '@/lib/workflow/executeWorkflow'
+import { requireCoptellerRole } from '@/lib/copteller/auth'
 
 export async function POST(
     request: NextRequest,
     { params }: { params: Promise<{ id: string }> }
 ) {
+    const auth = await requireCoptellerRole(request, ['superadmin', 'bank_staff'])
+    if (auth instanceof NextResponse) return auth
+
     const { id } = await params
 
     try {

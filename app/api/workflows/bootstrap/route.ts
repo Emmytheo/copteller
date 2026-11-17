@@ -1,13 +1,17 @@
-import { NextResponse } from 'next/server'
+import { NextRequest, NextResponse } from 'next/server'
 import { getPayload } from 'payload'
 import config from '@/payload.config'
 import { compileSDLToFlow } from '@/lib/workflow/sdl'
 import { ingestBlueprint, type BlueprintSDL } from '@/lib/workflow/blueprint'
+import { requireCoptellerRole } from '@/lib/copteller/auth'
 import fs from 'fs'
 import path from 'path'
 
-export async function GET() {
+export async function GET(req: NextRequest) {
     try {
+        const auth = await requireCoptellerRole(req, ['superadmin', 'bank_staff'])
+        if (auth instanceof NextResponse) return auth
+
         const payload = await getPayload({ config })
         const templatesDir = path.join(process.cwd(), 'lib/workflow/templates')
         

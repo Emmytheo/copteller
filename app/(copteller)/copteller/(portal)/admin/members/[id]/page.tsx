@@ -127,7 +127,7 @@ export default function AdminMemberDetailPage({ params }: PageProps) {
                     fullName: found.name,
                     phone: found.phone || '080X XXX XXXX',
                     email: found.email,
-                    address: found.address || 'Aba Trade Zone, Abia State',
+                    address: found.address || 'Commercial Trade Zone',
                     cooperative: coopProfile?.name || 'Aba Motor Union',
                     joinDate: 'Jan 10, 2026',
                     status: lowStatus === 'active' ? 'active' : (lowStatus === 'pending' ? 'pending' : 'suspended'),

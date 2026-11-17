@@ -12,15 +12,15 @@ export async function POST(req: Request) {
         }
 
         const body = await req.json().catch(() => ({}))
-        const rawAmount = body.amount_naira ?? body.amount
+        const rawAmount = Number(body.amount_naira ?? body.amount)
         const destination = body.destination_account_number ?? body.recipient ?? body.destination
         const narration = body.narration || 'Member Inter-cooperative Transfer'
 
-        if (!rawAmount || Number(rawAmount) <= 0 || !destination) {
-            return NextResponse.json({ error: 'amount and destination are required fields' }, { status: 400 })
+        if (!Number.isFinite(rawAmount) || rawAmount <= 0 || rawAmount > 100000000 || !destination) {
+            return NextResponse.json({ error: 'valid amount and destination are required fields' }, { status: 400 })
         }
 
-        const amount_naira = Number(rawAmount)
+        const amount_naira = rawAmount
         const destination_account_number = String(destination).trim()
         const amountKobo = Math.round(amount_naira * 100)
         const payload = await getDb()

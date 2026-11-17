@@ -373,7 +373,7 @@ export async function POST(req: NextRequest) {
                 name: auth.displayName || 'Cooperative Member',
                 email: auth.email,
                 role: auth.role,
-                cooperativeName: auth.cooperativeName || 'Abia Tricycle Operators Association',
+                cooperativeName: auth.cooperativeName || 'Metro Tricycle Operators Union',
             },
             providerDetails: providerExecutionDetails,
             payloadSummary: {

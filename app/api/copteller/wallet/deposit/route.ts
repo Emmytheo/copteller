@@ -12,13 +12,13 @@ export async function POST(req: Request) {
         }
 
         const body = await req.json().catch(() => ({}))
-        const rawAmount = body.amount_naira ?? body.amount
+        const rawAmount = Number(body.amount_naira ?? body.amount)
 
-        if (!rawAmount || Number(rawAmount) <= 0) {
-            return NextResponse.json({ error: 'amount must be a positive number' }, { status: 400 })
+        if (!Number.isFinite(rawAmount) || rawAmount <= 0 || rawAmount > 100000000) {
+            return NextResponse.json({ error: 'amount must be a valid positive number' }, { status: 400 })
         }
 
-        const amountKobo = Math.round(Number(rawAmount) * 100)
+        const amountKobo = Math.round(rawAmount * 100)
         const payload = await getDb()
 
         // 1. Find or resolve customer associated with user

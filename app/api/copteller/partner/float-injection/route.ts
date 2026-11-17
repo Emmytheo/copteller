@@ -13,7 +13,7 @@ export async function POST(req: NextRequest) {
         const {
             partnerSlug = 'abshia',
             amountKobo,
-            sourceBank = 'Abia State Central Treasury / CBN Microfinance Facility',
+            sourceBank = 'Partner Microfinance Liquidity Facility',
             reference,
             purpose = 'Statutory Risk Pool Liquidity Top-up'
         } = body

@@ -68,7 +68,7 @@ export async function GET(req: NextRequest) {
 
             return {
                 id: `due_${m.toLowerCase().replace(' ', '_')}`,
-                description: `Monthly Union Dues (${membership?.cooperative_name || 'Abia Cooperative Guild'})`,
+                description: `Monthly Union Dues (${membership?.cooperative_name || 'Regional Cooperative Guild'})`,
                 amount: monthlyDuesNaira,
                 period: m,
                 dueDate: isCurrentMonth ? 'Oct 28, 2026' : 'Paid on Schedule',
@@ -95,7 +95,7 @@ export async function GET(req: NextRequest) {
         return NextResponse.json({
             success: true,
             membership: {
-                cooperativeName: membership?.cooperative_name || 'Abia Tricycle Operators Cooperative Union',
+                cooperativeName: membership?.cooperative_name || 'Metro Tricycle Operators Union',
                 totalPaid: totalPaidNaira,
                 outstandingBalance: outstandingNaira,
                 monthlyDuesRate: monthlyDuesNaira,

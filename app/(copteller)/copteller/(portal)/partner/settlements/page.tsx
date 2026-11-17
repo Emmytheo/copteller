@@ -496,7 +496,7 @@ export default function FloatSettlementsPage() {
                             <div>
                                 <label className="font-bold text-foreground block mb-1">Counterparty (Beneficiary / Bank / Hospital) *</label>
                                 <Input
-                                    placeholder={isHealth ? "e.g. ABSUTH Teaching Hospital or Primary Cooperative" : "e.g. TVS Assembly Diagnostics Hub"}
+                                    placeholder={isHealth ? "e.g. Accredited Hospital or Primary Cooperative" : "e.g. TVS Assembly Diagnostics Hub"}
                                     value={formData.counterparty}
                                     onChange={(e) => setFormData(prev => ({ ...prev, counterparty: e.target.value }))}
                                     className="h-9 rounded-xl"

@@ -9,7 +9,7 @@ export async function GET(req: NextRequest) {
 
         const defaultCoop = {
             id: auth.cooperativeId || '1',
-            name: auth.cooperativeName || 'Abia State Tricycle Operators Association (ASTOA)',
+            name: auth.cooperativeName || 'Metro Tricycle Operators Union (MTOU)',
             description: 'Commercial Tricycle Transport Operators Guild • Aba Central',
             status: 'active',
             sector: 'transport',
@@ -95,7 +95,7 @@ export async function GET(req: NextRequest) {
             success: true,
             cooperative: {
                 id: '1',
-                name: 'Abia State Tricycle Operators Association (ASTOA)',
+                name: 'Metro Tricycle Operators Union (MTOU)',
                 description: 'Commercial Tricycle Transport Operators Guild • Aba Central',
                 status: 'active',
                 sector: 'transport',

@@ -1,34 +1,13 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { createClient as createServerSupabase } from '@/lib/supabase/server'
-import { getCoptellerAuth } from '@/lib/copteller/auth'
+import { requireCoptellerRole } from '@/lib/copteller/auth'
 import { getCoptellerPool } from '@/lib/copteller/pg'
 import { getPayload } from 'payload'
 import configPromise from '@payload-config'
 
 export async function POST(req: NextRequest) {
     try {
-        // Authenticate via Copteller auth first, then fallback to standard Partner MFB bank auth
-        let authenticatedUserId: string | null = null
-        try {
-            const coptellerAuth = await getCoptellerAuth(req)
-            if (!(coptellerAuth instanceof NextResponse)) {
-                authenticatedUserId = coptellerAuth.userId
-            }
-        } catch {
-            // fallback
-        }
-
-        if (!authenticatedUserId) {
-            const supabase = await createServerSupabase()
-            const { data: { user }, error: authError } = await supabase.auth.getUser()
-            if (!authError && user) {
-                authenticatedUserId = user.id
-            }
-        }
-
-        if (!authenticatedUserId) {
-            return NextResponse.json({ error: 'Not authenticated' }, { status: 401 })
-        }
+        const auth = await requireCoptellerRole(req, ['coop_admin', 'superadmin', 'bank_staff'])
+        if (auth instanceof NextResponse) return auth
 
         const payload = await getPayload({ config: configPromise })
 
@@ -335,10 +314,10 @@ export async function POST(req: NextRequest) {
                     actor_id, actor_role, actor_name, action, entity_type, entity_id,
                     metadata, created_at, updated_at
                 ) VALUES (
-                    $1, 'admin', 'Automated Collections Engine', 'ESUSU_CYCLE_COLLECTION_BATCH', 'ESUSU_CYCLE', 'BATCH',
-                    $2, NOW(), NOW()
+                    $1, $2, $3, 'ESUSU_CYCLE_COLLECTION_BATCH', 'ESUSU_CYCLE', 'BATCH',
+                    $4, NOW(), NOW()
                 )
-            `, [authenticatedUserId, JSON.stringify({ summary, cyclesProcessed: summary.length })])
+            `, [auth.userId, auth.role, auth.displayName || 'Automated Collections Engine', JSON.stringify({ summary, cyclesProcessed: summary.length })])
         } catch (logErr) {
             console.warn('[Run Collection] Audit log error (non-fatal):', logErr)
         }

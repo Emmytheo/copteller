@@ -182,7 +182,7 @@ export async function GET(req: NextRequest) {
                 score: tenureScore,
                 maxScore: 100,
                 trend: 'stable',
-                detail: `Continuous verified tenure in Abia State Cooperatives Union since ${joinedDate.toLocaleDateString(undefined, { month: 'short', year: 'numeric' })}.`
+                detail: `Continuous verified tenure in Regional Cooperatives Federation since ${joinedDate.toLocaleDateString(undefined, { month: 'short', year: 'numeric' })}.`
             }
         ]
 
@@ -240,7 +240,7 @@ export async function GET(req: NextRequest) {
             },
             {
                 id: "govt-grant-voucher",
-                product: "Abia State Agricultural & Trade Grant",
+                product: "Regional Agricultural & Trade Grant",
                 category: "Government Grant",
                 limit: 500000,
                 rate: "0% interest",
@@ -248,7 +248,7 @@ export async function GET(req: NextRequest) {
                 eligible: overallScore >= 750,
                 reason: "Requires minimum 750 Tier 1 credit score threshold for state economic recovery vouchers.",
                 description: "State-backed financial empowerment grant for certified farmers, food processors, and leather fabricators.",
-                requirements: ["Verified Business Premises in Abia State", "Minimum 750 Credit Score", "Tax Clearance Certificate"],
+                requirements: ["Verified Trade Premises with Cooperative", "Minimum 750 Credit Score", "Tax Clearance Certificate"],
                 actionUrl: "/copteller/schemes"
             },
             {
@@ -280,7 +280,7 @@ export async function GET(req: NextRequest) {
                 percentile: 94,
                 delinquencyAmount: 0,
                 totalContributed: membership?.total_contributed || 24000000,
-                cooperativeName: "Abia State Tricycle Operators Association",
+                cooperativeName: "Metro Tricycle Operators Union",
                 nextReviewCycle: "1st of next month"
             }
         })
@@ -297,7 +297,7 @@ export async function GET(req: NextRequest) {
                 { label: "Cooperative Participation Index", score: 76, maxScore: 100, trend: 'stable', detail: "Active standing in guild with continuous dues clearance and verified meeting attendance." },
                 { label: "Wallet Activity & Velocity", score: 82, maxScore: 100, trend: 'up', detail: "High velocity float and utility settlements maintained across multiple active pockets." },
                 { label: "Loan History & Default Index", score: 98, maxScore: 100, trend: 'stable', detail: "Zero micro-credit or dues defaults on your cooperative guild record. 100% on-time clearance rate." },
-                { label: "Membership Duration & Standing", score: 72, maxScore: 100, trend: 'stable', detail: "Continuous verified tenure in Abia State Cooperatives Union registry." }
+                { label: "Membership Duration & Standing", score: 72, maxScore: 100, trend: 'stable', detail: "Continuous verified tenure in Regional Cooperatives Federation registry." }
             ],
             scoreHistory: [
                 { month: "Sep", score: 682, change: "+6", event: "Joined Union & Completed KYC Tier 1" },
@@ -317,7 +317,7 @@ export async function GET(req: NextRequest) {
                 { id: "micro-emergency", product: "Emergency Micro-Credit", category: "Cash Float", limit: 50000, rate: "2.5% flat", term: "30 days", eligible: true, description: "Immediate cash advance credited directly to your primary cooperative wallet for emergency supplies or repairs.", requirements: ["Active Membership > 30 days", "Minimum 550 Credit Score", "Zero Unsettled Micro-Debits"], actionUrl: "/copteller/schemes" },
                 { id: "coop-working-cap", product: "Cooperative Working Capital", category: "SME Trade", limit: 350000, rate: "2.0% pm", term: "6 months", eligible: true, description: "Inventory purchase and working float financing for registered artisans, market traders, and fleet operators.", requirements: ["Continuous Ajo Streak > 90 days", "Minimum 620 Credit Score", "1 Guild Member Guarantor"], actionUrl: "/copteller/schemes" },
                 { id: "hp-asset-financing", product: "HP Vehicle & Asset Financing", category: "Asset Lease", limit: 1400000, rate: "1.8% pm", term: "18 months", eligible: true, description: "Acquire brand new TVS King Keke or commercial motorcycle with 20% equity and structured weekly repayments.", requirements: ["Verified Driver License / Union Badge", "Minimum 680 Credit Score", "2 Union Executive Endorsements"], actionUrl: "/copteller/schemes" },
-                { id: "govt-grant-voucher", product: "Abia State Agricultural & Trade Grant", category: "Government Grant", limit: 500000, rate: "0% interest", term: "Non-repayable", eligible: false, reason: "Requires minimum 750 Tier 1 credit score threshold for state economic recovery vouchers.", description: "State-backed financial empowerment grant for certified farmers, food processors, and leather fabricators.", requirements: ["Verified Business Premises in Abia State", "Minimum 750 Credit Score", "Tax Clearance Certificate"], actionUrl: "/copteller/schemes" },
+                { id: "govt-grant-voucher", product: "Regional Agricultural & Trade Grant", category: "Government Grant", limit: 500000, rate: "0% interest", term: "Non-repayable", eligible: false, reason: "Requires minimum 750 Tier 1 credit score threshold for state economic recovery vouchers.", description: "State-backed financial empowerment grant for certified farmers, food processors, and leather fabricators.", requirements: ["Verified Trade Premises with Cooperative", "Minimum 750 Credit Score", "Tax Clearance Certificate"], actionUrl: "/copteller/schemes" },
                 { id: "priority-liquidity", product: "Priority Cooperative Treasury Pool", category: "Institutional", limit: 2500000, rate: "1.5% pm", term: "24 months", eligible: false, reason: "Exclusive to Tier 1 Guild Executives and Senior Fleet Operators with 800+ credit score.", description: "Large-scale expansion credit line underwritten by Partner MFB partner liquidity vault.", requirements: ["Tenure > 12 Months", "Minimum 800 Credit Score", "Asset Collateralization Registry"], actionUrl: "/copteller/schemes" }
             ],
             hasPendingReview: false,
@@ -327,7 +327,7 @@ export async function GET(req: NextRequest) {
                 percentile: 94,
                 delinquencyAmount: 0,
                 totalContributed: 24000000,
-                cooperativeName: "Abia State Tricycle Operators Association",
+                cooperativeName: "Metro Tricycle Operators Union",
                 nextReviewCycle: "1st of next month"
             }
         })

@@ -52,8 +52,8 @@ export async function GET(req: NextRequest) {
             },
             {
                 id: 'sched_abshia_health',
-                category: 'ABSHIA State Health Insurance Cover',
-                description: 'Bulk statutory capitation pre-funded by MFB, micro-amortized at ₦300/wk for comprehensive primary care across ABSUTH, FMC & accredited hospitals',
+                category: 'Cooperative Health Insurance Cover',
+                description: 'Bulk statutory capitation pre-funded by MFB, micro-amortized at ₦300/wk for comprehensive primary care across accredited hospitals & primary medical centres',
                 amount: 1200,
                 frequency: 'monthly',
                 mandatory: false,

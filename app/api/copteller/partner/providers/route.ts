@@ -74,7 +74,7 @@ export async function POST(req: NextRequest) {
         }
 
         const newId = `prov_${Date.now()}_${Math.random().toString(36).substring(2, 6)}`
-        const codePrefix = sector === 'health' ? 'ABSHIA-FAC' : sector === 'transport' ? 'ATMA-WKSH' : 'AGRO-DEPOT'
+        const codePrefix = sector === 'health' ? 'NAHM-FAC' : sector === 'transport' ? 'TRANSIT-WKSH' : 'AGRO-DEPOT'
         const facilityCode = `${codePrefix}-${Math.floor(100 + Math.random() * 900)}`
 
         const newProvider: AccreditedProvider = {

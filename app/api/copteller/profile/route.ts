@@ -125,7 +125,7 @@ export async function GET(req: NextRequest) {
         if (!cooperative) {
             cooperative = {
                 id: auth.cooperativeId || '1',
-                name: auth.cooperativeName || 'Abia Tricycle Operators Association',
+                name: auth.cooperativeName || 'Metro Tricycle Operators Union',
                 sector: 'transport',
                 status: 'active',
             }

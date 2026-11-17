@@ -112,7 +112,7 @@ export default function CoopAdminServicesPage() {
                                 <Building2 className="h-4 w-4 text-amber-600 dark:text-amber-400" />
                             </div>
                             <p className="text-[10px] font-black text-amber-600 dark:text-amber-400 uppercase tracking-widest">
-                                Cooperative Console · {cooperative?.name || "Abia Tricycle Operators Association"}
+                                Cooperative Console · {cooperative?.name || "Metro Tricycle Operators Union"}
                                 {cooperative?.sector && <span className="ml-1 text-muted-foreground normal-case">({cooperative.sector.toUpperCase()} Sector)</span>}
                             </p>
                         </div>

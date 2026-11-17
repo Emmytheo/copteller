@@ -395,8 +395,8 @@ function MemberDashboardContent() {
                                     <HeartPulse className="h-4 w-4" />
                                 </div>
                                 <div className="min-w-0">
-                                    <p className="text-xs font-black text-foreground truncate">ABSHIA Health Coverage</p>
-                                    <p className="text-[10px] text-muted-foreground font-semibold truncate">Active at ABSUTH &amp; FMC Umuahia</p>
+                                    <p className="text-xs font-black text-foreground truncate">Cooperative Health Coverage</p>
+                                    <p className="text-[10px] text-muted-foreground font-semibold truncate">Active at Partner Hospitals & Medical Centres</p>
                                 </div>
                             </div>
                             <span className="text-[9px] font-black uppercase text-emerald-600 dark:text-emerald-400 bg-emerald-500/10 px-2 py-0.5 rounded-full border border-emerald-500/20 shrink-0">

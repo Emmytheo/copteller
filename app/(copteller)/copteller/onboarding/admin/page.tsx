@@ -316,7 +316,7 @@ export default function AdminOnboardingPage() {
 
                                         <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5 sm:gap-3">
                                             {[
-                                                { label: "State *", value: state, setter: setState, placeholder: "e.g. Abia" },
+                                                { label: "State *", value: state, setter: setState, placeholder: "e.g. Lagos" },
                                                 { label: "LGA *", value: lga, setter: setLga, placeholder: "e.g. Aba North" },
                                             ].map(({ label, value, setter, placeholder }) => (
                                                 <div key={label} className="space-y-1.5">

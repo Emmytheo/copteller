@@ -1,7 +1,8 @@
-import { NextResponse } from 'next/server'
+import { NextRequest, NextResponse } from 'next/server'
 import { getPayload } from 'payload'
 import config from '@payload-config'
 import { resolveSecret } from '@/lib/workflow/secrets/secretResolver'
+import { requireCoptellerRole } from '@/lib/copteller/auth'
 
 function resolvePayloadValue(key: string, payload: any) {
     if (!payload || typeof payload !== 'object') return undefined;
@@ -32,8 +33,11 @@ function resolvePayloadValue(key: string, payload: any) {
     return undefined;
 }
 
-export async function POST(req: Request) {
+export async function POST(req: NextRequest) {
     try {
+        const auth = await requireCoptellerRole(req, ['superadmin', 'bank_staff'])
+        if (auth instanceof NextResponse) return auth
+
         const payload = await getPayload({ config })
         const body = await req.json()
         const { endpointId, dynamicPayload } = body

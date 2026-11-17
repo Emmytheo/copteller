@@ -41,9 +41,9 @@ const ALL_PARTNER_SERVICES: ServiceItem[] = [
     // Health (ABSHIA)
     {
         id: "svc_abshia_basic",
-        name: "ABSHIA Informal Health Cover (₦300/wk)",
+        name: "Cooperative Health Cover (₦300/wk)",
         partnerSlug: "abshia",
-        partnerName: "Abia State Health Insurance Agency",
+        partnerName: "National Artisans Health Mutual",
         sector: "health",
         category: "Primary & Outpatient Care",
         icon: HeartPulse,
@@ -55,14 +55,14 @@ const ALL_PARTNER_SERVICES: ServiceItem[] = [
         subsidyPct: 0,
         activeEnrollees: 2840,
         providerPickerRequired: true,
-        providerNetwork: "ABSHIA Accredited Hospitals & PHCs",
+        providerNetwork: "Partner Accredited Hospitals & PHCs",
         status: "active"
     },
     {
         id: "svc_abshia_family",
         name: "Cooperative Household Family Health Shield",
         partnerSlug: "abshia",
-        partnerName: "Abia State Health Insurance Agency",
+        partnerName: "National Artisans Health Mutual",
         sector: "health",
         category: "Family & Inpatient Shield",
         icon: HeartPulse,
@@ -81,7 +81,7 @@ const ALL_PARTNER_SERVICES: ServiceItem[] = [
         id: "svc_abshia_maternal",
         name: "Maternal & Child Under-5 Subsidized Bundle",
         partnerSlug: "abshia",
-        partnerName: "Abia State Health Insurance Agency",
+        partnerName: "National Artisans Health Mutual",
         sector: "health",
         category: "Maternal & Child Health",
         icon: HeartPulse,
@@ -120,7 +120,7 @@ const ALL_PARTNER_SERVICES: ServiceItem[] = [
         id: "svc_transport_permit",
         name: "ATMA Roadworthiness & Digital Permit Micro-Financing",
         partnerSlug: "abia-transport",
-        partnerName: "Abia State Ministry of Transport & ATMA",
+        partnerName: "Partner Mobility & Transit Directorate",
         sector: "transport",
         category: "Statutory Permits & Verification",
         icon: Truck,
@@ -139,7 +139,7 @@ const ALL_PARTNER_SERVICES: ServiceItem[] = [
         id: "svc_transport_fleet_maint",
         name: "Commercial Fleet Scheduled Servicing & Tire Voucher",
         partnerSlug: "abia-transport",
-        partnerName: "Abia State Ministry of Transport & ATMA",
+        partnerName: "Partner Mobility & Transit Directorate",
         sector: "transport",
         category: "Fleet Maintenance & Spares",
         icon: Truck,
@@ -171,7 +171,7 @@ const ALL_PARTNER_SERVICES: ServiceItem[] = [
         subsidyPct: 50,
         activeEnrollees: 950,
         providerPickerRequired: true,
-        providerNetwork: "Abia ADP Central Seed & Fertilizer Depot",
+        providerNetwork: "Regional Agro Seed & Fertilizer Depot",
         status: "active"
     },
     {
@@ -190,7 +190,7 @@ const ALL_PARTNER_SERVICES: ServiceItem[] = [
         subsidyPct: 33,
         activeEnrollees: 410,
         providerPickerRequired: true,
-        providerNetwork: "Abia ADP Mechanization Depots",
+        providerNetwork: "Regional Agro Mechanization Depots",
         status: "active"
     },
     // Commerce / MSME (SMEDAN)

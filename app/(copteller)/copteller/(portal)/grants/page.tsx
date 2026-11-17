@@ -59,7 +59,7 @@ export default function MemberGrantsPage() {
                 setSchemes([
                     {
                         id: 'sch_g_1',
-                        name: 'Abia State Smallholder MSME Revival Grant',
+                        name: 'Smallholder MSME Revival Grant',
                         scheme_type: 'grant',
                         target_capital: 50000000, // ₦500k in kobo
                         yield_rate: 0,
@@ -96,7 +96,7 @@ export default function MemberGrantsPage() {
                 setApplications([
                     {
                         id: 'app_01',
-                        scheme_name: 'Abia State Smallholder MSME Revival Grant',
+                        scheme_name: 'Smallholder MSME Revival Grant',
                         requested_amount: 35000000,
                         status: 'approved',
                         created_at: new Date(Date.now() - 86400000 * 5).toISOString(),
@@ -298,7 +298,7 @@ export default function MemberGrantsPage() {
                                                 </h3>
 
                                                 <p className="text-xs text-muted-foreground font-medium line-clamp-2">
-                                                    {s.description || "Subsidized capital facility backed by Abia State Cooperative Ministry."}
+                                                    {s.description || "Subsidized capital facility backed by Regional Cooperative Directorate."}
                                                 </p>
                                             </div>
 

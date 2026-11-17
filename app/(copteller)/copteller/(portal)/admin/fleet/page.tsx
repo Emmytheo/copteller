@@ -972,7 +972,7 @@ export default function FleetPage() {
                                             <div className="p-4 rounded-2xl bg-muted/30 border border-border flex items-center justify-between text-xs">
                                                 <div>
                                                     <p className="font-black text-foreground">Cooperative Guild Certification</p>
-                                                    <p className="text-[11px] text-muted-foreground">Compliant with Abia State Ministry of Transport guild regulatory charter.</p>
+                                                    <p className="text-[11px] text-muted-foreground">Compliant with Partner Transport Directorate guild regulatory charter.</p>
                                                 </div>
                                                 <Badge className="bg-emerald-500/15 text-emerald-600 border border-emerald-500/25 font-bold">
                                                     Certified Unit

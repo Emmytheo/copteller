@@ -246,7 +246,7 @@ export default function CoptellerMemberCardsPage() {
                                     State & Institutional Credential Passes
                                 </h3>
                                 <p className="text-xs text-muted-foreground font-semibold">
-                                    Verifiable digital identification cards issued under active Abia State Government parastatals, healthcare agencies, and development partner programs.
+                                    Verifiable digital identification cards issued under active Public Partner Agency parastatals, healthcare agencies, and development partner programs.
                                 </p>
                             </div>
                             <span className="text-[11px] text-emerald-600 font-bold flex items-center gap-1.5">
@@ -255,7 +255,7 @@ export default function CoptellerMemberCardsPage() {
                         </div>
 
                         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                            {/* 1. ABSHIA Healthcare Pass */}
+                            {/* 1. Health Mutualcare Pass */}
                             <div className="relative rounded-3xl p-6 bg-gradient-to-br from-emerald-950 via-teal-900 to-slate-950 border border-emerald-500/30 text-white shadow-xl space-y-4 flex flex-col justify-between overflow-hidden group">
                                 <div className="absolute -right-12 -top-12 w-44 h-44 bg-emerald-500/10 rounded-full blur-2xl pointer-events-none group-hover:scale-125 transition-transform" />
                                 
@@ -263,10 +263,10 @@ export default function CoptellerMemberCardsPage() {
                                     <div className="flex items-start justify-between">
                                         <div>
                                             <span className="text-[9px] font-black uppercase tracking-widest text-emerald-400 block">
-                                                Abia State Government
+                                                Public Partner Agency
                                             </span>
                                             <h4 className="text-sm font-black text-white">
-                                                ABSHIA Social Health Pass
+                                                Cooperative Social Health Pass
                                             </h4>
                                         </div>
                                         <div className="px-2 py-0.5 rounded-full bg-emerald-500/20 border border-emerald-500/30 text-[9px] font-black text-emerald-300">
@@ -283,7 +283,7 @@ export default function CoptellerMemberCardsPage() {
                                     <div className="grid grid-cols-2 gap-2 p-3 rounded-2xl bg-white/5 border border-white/10 text-[10px]">
                                         <div>
                                             <span className="text-white/60 block">Policy ID</span>
-                                            <span className="font-mono font-bold text-emerald-300">ABSHIA-ABA-26-1049</span>
+                                            <span className="font-mono font-bold text-emerald-300">NAHM-COOP-26-1049</span>
                                         </div>
                                         <div>
                                             <span className="text-white/60 block">Micro-Due</span>
@@ -294,9 +294,9 @@ export default function CoptellerMemberCardsPage() {
                                     <div className="space-y-1">
                                         <span className="text-[9px] uppercase tracking-wider text-white/60 font-semibold block">Primary Hospital Provider</span>
                                         <p className="text-xs font-bold text-white leading-tight">
-                                            Abia State Univ. Teaching Hospital (ABSUTH)
+                                            Regional Teaching Hospital Network
                                         </p>
-                                        <span className="text-[9px] text-emerald-300/80">Umuoba Road, Aba • Code: ABSHIA-FAC-001</span>
+                                        <span className="text-[9px] text-emerald-300/80">Regional Medical Hub • Code: NAHM-FAC-001</span>
                                     </div>
                                 </div>
 
@@ -396,7 +396,7 @@ export default function CoptellerMemberCardsPage() {
                                     <div className="space-y-1">
                                         <span className="text-[9px] uppercase tracking-wider text-white/60 font-semibold block">Collection & Fertilizer Depot</span>
                                         <p className="text-xs font-bold text-white leading-tight">
-                                            Abia ADP Central Seed Depot
+                                            Regional Agro Seed Depot
                                         </p>
                                         <span className="text-[9px] text-amber-300/80">Min. of Agriculture Complex, Umuahia</span>
                                     </div>
