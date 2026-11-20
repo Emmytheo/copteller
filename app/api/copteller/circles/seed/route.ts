@@ -1,12 +1,15 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { getCoptellerPool } from '@/lib/copteller/pg'
-import { requireCoptellerRole } from '@/lib/copteller/auth'
+import { isProductionMaintenanceBlocked, requireCoptellerRole } from '@/lib/copteller/auth'
 
 export const dynamic = 'force-dynamic'
 
 export async function POST(req: NextRequest) {
     try {
-        const auth = await requireCoptellerRole(req, ['superadmin', 'bank_staff'])
+        if (isProductionMaintenanceBlocked()) {
+            return NextResponse.json({ error: 'Destructive seed endpoint is disabled in production.' }, { status: 403 })
+        }
+        const auth = await requireCoptellerRole(req, ['superadmin'])
         if (auth instanceof NextResponse) return auth
 
         const pool = getCoptellerPool()

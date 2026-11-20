@@ -16,12 +16,32 @@ export interface CoopMemberFormSpec {
      */
     declarationPurpose: string
     /**
-     * Voluntary/personal engagements do not require Union Leader Clearance (false by default).
-     * Traditional trade unions that mandate chairman co-signoff can opt in (true).
+     * Union Leader / Cooperative President signature block on application forms.
+     * Reinstated to true by default for official society endorsement.
      */
     requireUnionClearance: boolean
+    /**
+     * Partner Microfinance Bank / Bank Auditor approval signature block.
+     * Optional (false by default); cooperatives or admins may enable when bank countersignature is required.
+     */
+    requireBankSignature: boolean
+    /**
+     * Form density/privacy preset:
+     * - "standard": full KYC/registration metadata, BVN/DOB, and account class checkboxes
+     * - "lite": minimal non-sensitive field capture (omits BVN/NIN/DOB/email, registration data, and account class strip)
+     */
+    formMode?: "standard" | "lite"
     requirePassportPhoto: boolean
     requireBvn: boolean
+    /**
+     * Configurable label for Part C contribution amount field (defaults to "Target Contribution Amount (₦)").
+     */
+    contributionFieldLabel?: string
+    /**
+     * When true, pre-fills defaultContributionNaira on printed forms.
+     * When false (default), leaves the contribution line blank so each member can write their chosen amount.
+     */
+    prefillContributionAmount?: boolean
     allowedFrequencies: ContributionFrequency[]
     defaultFrequency: ContributionFrequency
     defaultContributionNaira?: number
@@ -43,6 +63,9 @@ export interface RegisteredCoopDirectoryItem {
     segment?: string
     cooperativeType?: string
     regNumber?: string
+    certificateCode?: string
+    registrationDate?: string
+    issuingAuthority?: string
     state?: string
     lga?: string
     membersCount: number
@@ -58,14 +81,17 @@ export function getSectorDefaultFields(sector: string): CoopCustomField[] {
     switch (sector) {
         case "transport":
             return [
-                { id: "route_park", label: "Primary Operating Route / Park", type: "text", required: true, placeholder: "e.g. Main Market – Express Axis" },
-                { id: "vehicle_reg", label: "Tricycle / Vehicle Plate No.", type: "text", required: false, placeholder: "Optional if applying for new fleet" },
+                { id: "route_park", label: "Primary Operating Route / Park", type: "text", required: true, placeholder: "e.g. Umuahia Main Market – Isi Gate" },
+                { id: "vehicle_reg", label: "Tricycle (Keke) Plate / Chassis No.", type: "text", required: false, placeholder: "Optional if applying for new fleet" },
+                { id: "next_of_kin_name", label: "Next of Kin / Guarantor Full Name", type: "text", required: true, placeholder: "Full legal name" },
                 { id: "next_of_kin_phone", label: "Next of Kin / Guarantor Phone", type: "tel", required: true, placeholder: "080..." },
             ]
         case "commerce":
             return [
                 { id: "market_stall", label: "Market Name & Shop / Stall No.", type: "text", required: true, placeholder: "e.g. Line B, Shop 14" },
                 { id: "trade_category", label: "Primary Trade / Goods Category", type: "text", required: false, placeholder: "e.g. Provisions, Textiles" },
+                { id: "next_of_kin_name", label: "Next of Kin Full Name", type: "text", required: true, placeholder: "Full legal name" },
+                { id: "next_of_kin_phone", label: "Next of Kin Contact Phone", type: "tel", required: true, placeholder: "080..." },
             ]
         case "agriculture":
             return [
@@ -105,10 +131,15 @@ export function resolveMemberFormSpec(
 
     return {
         declarationPurpose: rawSpec?.declarationPurpose?.trim() || `the ${cleanName}`,
-        // Default to false: voluntary personal engagement, eliminating unnecessary union clearance encumbrance
-        requireUnionClearance: typeof rawSpec?.requireUnionClearance === "boolean" ? rawSpec.requireUnionClearance : false,
+        // Union Leader signature reinstated as default (true)
+        requireUnionClearance: typeof rawSpec?.requireUnionClearance === "boolean" ? rawSpec.requireUnionClearance : true,
+        // Partner Bank / MFB signature is optional (false by default)
+        requireBankSignature: typeof rawSpec?.requireBankSignature === "boolean" ? rawSpec.requireBankSignature : false,
+        formMode: rawSpec?.formMode === "lite" ? "lite" : "standard",
         requirePassportPhoto: typeof rawSpec?.requirePassportPhoto === "boolean" ? rawSpec.requirePassportPhoto : true,
         requireBvn: typeof rawSpec?.requireBvn === "boolean" ? rawSpec.requireBvn : true,
+        contributionFieldLabel: rawSpec?.contributionFieldLabel?.trim() || "Target Contribution Amount (₦)",
+        prefillContributionAmount: typeof rawSpec?.prefillContributionAmount === "boolean" ? rawSpec.prefillContributionAmount : false,
         allowedFrequencies,
         defaultFrequency,
         defaultContributionNaira: rawSpec?.defaultContributionNaira ?? defaults?.contributionNaira,
@@ -118,27 +149,35 @@ export function resolveMemberFormSpec(
     }
 }
 
+export const OFFICIAL_KEKE_COOP_REG_NO = "ABSG/MOPASP/2026/00430"
+
 export const PRESET_REGISTERED_COOPS: RegisteredCoopDirectoryItem[] = [
     {
         id: "preset_keke_owners",
-        name: "Copteller's Keke Owners and Operators Cooperative",
-        description: "Personal & voluntary mobility thrift and hire-purchase fleet cooperative for commercial tricycle owners and drivers.",
+        name: "KEKE OWNERS & OPERATORS MULTI-PURPOSE CO-OPERATIVE SOCIETY LIMITED",
+        description: "Registered under Section 5(1) of the Nigeria Co-operative Societies Act 2004 (Abia State COOP 15, Reg. No. ABSG/MOPASP/2026/00430) for commercial tricycle (Keke) owners and operators.",
         sector: "transport",
-        segment: "Tricycle (Keke)",
-        cooperativeType: "transport",
-        regNumber: "COOP-KEKE-001",
-        state: "Multi-State Network",
-        lga: "Regional Transit Hubs",
-        membersCount: 184,
-        adminName: "Cooperative Operations Desk",
+        segment: "Tricycle (Keke) Owners & Operators",
+        cooperativeType: "multipurpose",
+        regNumber: OFFICIAL_KEKE_COOP_REG_NO,
+        certificateCode: "COOP 15",
+        registrationDate: "14 October 2026",
+        issuingAuthority: "Director of Cooperatives, Abia State of Nigeria",
+        state: "Abia State",
+        lga: "Umuahia",
+        membersCount: 10,
+        adminName: "Union Leadership Secretariat",
         cycleFrequency: "weekly",
         defaultContributionNaira: 15000,
         authorizedProducts: [],
         memberFormSpec: {
-            declarationPurpose: "Copteller's KEKE OWNERS and OPERATORS COOPERATIVE",
-            requireUnionClearance: false,
+            declarationPurpose: "KEKE OWNERS & OPERATORS MULTI-PURPOSE CO-OPERATIVE SOCIETY LIMITED (Reg. No: ABSG/MOPASP/2026/00430)",
+            requireUnionClearance: true,
+            requireBankSignature: false,
             requirePassportPhoto: true,
             requireBvn: true,
+            contributionFieldLabel: "Target Contribution Amount (₦)",
+            prefillContributionAmount: false,
             allowedFrequencies: ["daily", "weekly", "monthly"],
             defaultFrequency: "weekly",
             defaultContributionNaira: 15000,
@@ -163,7 +202,8 @@ export const PRESET_REGISTERED_COOPS: RegisteredCoopDirectoryItem[] = [
         authorizedProducts: [],
         memberFormSpec: {
             declarationPurpose: "Progressive Market Traders Multipurpose Cooperative",
-            requireUnionClearance: false,
+            requireUnionClearance: true,
+            requireBankSignature: false,
             requirePassportPhoto: true,
             requireBvn: true,
             allowedFrequencies: ["daily", "weekly", "monthly"],
@@ -190,7 +230,8 @@ export const PRESET_REGISTERED_COOPS: RegisteredCoopDirectoryItem[] = [
         authorizedProducts: [],
         memberFormSpec: {
             declarationPurpose: "Emerald Agro-Allied Producers Cooperative",
-            requireUnionClearance: false,
+            requireUnionClearance: true,
+            requireBankSignature: false,
             requirePassportPhoto: true,
             requireBvn: true,
             allowedFrequencies: ["weekly", "monthly"],
@@ -218,6 +259,7 @@ export const PRESET_REGISTERED_COOPS: RegisteredCoopDirectoryItem[] = [
         memberFormSpec: {
             declarationPurpose: "Unified Artisans & Garment Makers Society",
             requireUnionClearance: true,
+            requireBankSignature: false,
             requirePassportPhoto: true,
             requireBvn: true,
             allowedFrequencies: ["weekly", "monthly"],
@@ -230,12 +272,13 @@ export const PRESET_REGISTERED_COOPS: RegisteredCoopDirectoryItem[] = [
 ]
 
 export function normalizeDbCoopToDirectoryItem(c: any): RegisteredCoopDirectoryItem {
-    const contribRaw = Number(c?.defaultContributionAmount ?? 0)
+    const contribRaw = Number(c?.defaultContributionAmount ?? c?.default_contribution_amount ?? 0)
     const defaultContributionNaira =
-        contribRaw > 0 ? (contribRaw >= 1000 ? Math.round(contribRaw / 100) : contribRaw) : undefined
+        contribRaw > 0 ? (contribRaw >= 100000 ? Math.round(contribRaw / 100) : contribRaw) : undefined
 
     const sector = String(c?.sector || "commerce")
-    const rawSpec = (c?.metadata?.memberFormSpec || c?.memberFormSpec || null) as Partial<CoopMemberFormSpec> | null
+    const meta = (c?.metadata && typeof c.metadata === "object" ? c.metadata : {}) as Record<string, any>
+    const rawSpec = (meta.memberFormSpec || c?.memberFormSpec || null) as Partial<CoopMemberFormSpec> | null
     const adminName = c?.union_leader && typeof c.union_leader === "object"
         ? [c.union_leader.firstName, c.union_leader.lastName].filter(Boolean).join(" ") || "Cooperative Admin"
         : "Cooperative Admin"
@@ -251,6 +294,10 @@ export function normalizeDbCoopToDirectoryItem(c: any): RegisteredCoopDirectoryI
             }))
         : []
 
+    const cycleFreqRaw = c?.cycleFrequency ?? c?.cycle_frequency
+    const cycleFrequency: ContributionFrequency =
+        cycleFreqRaw === "daily" || cycleFreqRaw === "monthly" ? cycleFreqRaw : "weekly"
+
     return {
         id: String(c.id),
         name: String(c.name || "Registered Cooperative"),
@@ -259,15 +306,22 @@ export function normalizeDbCoopToDirectoryItem(c: any): RegisteredCoopDirectoryI
         segment: c.segment ? String(c.segment) : undefined,
         cooperativeType: c.cooperative_type ? String(c.cooperative_type) : undefined,
         regNumber: c.registration_number ? String(c.registration_number) : undefined,
+        certificateCode: meta.certificate_form_code ? String(meta.certificate_form_code) : undefined,
+        registrationDate: meta.registration_date_display
+            ? String(meta.registration_date_display)
+            : meta.registration_date
+                ? String(meta.registration_date)
+                : undefined,
+        issuingAuthority: meta.issuing_authority ? String(meta.issuing_authority) : undefined,
         state: c.state ? String(c.state) : undefined,
         lga: c.lga ? String(c.lga) : undefined,
         membersCount: Number(c.current_member_count || c.members_count || 0),
         adminName,
-        cycleFrequency: (c.cycleFrequency === "daily" || c.cycleFrequency === "monthly" ? c.cycleFrequency : "weekly"),
+        cycleFrequency,
         defaultContributionNaira,
         authorizedProducts,
         memberFormSpec: resolveMemberFormSpec(String(c.name || ""), rawSpec, sector, {
-            frequency: c.cycleFrequency,
+            frequency: cycleFrequency,
             contributionNaira: defaultContributionNaira,
         }),
         isPreset: false,

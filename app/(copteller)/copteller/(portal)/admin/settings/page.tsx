@@ -1,14 +1,16 @@
 "use client"
 
 import * as React from "react"
-import { Settings, Save, RefreshCw, FileText } from "lucide-react"
+import { Settings, Save, RefreshCw, FileText, Printer } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { toast } from "sonner"
 import type { CoopCustomField, CoopMemberFormSpec } from "@/lib/copteller/coop-form-specs"
+import { PrintableFormDialog } from "@/components/copteller/printable-form"
 
 export default function AdminSettingsPage() {
     const [loading, setLoading] = React.useState(true)
     const [saving, setSaving] = React.useState(false)
+    const [showPrintForm, setShowPrintForm] = React.useState(false)
     const [settings, setSettings] = React.useState({
         weeklyContribution: 20000,
         managementYield: 2.5,
@@ -20,11 +22,15 @@ export default function AdminSettingsPage() {
     const [coopName, setCoopName] = React.useState("Cooperative")
     const [formSpec, setFormSpec] = React.useState<CoopMemberFormSpec>({
         declarationPurpose: "Copteller Cooperative",
-        requireUnionClearance: false,
+        requireUnionClearance: true,
+        requireBankSignature: false,
         requirePassportPhoto: true,
         requireBvn: true,
+        contributionFieldLabel: "Target Contribution Amount (₦)",
+        prefillContributionAmount: false,
         allowedFrequencies: ["daily", "weekly", "monthly"],
         defaultFrequency: "weekly",
+        defaultContributionNaira: 15000,
         customFields: [],
     })
 
@@ -92,8 +98,16 @@ export default function AdminSettingsPage() {
                 <div>
                     <span className="text-[10px] font-black bg-amber-500/10 text-amber-600 dark:text-amber-400 border border-amber-500/20 px-2 py-0.5 rounded-full uppercase tracking-wider">Management</span>
                     <h1 className="text-2xl sm:text-3xl font-black mt-2">Guild Configurations</h1>
-                    <p className="text-xs text-muted-foreground mt-1">Modify trade guild general parameters, interest thresholds, and default limits.</p>
+                    <p className="text-xs text-muted-foreground mt-1">Modify trade guild general parameters, interest thresholds, and member form signature policies.</p>
                 </div>
+                <Button
+                    type="button"
+                    variant="outline"
+                    onClick={() => setShowPrintForm(true)}
+                    className="h-10 rounded-xl border-emerald-500/30 bg-emerald-500/5 hover:bg-emerald-500/10 text-emerald-700 dark:text-emerald-400 font-black text-xs gap-2 shrink-0"
+                >
+                    <Printer className="h-4 w-4" /> Preview / Print Member Form
+                </Button>
             </div>
 
             <form onSubmit={handleSave} className="bg-white dark:bg-slate-950/60 p-4 sm:p-6 border border-slate-200 dark:border-slate-900 rounded-3xl space-y-6 sm:space-y-8 shadow-sm">
@@ -179,11 +193,93 @@ export default function AdminSettingsPage() {
                         />
                     </div>
 
+                    {/* Configurable Contribution Amount Section */}
+                    <div className="grid grid-cols-1 sm:grid-cols-12 gap-3 p-3.5 rounded-2xl bg-slate-50/70 dark:bg-slate-900/40 border border-slate-200/80 dark:border-slate-800">
+                        <div className="sm:col-span-5 space-y-1">
+                            <label className="text-[10px] font-black text-muted-foreground uppercase tracking-wider">
+                                Contribution Field Label
+                            </label>
+                            <input
+                                type="text"
+                                value={formSpec.contributionFieldLabel || "Target Contribution Amount (₦)"}
+                                onChange={e => setFormSpec(prev => ({ ...prev, contributionFieldLabel: e.target.value }))}
+                                placeholder="Target Contribution Amount (₦)"
+                                className="w-full h-9 px-3 rounded-xl border border-slate-200 dark:border-slate-800 bg-background font-semibold text-xs focus:outline-none focus:border-amber-500"
+                            />
+                        </div>
+                        <div className="sm:col-span-4 space-y-1">
+                            <label className="text-[10px] font-black text-muted-foreground uppercase tracking-wider">
+                                Default Amount (₦)
+                            </label>
+                            <input
+                                type="number"
+                                min={0}
+                                step={500}
+                                value={formSpec.defaultContributionNaira ?? ""}
+                                onChange={e => setFormSpec(prev => ({
+                                    ...prev,
+                                    defaultContributionNaira: e.target.value === "" ? undefined : Number(e.target.value),
+                                }))}
+                                placeholder="e.g. 15000 (or leave blank)"
+                                className="w-full h-9 px-3 rounded-xl border border-slate-200 dark:border-slate-800 bg-background font-bold text-xs focus:outline-none focus:border-amber-500"
+                            />
+                        </div>
+                        <div className="sm:col-span-3 space-y-1">
+                            <label className="text-[10px] font-black text-muted-foreground uppercase tracking-wider">
+                                Default Frequency
+                            </label>
+                            <select
+                                value={formSpec.defaultFrequency}
+                                onChange={e => setFormSpec(prev => ({ ...prev, defaultFrequency: e.target.value as any }))}
+                                className="w-full h-9 px-2.5 rounded-xl border border-slate-200 dark:border-slate-800 bg-background font-bold text-xs focus:outline-none focus:border-amber-500"
+                            >
+                                <option value="daily">Daily</option>
+                                <option value="weekly">Weekly</option>
+                                <option value="monthly">Monthly</option>
+                            </select>
+                        </div>
+                        <div className="sm:col-span-12 flex items-center justify-between pt-2 border-t border-slate-200/60 dark:border-slate-800/80 gap-4">
+                            <div>
+                                <p className="font-bold text-xs">Pre-fill Contribution Amount on Printed Forms</p>
+                                <p className="text-[10px] text-slate-500 font-medium">
+                                    Keep off to leave a clean blank line for members to write their own target amount; turn on to pre-print the fixed default amount above.
+                                </p>
+                            </div>
+                            <label className="relative inline-flex items-center cursor-pointer shrink-0">
+                                <input
+                                    type="checkbox"
+                                    checked={Boolean(formSpec.prefillContributionAmount)}
+                                    onChange={e => setFormSpec(prev => ({ ...prev, prefillContributionAmount: e.target.checked }))}
+                                    className="sr-only peer"
+                                />
+                                <div className="w-11 h-6 bg-slate-200 peer-focus:outline-none rounded-full peer dark:bg-slate-800 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-slate-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all dark:border-slate-600 peer-checked:bg-emerald-500"></div>
+                            </label>
+                        </div>
+                    </div>
+
                     <div className="flex justify-between items-center py-3 border-b border-slate-100 dark:border-slate-900/50 gap-4">
                         <div className="max-w-md">
-                            <p className="font-bold text-sm">Require Union Leader Clearance Signature</p>
+                            <p className="font-bold text-sm">Default to Very Lite Member Form</p>
                             <p className="text-[10px] text-slate-500 font-medium mt-0.5 leading-relaxed">
-                                Keep disabled for personal &amp; voluntary engagements so members aren&apos;t encumbered by third-party union sign-off.
+                                Omits sensitive KYC credentials (BVN/NIN/DOB/Email), statutory registration metadata, and account class checkboxes for frictionless field onboarding.
+                            </p>
+                        </div>
+                        <label className="relative inline-flex items-center cursor-pointer shrink-0">
+                            <input
+                                type="checkbox"
+                                checked={formSpec.formMode === "lite"}
+                                onChange={e => setFormSpec(prev => ({ ...prev, formMode: e.target.checked ? "lite" : "standard" }))}
+                                className="sr-only peer"
+                            />
+                            <div className="w-11 h-6 bg-slate-200 peer-focus:outline-none rounded-full peer dark:bg-slate-800 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-slate-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all dark:border-slate-600 peer-checked:bg-amber-500"></div>
+                        </label>
+                    </div>
+
+                    <div className="flex justify-between items-center py-3 border-b border-slate-100 dark:border-slate-900/50 gap-4">
+                        <div className="max-w-md">
+                            <p className="font-bold text-sm">Require Union/Co-Op Exec. Signature</p>
+                            <p className="text-[10px] text-slate-500 font-medium mt-0.5 leading-relaxed">
+                                Enabled by default so offline member application forms include the Union/Co-Op Exec. endorsement block.
                             </p>
                         </div>
                         <label className="relative inline-flex items-center cursor-pointer shrink-0">
@@ -191,6 +287,24 @@ export default function AdminSettingsPage() {
                                 type="checkbox"
                                 checked={formSpec.requireUnionClearance}
                                 onChange={e => setFormSpec(prev => ({ ...prev, requireUnionClearance: e.target.checked }))}
+                                className="sr-only peer"
+                            />
+                            <div className="w-11 h-6 bg-slate-200 peer-focus:outline-none rounded-full peer dark:bg-slate-800 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-slate-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all dark:border-slate-600 peer-checked:bg-emerald-500"></div>
+                        </label>
+                    </div>
+
+                    <div className="flex justify-between items-center py-3 border-b border-slate-100 dark:border-slate-900/50 gap-4">
+                        <div className="max-w-md">
+                            <p className="font-bold text-sm">Include Partner Bank / MFB Signature (Optional)</p>
+                            <p className="text-[10px] text-slate-500 font-medium mt-0.5 leading-relaxed">
+                                Optional bank countersignature line. Keep off unless your society requires an on-paper bank officer sign-off on member forms.
+                            </p>
+                        </div>
+                        <label className="relative inline-flex items-center cursor-pointer shrink-0">
+                            <input
+                                type="checkbox"
+                                checked={Boolean(formSpec.requireBankSignature)}
+                                onChange={e => setFormSpec(prev => ({ ...prev, requireBankSignature: e.target.checked }))}
                                 className="sr-only peer"
                             />
                             <div className="w-11 h-6 bg-slate-200 peer-focus:outline-none rounded-full peer dark:bg-slate-800 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-slate-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all dark:border-slate-600 peer-checked:bg-amber-500"></div>
@@ -270,6 +384,15 @@ export default function AdminSettingsPage() {
                     </Button>
                 </div>
             </form>
+
+            <PrintableFormDialog
+                open={showPrintForm}
+                onClose={() => setShowPrintForm(false)}
+                roleType="member"
+                coopName={coopName}
+                formSpec={formSpec}
+                accentClassName="bg-amber-500 hover:bg-amber-600 text-black"
+            />
         </div>
     )
 }

@@ -1,10 +1,14 @@
-import { NextResponse } from 'next/server'
+import { NextRequest, NextResponse } from 'next/server'
 import { getPayload } from 'payload'
 import config from '@payload-config'
 import { compileSDLToFlow } from '@/lib/workflow/sdl'
+import { requireCoptellerCronOrAdmin } from '@/lib/copteller/auth'
 import yaml from 'yaml'
 
-export async function POST(req: Request) {
+export async function POST(req: NextRequest) {
+    const auth = await requireCoptellerCronOrAdmin(req)
+    if (auth instanceof NextResponse) return auth
+
     try {
         const contentType = req.headers.get('content-type') || ''
         const rawBody = await req.text()

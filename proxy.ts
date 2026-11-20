@@ -24,7 +24,6 @@ const COPTELLER_PUBLIC_PATTERNS = [
     "/api/copteller/campaigns/claim",
     "/api/copteller/sector-products",
     "/api/account-lookup",
-    "/api/mock",
 ];
 
 function isPayloadAdminRoute(pathname: string): boolean {
@@ -44,21 +43,20 @@ const coptellerAuthCache = new Map<string, { user: any; expiresAt: number }>();
 const coptellerInFlightAuth = new Map<string, Promise<any>>();
 
 async function getVerifiedCoptellerUser(request: NextRequest): Promise<any> {
-    // Only allow header-based identity override if accompanied by server ADMIN_SECRET
+    // Allow service-to-service bridge calls authenticated by ADMIN_SECRET
     const internalSecret = request.headers.get("x-copteller-internal-secret");
     const devHeaderUserId = request.headers.get("x-copteller-user-id");
     if (
-        devHeaderUserId &&
         internalSecret &&
         process.env.ADMIN_SECRET &&
         internalSecret === process.env.ADMIN_SECRET
     ) {
         return {
-            id: devHeaderUserId,
-            email: request.headers.get("x-copteller-user-email") || "partner@copteller.ng",
+            id: devHeaderUserId || "banksuite-bridge",
+            email: request.headers.get("x-copteller-user-email") || "bridge@banksuite.internal",
             user_metadata: {
-                full_name: request.headers.get("x-copteller-user-name") || "Institutional Partner Desk",
-                role: request.headers.get("x-copteller-user-role") || "partner",
+                full_name: request.headers.get("x-copteller-user-name") || "BankSuite Institutional Bridge",
+                role: request.headers.get("x-copteller-user-role") || "superadmin",
             },
         };
     }

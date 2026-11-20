@@ -6,12 +6,13 @@ import { motion, AnimatePresence } from "framer-motion"
 import {
     BookUser, Search, Plus, X, CheckCircle2, Clock, AlertCircle,
     Users, BarChart3, Wallet, Shield, Phone, MapPin, Calendar,
-    Edit2, RefreshCw, TrendingUp, ChevronDown, Banknote, Activity, Loader2
+    Edit2, RefreshCw, TrendingUp, ChevronDown, Banknote, Activity, Loader2, Printer
 } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { toast } from "sonner"
 import { useRouter } from "next/navigation"
 import { SidePanelWrapper } from "@/components/side-panel-wrapper"
+import { PrintableFormDialog } from "@/components/copteller/printable-form"
 
 const fmt = (n: number) => `₦${Number(n || 0).toLocaleString()}`
 
@@ -77,6 +78,7 @@ export default function AdminMembersPage() {
 
     // Onboarding Form States
     const [isAddModalOpen, setIsAddModalOpen] = React.useState(false)
+    const [showPrintForm, setShowPrintForm] = React.useState(false)
     const [firstName, setFirstName] = React.useState('')
     const [lastName, setLastName] = React.useState('')
     const [email, setEmail] = React.useState('')
@@ -333,9 +335,19 @@ export default function AdminMembersPage() {
                     <h1 className="text-2xl sm:text-3xl font-black mt-2">{coopProfile ? `${coopProfile.name} Directory` : "Member Accounts"}</h1>
                     <p className="text-xs text-muted-foreground mt-1 font-semibold">Manage cooperative member profiles, KYC tiers, wallet status, and account standing.</p>
                 </div>
-                <Button onClick={() => setIsAddModalOpen(true)} className="h-9 rounded-xl bg-amber-500 hover:bg-amber-600 text-black font-black text-xs border-0 gap-2 w-full sm:w-auto">
-                    <Plus className="h-3.5 w-3.5" /> Onboard Member
-                </Button>
+                <div className="flex flex-col sm:flex-row gap-2 w-full sm:w-auto">
+                    <Button
+                        type="button"
+                        variant="outline"
+                        onClick={() => setShowPrintForm(true)}
+                        className="h-9 rounded-xl border-emerald-500/30 bg-emerald-500/5 hover:bg-emerald-500/10 text-emerald-700 dark:text-emerald-400 font-black text-xs gap-2 w-full sm:w-auto"
+                    >
+                        <Printer className="h-3.5 w-3.5" /> Print Member Form
+                    </Button>
+                    <Button onClick={() => setIsAddModalOpen(true)} className="h-9 rounded-xl bg-amber-500 hover:bg-amber-600 text-black font-black text-xs border-0 gap-2 w-full sm:w-auto">
+                        <Plus className="h-3.5 w-3.5" /> Onboard Member
+                    </Button>
+                </div>
             </div>
 
             {/* Stats */}
@@ -729,6 +741,21 @@ export default function AdminMembersPage() {
                 </AnimatePresence>,
                 document.body
             )}
+            <PrintableFormDialog
+                open={showPrintForm}
+                onClose={() => setShowPrintForm(false)}
+                roleType="member"
+                coopName={coopProfile?.name}
+                sector={coopProfile?.sector}
+                regNumber={coopProfile?.registration_number}
+                certificateCode={coopProfile?.metadata?.certificate_form_code}
+                registrationDate={coopProfile?.metadata?.registration_date_display}
+                issuingAuthority={coopProfile?.metadata?.issuing_authority}
+                state={coopProfile?.state}
+                lga={coopProfile?.lga}
+                formSpec={coopProfile?.metadata?.memberFormSpec}
+                accentClassName="bg-emerald-500 hover:bg-emerald-600 text-black"
+            />
         </div>
     )
 }

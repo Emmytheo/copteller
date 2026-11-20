@@ -4,14 +4,16 @@ import * as React from "react"
 import { usePathname, useRouter } from "next/navigation"
 import Link from "next/link"
 import {
-    ChevronRight, Cpu, ChevronDown, Check, User,
+    ChevronRight, ChevronDown, Check, User,
     LayoutDashboard, PiggyBank, Wallet, Truck, Users, CircleDollarSign, Menu,
     ShieldCheck, Landmark, CheckCircle2, Zap, TrendingUp, Coins,
     Building2, Users2
 } from "lucide-react"
 import { SidebarProvider, SidebarInset, SidebarTrigger, useSidebar } from "@/components/ui/sidebar"
 import { CoptellerSidebar } from "@/components/copteller-sidebar"
+import { CoptellerMark } from "@/components/copteller/copteller-logo"
 import { ThemeCustomizer } from "@/components/theme-customizer"
+import { CoptellerCommandPalette } from "@/components/copteller/command-palette"
 import { ScopeProvider, useScope } from "@/context/scope-context"
 
 // Helper to format breadcrumb segments
@@ -417,17 +419,22 @@ export default function CoptellerPortalLayout({
                                 </nav>
 
                                 {/* Mobile Simple Label */}
-                                <div className="md:hidden flex items-center gap-1.5 min-w-0">
-                                    <Cpu className="h-3.5 w-3.5 text-emerald-500 shrink-0" />
+                                <div className="md:hidden flex items-center gap-2 min-w-0">
+                                    <CoptellerMark size={22} />
                                     <span className="text-xs font-black uppercase tracking-wider text-foreground truncate max-w-[155px] sm:max-w-[260px]">
                                         {segments.length > 0 ? formatSegment(segments[segments.length - 1]) : "Portal"}
                                     </span>
                                 </div>
                             </div>
                             
-                            <div className="flex items-center gap-1.5 sm:gap-3 shrink-0">
+                            <div className="flex items-center gap-1.5 sm:gap-2.5 shrink-0">
+                                <CoptellerCommandPalette />
+                                <div className="hidden xl:inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-emerald-500/10 border border-emerald-500/20 text-[10px] font-black uppercase tracking-wider text-emerald-600 dark:text-emerald-400">
+                                    <span className="size-1.5 rounded-full bg-emerald-500 animate-pulse" />
+                                    Ledger Live
+                                </div>
                                 <ThemeCustomizer />
-                                {/* Live scope switcher chip — replaces the static SECURE badge */}
+                                {/* Live scope switcher chip */}
                                 <ScopeChip />
                             </div>
                         </header>

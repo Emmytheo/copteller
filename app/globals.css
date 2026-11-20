@@ -392,7 +392,7 @@
   .printable-a4-form {
     border: 1px solid #cbd5e1 !important;
     box-shadow: none !important;
-    padding: 20px 24px !important;
+    padding: 0 !important;
     width: 100% !important;
     max-width: 100% !important;
     margin: 0 auto !important;
@@ -420,4 +420,28 @@
     -ms-overflow-style: none;
     scrollbar-width: none;
   }
+  .tabular-nums-fintech {
+    font-variant-numeric: tabular-nums lining-nums;
+  }
+  .fintech-card {
+    @apply bg-card/95 text-card-foreground border border-border/80 rounded-2xl shadow-sm transition-all duration-200;
+  }
+  .fintech-card:hover {
+    @apply border-primary/30 shadow-md;
+  }
+}
+
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+::-webkit-scrollbar-thumb {
+  background: hsl(var(--muted-foreground) / 0.25);
+  border-radius: 9999px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: hsl(var(--muted-foreground) / 0.45);
 }

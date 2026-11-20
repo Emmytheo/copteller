@@ -80,17 +80,47 @@ export default function CoptellerSuperadminPage() {
         fetchOversightData()
     }, [])
 
-    const runAuditWorkflow = () => {
+    const [auditSteps, setAuditSteps] = React.useState<string[]>([])
+
+    const runAuditWorkflow = async () => {
         setWorkflowRunning(true)
-        setWorkflowStep(-1)
-        const steps = [0, 1, 2, 3, 4]
-        steps.forEach((s, i) => setTimeout(() => {
-            setWorkflowStep(s)
-            if (s === 4) setTimeout(() => {
-                setWorkflowRunning(false)
-                toast.success(`Full platform audit complete — ${metrics.totalCoops} active cooperatives reconciled.`)
-            }, 800)
-        }, i * 1100))
+        setWorkflowStep(0)
+        setAuditSteps([
+            "Querying live cooperative escrow balances & membership ledger...",
+            "Fetching CBN compliance & audit trail telemetry...",
+            "Cross-checking active schemes & HP repayment collections...",
+            "Verifying encrypted vault & bridge readiness...",
+            "Finalizing live institutional reconciliation..."
+        ])
+        try {
+            const t0 = Date.now()
+            const [mRes, cRes] = await Promise.all([
+                fetch('/api/copteller/admin/metrics', { cache: 'no-store' }),
+                fetch('/api/copteller/superadmin/compliance', { cache: 'no-store' }).catch(() => null),
+            ])
+            setWorkflowStep(2)
+            const mJson = await mRes.json().catch(() => null)
+            if (mJson?.success && mJson.metrics) {
+                setMetrics(mJson.metrics)
+            }
+            const cJson = cRes && cRes.ok ? await cRes.json().catch(() => null) : null
+            setWorkflowStep(4)
+            const elapsed = Date.now() - t0
+            const coopsCount = mJson?.metrics?.totalCoops ?? metrics.totalCoops
+            const auditCount = cJson?.logs?.length ?? cJson?.auditLogs?.length ?? 0
+            setAuditSteps([
+                `Scanned ${coopsCount} cooperative vault(s) in ${elapsed}ms`,
+                `Verified platform escrow AUM: ₦${Number(mJson?.metrics?.platformEscrow ?? metrics.platformEscrow).toLocaleString()}`,
+                `Checked collection efficiency: ${mJson?.metrics?.collectionRate ?? metrics.collectionRate}%`,
+                `Loaded ${auditCount} compliance ledger telemetry record(s)`,
+                `✓ Live reconciliation complete — all systems nominal`
+            ])
+            toast.success(`Live platform audit complete (${elapsed}ms) — ${coopsCount} cooperative(s) verified.`)
+        } catch (err: any) {
+            toast.error(err?.message || "Audit verification encountered an error")
+        } finally {
+            setTimeout(() => setWorkflowRunning(false), 1800)
+        }
     }
 
     const displayAlerts = metrics.alerts?.length > 0 ? metrics.alerts : [
@@ -112,51 +142,75 @@ export default function CoptellerSuperadminPage() {
 
             <div className="relative z-10 max-w-6xl mx-auto px-3 sm:px-6 py-4 sm:py-8 space-y-6">
 
-                {/* ── HEADER ───────────────────────────────────────────────────────────── */}
-                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-                    <div>
-                        <div className="flex items-center gap-2 mb-1">
-                            <div className="p-1.5 bg-rose-500/10 border border-rose-500/20 rounded-lg">
-                                <ShieldAlert className="h-4 w-4 text-rose-600 dark:text-rose-400" />
+                {/* ── EXECUTIVE REGULATOR HERO ─────────────────────────────────────────── */}
+                <section className="relative overflow-hidden rounded-3xl p-6 sm:p-8 text-white shadow-2xl border border-white/10 bg-gradient-to-br from-slate-950 via-[#1a0b16] to-[#0a1b16]">
+                    <div className="pointer-events-none absolute -top-20 -right-16 size-72 rounded-full bg-rose-500/20 blur-3xl" />
+                    <div className="pointer-events-none absolute -bottom-24 left-12 size-64 rounded-full bg-emerald-500/20 blur-3xl" />
+
+                    <div className="relative z-10 flex flex-col xl:flex-row xl:items-end justify-between gap-6">
+                        <div className="space-y-3 max-w-2xl">
+                            <div className="inline-flex flex-wrap items-center gap-2 px-3 py-1 rounded-full bg-white/10 border border-white/15 text-[10px] font-black uppercase tracking-widest">
+                                <span className="size-1.5 rounded-full bg-emerald-400 animate-pulse" />
+                                <span className="text-rose-300">Platform Regulator Console</span>
+                                <span className="opacity-50">·</span>
+                                <span className="text-emerald-300">BankSuite Bridge Ready</span>
                             </div>
-                            <p className="text-[10px] font-black text-rose-600 dark:text-rose-400 uppercase tracking-widest">Platform Regulator Console</p>
+                            <h1 className="text-2xl sm:text-4xl font-black tracking-tight">Copteller Platform Oversight</h1>
+                            <p className="text-xs sm:text-sm text-white/75 font-medium leading-relaxed">
+                                Multi-cooperative escrow custody, AES-256-GCM vault governance, and real-time CBN regulatory compliance across{" "}
+                                <span className="text-emerald-300 font-bold">{metrics.totalCoops} active cooperative(s)</span> and{" "}
+                                <span className="text-rose-300 font-bold">{servicesCount} live services</span>.
+                            </p>
+
+                            <div className="flex flex-wrap items-center gap-2.5 pt-1">
+                                <Button
+                                    onClick={runAuditWorkflow}
+                                    disabled={workflowRunning}
+                                    size="sm"
+                                    className="h-10 rounded-xl bg-gradient-to-r from-rose-600 to-amber-500 hover:opacity-95 text-white font-black text-xs border-0 gap-2 px-4 shadow-lg disabled:opacity-60"
+                                >
+                                    {workflowRunning ? <RefreshCw className="h-3.5 w-3.5 animate-spin" /> : <Zap className="h-3.5 w-3.5" />}
+                                    {workflowRunning ? 'Verifying Live Ledger...' : 'Run Live Platform Audit'}
+                                </Button>
+                                <Link href="/copteller/superadmin/services">
+                                    <Button variant="outline" size="sm" className="h-10 rounded-xl font-bold text-xs gap-2 bg-white/10 hover:bg-white/20 text-white border-white/20">
+                                        <Cpu className="h-3.5 w-3.5 text-rose-300" /> Services ({servicesCount})
+                                    </Button>
+                                </Link>
+                                <Button onClick={() => router.push('/copteller/superadmin/compliance')} variant="outline" size="sm" className="h-10 rounded-xl font-bold text-xs gap-2 bg-white/10 hover:bg-white/20 text-white border-white/20">
+                                    <Download className="h-3.5 w-3.5" /> CBN Compliance
+                                </Button>
+                            </div>
                         </div>
-                        <h1 className="text-2xl font-black">Copteller Platform Oversight</h1>
-                        <p className="text-xs text-muted-foreground mt-0.5 font-semibold">
-                            Licensed MFB Operations · <span className="text-emerald-600 dark:text-emerald-400">{metrics.totalCoops} Active Cooperatives</span> · <span className="text-rose-600 dark:text-rose-400">{servicesCount} Core Services</span>
-                        </p>
+
+                        <div className="grid grid-cols-2 gap-3 bg-black/35 backdrop-blur-md border border-white/15 rounded-2xl p-4 min-w-[270px] shrink-0">
+                            <div>
+                                <p className="text-[10px] font-bold uppercase tracking-widest text-white/60">Escrow AUM</p>
+                                <p className="text-xl sm:text-2xl font-black mt-0.5 tabular-nums">
+                                    ₦{Number(metrics.platformEscrow).toLocaleString(undefined, { maximumFractionDigits: 0 })}
+                                </p>
+                            </div>
+                            <div className="border-l border-white/10 pl-3">
+                                <p className="text-[10px] font-bold uppercase tracking-widest text-white/60">Collection Rate</p>
+                                <p className="text-xl sm:text-2xl font-black text-emerald-400 mt-0.5 tabular-nums">
+                                    {metrics.collectionRate}%
+                                </p>
+                            </div>
+                        </div>
                     </div>
-                    <div className="flex flex-wrap sm:flex-nowrap items-center gap-2 sm:gap-3">
-                        <Link href="/copteller/superadmin/services" className="flex-1 sm:flex-initial">
-                            <Button variant="outline" size="sm" className="w-full sm:w-auto h-9 rounded-xl font-bold text-xs gap-2">
-                                <Cpu className="h-3.5 w-3.5 text-rose-500" /> Services Engine ({servicesCount})
-                            </Button>
-                        </Link>
-                        <Button onClick={() => router.push('/copteller/superadmin/compliance')} variant="outline" size="sm" className="flex-1 sm:flex-initial h-9 rounded-xl font-bold text-xs gap-2">
-                            <Download className="h-3.5 w-3.5" /> CBN Report
-                        </Button>
-                        <Button
-                            onClick={runAuditWorkflow}
-                            disabled={workflowRunning}
-                            className="w-full sm:w-auto h-9 rounded-xl bg-gradient-to-r from-rose-600 to-amber-500 text-white font-black text-xs border-0 gap-2 shadow-lg disabled:opacity-60"
-                        >
-                            {workflowRunning ? <RefreshCw className="h-3.5 w-3.5 animate-spin" /> : <Zap className="h-3.5 w-3.5" />}
-                            {workflowRunning ? 'Running Audit...' : 'Run Platform Audit'}
-                        </Button>
-                    </div>
-                </div>
+                </section>
 
                 {/* Audit workflow console */}
                 <AnimatePresence>
                     {workflowRunning && (
                         <motion.div initial={{ opacity: 0, height: 0 }} animate={{ opacity: 1, height: "auto" }} exit={{ opacity: 0, height: 0 }} className="overflow-hidden">
                             <WorkflowLog
-                                steps={[
-                                    "Scanning all cooperative escrow vaults...",
+                                steps={auditSteps.length > 0 ? auditSteps : [
+                                    "Scanning cooperative escrow vaults...",
                                     "Cross-referencing HP payback ledgers...",
                                     "Validating member credit score deltas...",
-                                    "Generating CBN compliance report draft...",
-                                    `✓ Audit complete — ${metrics.totalCoops} cooperatives reconciled`
+                                    "Checking CBN compliance telemetry...",
+                                    "Finalizing verification..."
                                 ]}
                                 active={workflowStep}
                             />

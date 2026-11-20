@@ -5,9 +5,44 @@
  * Validates Supabase session and enforces role-based access control.
  */
 
+import crypto from 'crypto'
 import { createCoptellerServerClient } from '@/lib/copteller/supabase/server'
 import { getProfilesForUser, type CoptellerProfileRow } from '@/lib/copteller/supabase/admin'
 import { NextRequest, NextResponse } from 'next/server'
+
+export function timingSafeSecretMatch(provided: string | null | undefined, expected: string | undefined): boolean {
+    if (!provided || !expected) return false
+    const a = Buffer.from(provided)
+    const b = Buffer.from(expected)
+    if (a.length !== b.length) return false
+    return crypto.timingSafeEqual(a, b)
+}
+
+export function isProductionMaintenanceBlocked(): boolean {
+    return process.env.NODE_ENV === 'production' && process.env.ALLOW_ADMIN_MAINTENANCE_ENDPOINTS !== 'true'
+}
+
+export async function requireCoptellerCronOrAdmin(req: NextRequest): Promise<CoptellerAuthContext | NextResponse> {
+    const authHeader = req.headers.get('authorization')
+    const bearer = authHeader?.startsWith('Bearer ') ? authHeader.slice(7).trim() : null
+    const internalSecret = req.headers.get('x-copteller-internal-secret') || req.headers.get('workflow-admin')
+
+    if (
+        timingSafeSecretMatch(bearer, process.env.CRON_SECRET) ||
+        timingSafeSecretMatch(bearer, process.env.ADMIN_SECRET) ||
+        timingSafeSecretMatch(internalSecret, process.env.ADMIN_SECRET) ||
+        timingSafeSecretMatch(internalSecret, process.env.PAYLOAD_SECRET)
+    ) {
+        return {
+            userId: 'system-cron',
+            email: 'system@copteller.internal',
+            role: 'superadmin',
+            displayName: 'Copteller System Scheduler',
+        }
+    }
+
+    return requireCoptellerRole(req, ['superadmin', 'bank_staff'])
+}
 
 export type CoptellerRole = 'member' | 'coop_admin' | 'investor' | 'partner' | 'superadmin' | 'bank_staff'
 
@@ -53,11 +88,7 @@ export { getProfilesForUser, createProfileForUser } from '@/lib/copteller/supaba
  */
 export async function getCoptellerAuth(req: NextRequest): Promise<CoptellerAuthContext | NextResponse> {
     const internalSecret = req.headers.get('x-copteller-internal-secret')
-    const hasVerifiedInternalSecret = Boolean(
-        internalSecret &&
-        process.env.ADMIN_SECRET &&
-        internalSecret === process.env.ADMIN_SECRET
-    )
+    const hasVerifiedInternalSecret = timingSafeSecretMatch(internalSecret, process.env.ADMIN_SECRET)
 
     const headerUserId = req.headers.get('x-copteller-user-id')
     let userId = headerUserId

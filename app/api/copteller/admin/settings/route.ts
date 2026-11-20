@@ -22,7 +22,7 @@ async function resolveTargetCooperative(cooperativeId?: string | null) {
                late_payment_penalty_kobo, metadata
         FROM copteller.cooperatives
         WHERE status = 'active'
-        ORDER BY created_at ASC
+        ORDER BY (registration_number IS NOT NULL) DESC, created_at DESC
         LIMIT 1
     `)
     return fallback.rows[0] || null

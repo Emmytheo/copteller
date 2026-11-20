@@ -1,9 +1,12 @@
-import { NextResponse } from 'next/server';
+import { NextRequest, NextResponse } from 'next/server';
 import fs from 'fs';
 import path from 'path';
 import { importRegistryBundle } from '@/lib/registry/sdl';
+import { requireCoptellerCronOrAdmin } from '@/lib/copteller/auth';
 
-export async function GET() {
+export async function GET(req: NextRequest) {
+    const auth = await requireCoptellerCronOrAdmin(req);
+    if (auth instanceof NextResponse) return auth;
     try {
         const templatesDir = path.join(process.cwd(), 'lib/workflow/templates');
         if (!fs.existsSync(templatesDir)) {

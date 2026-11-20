@@ -3,7 +3,7 @@
 import * as React from "react"
 import { motion, AnimatePresence } from "framer-motion"
 import {
-    ShieldCheck, User, Users, TrendingUp, Shield, Cpu,
+    ShieldCheck, User, Users, TrendingUp, Shield,
     ArrowRight, Plus, RefreshCw, LogOut, ChevronRight, Landmark
 } from "lucide-react"
 import Link from "next/link"
@@ -11,6 +11,7 @@ import { useRouter } from "next/navigation"
 import { Button } from "@/components/ui/button"
 import { toast } from "sonner"
 import { createCoptellerClient } from "@/lib/copteller/supabase/client"
+import { CoptellerLogo } from "@/components/copteller/copteller-logo"
 
 type CoptellerRole = 'member' | 'coop_admin' | 'investor' | 'partner' | 'superadmin' | 'bank_staff'
 
@@ -230,13 +231,8 @@ export default function SelectProfilePage() {
             <div className="w-full max-w-lg space-y-5 sm:space-y-6 relative z-10">
                 {/* Logo */}
                 <div className="text-center space-y-3 pb-2">
-                    <div className="flex items-center justify-center gap-2 mb-3 sm:mb-4">
-                        <div className="p-2 bg-gradient-to-br from-emerald-500 to-amber-500 rounded-xl shadow-lg">
-                            <Cpu className="h-5 w-5 text-black" />
-                        </div>
-                        <span className="text-lg font-black tracking-widest text-transparent bg-clip-text bg-gradient-to-r from-emerald-600 to-amber-500 dark:from-emerald-400 dark:to-amber-400">
-                            COPTELLER
-                        </span>
+                    <div className="flex items-center justify-center mb-3 sm:mb-4">
+                        <CoptellerLogo size="md" subtitle="Cooperative Escrow OS" />
                     </div>
                     <h1 className="text-2xl sm:text-3xl md:text-4xl font-black tracking-tight">
                         Choose Your Workspace

@@ -1,8 +1,11 @@
-import { NextResponse } from 'next/server';
+import { NextRequest, NextResponse } from 'next/server';
 import { getPayload } from 'payload';
 import configPromise from '@payload-config';
+import { requireCoptellerCronOrAdmin } from '@/lib/copteller/auth';
 
-export async function GET() {
+export async function GET(req: NextRequest) {
+    const auth = await requireCoptellerCronOrAdmin(req);
+    if (auth instanceof NextResponse) return auth;
     try {
         const payload = await getPayload({ config: configPromise });
         const { docs: services } = await payload.find({

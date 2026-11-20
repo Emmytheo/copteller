@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
+import { isProductionMaintenanceBlocked, requireCoptellerRole } from '@/lib/copteller/auth';
 
 // ============================================================
 // UNIFIED MOCK GATEWAY — /api/mock/[...path]
@@ -229,9 +230,11 @@ const routes: Record<string, MockHandler> = {
 };
 
 async function handler(req: NextRequest, { params }: { params: Promise<{ path: string[] }> }) {
-    if (process.env.NODE_ENV === 'production') {
+    if (isProductionMaintenanceBlocked()) {
         return NextResponse.json({ error: 'Mock endpoints are disabled in production.' }, { status: 403 });
     }
+    const auth = await requireCoptellerRole(req, ['superadmin', 'bank_staff']);
+    if (auth instanceof NextResponse) return auth;
 
     const { path } = await params;
     const routeKey = path.join('/');

@@ -3,9 +3,10 @@
 import * as React from "react"
 import { usePathname } from "next/navigation"
 import Link from "next/link"
-import { Cpu, ShieldCheck, Award, Menu, X } from "lucide-react"
+import { ShieldCheck, Award, Menu, X } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { ThemeSwitcher } from "@/components/theme-switcher"
+import { CoptellerLogo } from "@/components/copteller/copteller-logo"
 import { motion, AnimatePresence } from "framer-motion"
 
 export default function CoptellerLayout({
@@ -64,13 +65,8 @@ export default function CoptellerLayout({
                 <div className="max-w-7xl mx-auto flex h-16 items-center justify-between px-4 sm:px-6 md:px-8">
                     
                     {/* Logo */}
-                    <Link href="/copteller" className="flex items-center gap-2 group">
-                        <div className="p-1.5 bg-gradient-to-r from-emerald-500 to-amber-500 rounded-xl shadow-lg shadow-emerald-950/30">
-                            <Cpu className="h-5 w-5 text-black font-black" />
-                        </div>
-                        <span className="text-lg font-black tracking-widest text-transparent bg-clip-text bg-gradient-to-r from-emerald-600 to-amber-500 dark:from-emerald-350 dark:to-amber-355 transition-colors">
-                            COPTELLER
-                        </span>
+                    <Link href="/copteller" className="flex items-center group transition-transform hover:scale-[1.01]">
+                        <CoptellerLogo size="md" subtitle="Cooperative Escrow OS" />
                     </Link>
 
                     {/* Nav Links (Desktop) */}
@@ -149,9 +145,8 @@ export default function CoptellerLayout({
             <footer className="border-t border-emerald-500/10 bg-slate-50 dark:bg-[#080808] py-12">
                 <div className="max-w-7xl mx-auto px-6 md:px-8 grid grid-cols-1 md:grid-cols-4 gap-8">
                     <div className="space-y-4">
-                        <Link href="/copteller" className="flex items-center gap-2">
-                            <Cpu className="h-5 w-5 text-emerald-500" />
-                            <span className="text-base font-black tracking-widest text-foreground">COPTELLER</span>
+                        <Link href="/copteller" className="inline-flex items-center">
+                            <CoptellerLogo size="sm" subtitle="Cooperative Escrow OS" />
                         </Link>
                         <p className="text-[10px] font-semibold text-muted-foreground leading-relaxed">
                             A secure, escrow-backed subdivision driving digital Ajo thrift cycles and automated fleet Hire Purchase models for trade guilds.

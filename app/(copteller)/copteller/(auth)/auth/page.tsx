@@ -8,6 +8,7 @@ import { useRouter } from "next/navigation"
 import { Button } from "@/components/ui/button"
 import { toast } from "sonner"
 import { createCoptellerClient } from "@/lib/copteller/supabase/client"
+import { CoptellerLogo } from "@/components/copteller/copteller-logo"
 
 type AuthMode = 'login' | 'signup'
 type CoptellerRole = 'member' | 'coop_admin'
@@ -190,11 +191,11 @@ export default function CoptellerAuthPage() {
             <div className="w-full max-w-md bg-slate-50 dark:bg-slate-950/40 border border-slate-200 dark:border-slate-900 rounded-3xl p-5 sm:p-8 backdrop-blur-xl shadow-2xl space-y-5 sm:space-y-6 relative my-auto">
 
                 {/* Header */}
-                <div className="text-center space-y-2">
-                    <div className="inline-flex p-3 bg-emerald-500/10 border border-emerald-500/20 text-emerald-600 dark:text-emerald-400 rounded-2xl mb-2">
-                        <ShieldCheck className="h-6 w-6" />
+                <div className="text-center space-y-2.5">
+                    <div className="flex justify-center pb-1">
+                        <CoptellerLogo size="md" subtitle="Cooperative Escrow OS" />
                     </div>
-                    <h2 className="text-3xl font-black tracking-tight">COPTELLER Portal</h2>
+                    <h2 className="text-2xl font-black tracking-tight">Sign In to Portal</h2>
                     <p className="text-xs text-muted-foreground font-semibold leading-relaxed">
                         Access your target savings, investment schemes, and hire purchase logs.
                     </p>

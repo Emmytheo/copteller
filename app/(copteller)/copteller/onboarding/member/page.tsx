@@ -784,6 +784,9 @@ export default function MemberOnboardingPage() {
                 coopName={coopMode === "create" ? newCoopName : selectedCoop?.name}
                 sector={coopMode === "create" ? newCoopSector : selectedCoop?.sector}
                 regNumber={coopMode === "create" ? newCoopReg : selectedCoop?.regNumber}
+                certificateCode={coopMode === "create" ? undefined : selectedCoop?.certificateCode}
+                registrationDate={coopMode === "create" ? undefined : selectedCoop?.registrationDate}
+                issuingAuthority={coopMode === "create" ? undefined : selectedCoop?.issuingAuthority}
                 state={coopMode === "create" ? newCoopState : selectedCoop?.state}
                 lga={coopMode === "create" ? newCoopLga : selectedCoop?.lga}
                 formSpec={selectedCoop?.memberFormSpec}

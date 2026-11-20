@@ -27,6 +27,7 @@ import { Button } from "./ui/button"
 import { toast } from "sonner"
 import { useScope } from "@/context/scope-context"
 import { createCoptellerClient } from "@/lib/copteller/supabase/client"
+import { CoptellerLogo, CoptellerMark } from "@/components/copteller/copteller-logo"
 
 type NavGroup = {
     label: string
@@ -321,18 +322,13 @@ export function CoptellerSidebar() {
 
     return (
         <Sidebar collapsible="icon" className="border-r border-sidebar-border bg-sidebar text-sidebar-foreground transition-all duration-300 font-sans">
-            <SidebarHeader className="h-16 flex items-center px-4 border-b border-sidebar-border shrink-0 group-data-[collapsible=icon]:!justify-center">
-                <Link href="/copteller" className="flex items-center gap-2.5 group w-full group-data-[collapsible=icon]:!justify-center">
-                    <div className="p-2 bg-primary/10 border border-primary/25 rounded-xl shadow-sm group-hover:scale-105 transition-transform duration-300">
-                        <Cpu className="h-4.5 w-4.5 text-primary" />
+            <SidebarHeader className="h-16 !flex-row items-center justify-start !py-0 px-4 gap-0 border-b border-sidebar-border shrink-0 group-data-[collapsible=icon]:!justify-center group-data-[collapsible=icon]:!px-0">
+                <Link href="/copteller" className="flex items-center h-full group w-full group-data-[collapsible=icon]:!justify-center">
+                    <div className="hidden group-data-[collapsible=icon]:flex items-center justify-center">
+                        <CoptellerMark size={32} className="group-hover:scale-105 transition-transform duration-300" />
                     </div>
-                    <div className="flex flex-col group-data-[collapsible=icon]:hidden">
-                        <span className="text-base font-black tracking-widest text-foreground">
-                            COPTELLER
-                        </span>
-                        <span className="text-[9px] font-bold text-muted-foreground uppercase tracking-wider -mt-1">
-                            Cooperative Bank
-                        </span>
+                    <div className="flex items-center group-data-[collapsible=icon]:hidden">
+                        <CoptellerLogo size="sm" subtitle="Cooperative Escrow OS" />
                     </div>
                 </Link>
             </SidebarHeader>

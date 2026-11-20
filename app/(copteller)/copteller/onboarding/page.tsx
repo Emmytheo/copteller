@@ -781,8 +781,12 @@ export default function OnboardingPage() {
                                 <p className="text-[10px] font-semibold text-emerald-600 dark:text-emerald-400">
                                     Declaration: &ldquo;...for the purposes of {selectedOfflineCoop.memberFormSpec.declarationPurpose}&rdquo; &bull;{" "}
                                     {selectedOfflineCoop.memberFormSpec.requireUnionClearance
-                                        ? "Includes Union Leader Clearance signature"
-                                        : "Voluntary engagement (No Union Leader Clearance required)"}
+                                        ? "Includes Union/Co-Op Exec. Signature"
+                                        : "No Union/Co-Op Exec. Signature"}{" "}
+                                    &bull;{" "}
+                                    {selectedOfflineCoop.memberFormSpec.requireBankSignature
+                                        ? "Includes Partner Bank Signature"
+                                        : "Bank Signature Optional (Omitted by default)"}
                                 </p>
                             )}
                         </div>

@@ -32,8 +32,34 @@ yarn-error.log*
 .pnpm-debug.log*
 
 # env files (can opt-in for committing if needed)
-.env*.local
 .env
+.env.*
+.env*.local
+!.env.example
+
+# certificates, private keys & local secrets
+*.key
+*.p12
+*.pfx
+*.crt
+*.cert
+*.jks
+*.keystore
+*secret*.json
+*credentials*.json
+service-account*.json
+
+# local scratch, debug scripts, generated client forms, databases & backups
+/scratch/
+/tmp/
+/trash/
+/public/forms/
+*.sqlite
+*.sqlite3
+*.db
+*.bak
+*.backup.*
+*.original.backup.*
 
 # vercel
 .vercel

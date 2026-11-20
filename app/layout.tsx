@@ -23,6 +23,11 @@ export const metadata: Metadata = {
         default: 'Copteller — Digital Cooperative, Thrift & Fleet Financing OS',
     },
     description: "Autonomous Cooperative Governance, Rotational Thrift (Ajo), Asset Hire-Purchase, and Institutional Liquidity Syndication Platform.",
+    icons: {
+        icon: "/copteller-mark.svg",
+        shortcut: "/copteller-mark.svg",
+        apple: "/copteller-mark.svg",
+    },
 };
 
 export default function RootLayout({

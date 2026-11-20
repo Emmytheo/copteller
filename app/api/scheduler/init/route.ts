@@ -1,12 +1,10 @@
-import { NextResponse } from 'next/server'
+import { NextRequest, NextResponse } from 'next/server'
 import { rescheduleAll } from '@/lib/workflow/scheduler/cronRunner'
+import { requireCoptellerCronOrAdmin } from '@/lib/copteller/auth'
 
-// Secure this endpoint in production using a secret token header or internal networking
-export async function POST(req: Request) {
-    const authHeader = req.headers.get('workflow-admin')
-    if (process.env.NODE_ENV === 'production' && authHeader !== process.env.PAYLOAD_SECRET) {
-        return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
-    }
+export async function POST(req: NextRequest) {
+    const auth = await requireCoptellerCronOrAdmin(req)
+    if (auth instanceof NextResponse) return auth
 
     try {
         await rescheduleAll()
