@@ -32,6 +32,7 @@ export interface PrintableFormProps {
         phone?: string
         email?: string
         bvn?: string
+        nin?: string
         dob?: string
         address?: string
         schemeAmount?: string
@@ -73,6 +74,7 @@ export function PrintableForm({
         phone: formData.phone || "",
         email: formData.email || "",
         bvn: formData.bvn || "",
+        nin: formData.nin || "",
         dob: formData.dob || "",
         address: formData.address || "",
         schemeAmount: displayAmount,
@@ -198,47 +200,74 @@ export function PrintableForm({
                 )}
 
                 {/* Part A: Personal Identity Info */}
-                <div className={isLite ? "space-y-3.5" : "space-y-2.5"}>
+                <div className={isLite ? "space-y-3" : "space-y-2.5"}>
                     <h3 className="text-[10px] font-black uppercase bg-[#064E3B] text-white px-2.5 py-1 tracking-[0.12em] rounded-sm">
                         {isLite
-                            ? "Part A: Member Basic Information (Fill in BLOCK LETTERS)"
+                            ? "Part A: Member Identity Information (Fill in BLOCK LETTERS)"
                             : "Part A: Applicant Personal & Identity Details (Fill in BLOCK LETTERS)"}
                     </h3>
-                    <div className={`grid grid-cols-2 gap-x-5 ${isLite ? "gap-y-3.5" : "gap-y-2.5"}`}>
+                    <div className={`grid grid-cols-2 gap-x-5 ${isLite ? "gap-y-3" : "gap-y-2.5"}`}>
                         <div>
                             <label className="text-[8.5px] font-black text-slate-500 uppercase tracking-wider">First Name &amp; Middle Name</label>
-                            <div className={`font-bold border-b border-slate-400 ${isLite ? "min-h-[26px]" : "min-h-[22px]"} pt-0.5 text-[11px]`}>{f.firstName}</div>
+                            <div className={`font-bold border-b border-slate-400 ${isLite ? "min-h-[25px]" : "min-h-[22px]"} pt-0.5 text-[11px]`}>{f.firstName}</div>
                         </div>
                         <div>
                             <label className="text-[8.5px] font-black text-slate-500 uppercase tracking-wider">Surname (Last Name)</label>
-                            <div className={`font-bold border-b border-slate-400 ${isLite ? "min-h-[26px]" : "min-h-[22px]"} pt-0.5 text-[11px]`}>{f.lastName}</div>
+                            <div className={`font-bold border-b border-slate-400 ${isLite ? "min-h-[25px]" : "min-h-[22px]"} pt-0.5 text-[11px]`}>{f.lastName}</div>
                         </div>
-                        <div className={isLite ? "col-span-2" : ""}>
-                            <label className="text-[8.5px] font-black text-slate-500 uppercase tracking-wider">Phone Number (WhatsApp / Active GSM)</label>
-                            <div className={`font-bold border-b border-slate-400 ${isLite ? "min-h-[26px]" : "min-h-[22px]"} pt-0.5 text-[11px]`}>{f.phone}</div>
+                    </div>
+                    {isLite ? (
+                        <div className="grid grid-cols-3 items-end gap-x-4 gap-y-3">
+                            <div>
+                                <label className="text-[8.5px] font-black text-slate-500 uppercase tracking-wider">Phone Number (WhatsApp / GSM)</label>
+                                <div className="font-bold border-b border-slate-400 min-h-[25px] pt-0.5 text-[11px]">{f.phone}</div>
+                            </div>
+                            <div>
+                                <label className="text-[8.5px] font-black text-slate-500 uppercase tracking-wider">
+                                    BVN (11 Digits){resolvedSpec.requireBvn === false ? " — Opt." : ""}
+                                </label>
+                                <div className="font-mono font-bold border-b border-slate-400 min-h-[25px] pt-0.5 text-[11px]">{f.bvn}</div>
+                            </div>
+                            <div>
+                                <label className="text-[8.5px] font-black text-slate-500 uppercase tracking-wider">NIN (11 Digits)</label>
+                                <div className="font-mono font-bold border-b border-slate-400 min-h-[25px] pt-0.5 text-[11px]">{f.nin}</div>
+                            </div>
                         </div>
-                        {!isLite && (
-                            <>
+                    ) : (
+                        <>
+                            <div className="grid grid-cols-3 gap-x-4 gap-y-2.5">
                                 <div>
-                                    <label className="text-[8.5px] font-black text-slate-500 uppercase tracking-wider">Email Address (Optional if none)</label>
+                                    <label className="text-[8.5px] font-black text-slate-500 uppercase tracking-wider">Phone Number (WhatsApp / GSM)</label>
+                                    <div className="font-bold border-b border-slate-400 min-h-[22px] pt-0.5 text-[11px]">{f.phone}</div>
+                                </div>
+                                <div>
+                                    <label className="text-[8.5px] font-black text-slate-500 uppercase tracking-wider">Email Address (Optional)</label>
                                     <div className="font-bold border-b border-slate-400 min-h-[22px] pt-0.5 text-[11px]">{f.email}</div>
                                 </div>
                                 <div>
+                                    <label className="text-[8.5px] font-black text-slate-500 uppercase tracking-wider">Date of Birth (DD / MM / YYYY)</label>
+                                    <div className="font-bold border-b border-slate-400 min-h-[22px] pt-0.5 text-[11px]">{f.dob}</div>
+                                </div>
+                            </div>
+                            <div className="grid grid-cols-2 gap-x-5 gap-y-2.5">
+                                <div>
                                     <label className="text-[8.5px] font-black text-slate-500 uppercase tracking-wider">
-                                        BVN (Bank Verification No.){resolvedSpec.requireBvn === false ? " — Optional" : ""}
+                                        BVN (Bank Verification No. — 11 Digits){resolvedSpec.requireBvn === false ? " — Optional" : ""}
                                     </label>
                                     <div className="font-mono font-bold border-b border-slate-400 min-h-[22px] pt-0.5 text-[11px]">{f.bvn}</div>
                                 </div>
                                 <div>
-                                    <label className="text-[8.5px] font-black text-slate-500 uppercase tracking-wider">Date of Birth (DD / MM / YYYY) &amp; NIN</label>
-                                    <div className="font-bold border-b border-slate-400 min-h-[22px] pt-0.5 text-[11px]">{f.dob}</div>
+                                    <label className="text-[8.5px] font-black text-slate-500 uppercase tracking-wider">
+                                        NIN (National Identification No. — 11 Digits)
+                                    </label>
+                                    <div className="font-mono font-bold border-b border-slate-400 min-h-[22px] pt-0.5 text-[11px]">{f.nin}</div>
                                 </div>
-                            </>
-                        )}
-                    </div>
+                            </div>
+                        </>
+                    )}
                     <div>
                         <label className="text-[8.5px] font-black text-slate-500 uppercase tracking-wider">Current Residential Address</label>
-                        <div className={`font-bold border-b border-slate-400 ${isLite ? "min-h-[26px]" : "min-h-[22px]"} pt-0.5 text-[11px]`}>{f.address}</div>
+                        <div className={`font-bold border-b border-slate-400 ${isLite ? "min-h-[25px]" : "min-h-[22px]"} pt-0.5 text-[11px]`}>{f.address}</div>
                     </div>
                 </div>
 

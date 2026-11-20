@@ -261,7 +261,7 @@ export default function AdminSettingsPage() {
                         <div className="max-w-md">
                             <p className="font-bold text-sm">Default to Very Lite Member Form</p>
                             <p className="text-[10px] text-slate-500 font-medium mt-0.5 leading-relaxed">
-                                Omits sensitive KYC credentials (BVN/NIN/DOB/Email), statutory registration metadata, and account class checkboxes for frictionless field onboarding.
+                                Retains essential BVN &amp; NIN identity fields while omitting statutory registration metadata, account class checkboxes, email, and DOB for streamlined field onboarding.
                             </p>
                         </div>
                         <label className="relative inline-flex items-center cursor-pointer shrink-0">

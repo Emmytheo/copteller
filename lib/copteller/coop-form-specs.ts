@@ -27,8 +27,8 @@ export interface CoopMemberFormSpec {
     requireBankSignature: boolean
     /**
      * Form density/privacy preset:
-     * - "standard": full KYC/registration metadata, BVN/DOB, and account class checkboxes
-     * - "lite": minimal non-sensitive field capture (omits BVN/NIN/DOB/email, registration data, and account class strip)
+     * - "standard": full KYC/registration metadata, BVN/NIN/DOB/email, and account class checkboxes
+     * - "lite": minimal field capture (retains essential BVN & NIN identity fields while omitting cooperative statutory registration metadata, account class checkboxes, email, and DOB)
      */
     formMode?: "standard" | "lite"
     requirePassportPhoto: boolean

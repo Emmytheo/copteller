@@ -81,6 +81,7 @@ export default function MemberOnboardingPage() {
     const [lastName, setLastName] = React.useState("")
     const [phone, setPhone] = React.useState("")
     const [bvn, setBvn] = React.useState("")
+    const [nin, setNin] = React.useState("")
     const [dob, setDob] = React.useState("")
     const [bvnVerified, setBvnVerified] = React.useState(false)
     const [verifyingBvn, setVerifyingBvn] = React.useState(false)
@@ -207,6 +208,7 @@ export default function MemberOnboardingPage() {
                     cooperative: activeCoopId,
                     role: 'member',
                     metadata: {
+                        nin: nin || undefined,
                         selectedProduct: selectedProduct ? { id: selectedProduct.id, name: selectedProduct.name } : null,
                         applicationAnswers: formAnswers,
                         coopSpecAnswers,
@@ -386,6 +388,13 @@ export default function MemberOnboardingPage() {
                                                 )}
                                             </div>
                                             <p className="text-[10px] text-muted-foreground font-semibold">Dial *565*0# on your registered phone to retrieve your BVN.</p>
+                                        </div>
+
+                                        <div className="space-y-1.5">
+                                            <label className="text-[10px] font-black text-muted-foreground uppercase tracking-wider">National Identification Number (NIN)</label>
+                                            <input value={nin} onChange={e => setNin(e.target.value.replace(/\D/g, "").slice(0, 11))} placeholder="11-digit NIN" type="tel" maxLength={11}
+                                                className="w-full h-10 px-3 rounded-xl border border-slate-200 dark:border-slate-800 bg-background text-xs font-semibold focus:outline-none focus:ring-2 focus:ring-emerald-500/30 focus:border-emerald-500/50 transition-all" />
+                                            <p className="text-[10px] text-muted-foreground font-semibold">Dial *346# on your registered phone to retrieve your NIN.</p>
                                         </div>
 
                                         {bvnVerified && (
@@ -791,7 +800,7 @@ export default function MemberOnboardingPage() {
                 lga={coopMode === "create" ? newCoopLga : selectedCoop?.lga}
                 formSpec={selectedCoop?.memberFormSpec}
                 customAnswers={coopSpecAnswers}
-                formData={{ firstName, lastName, phone, bvn, dob }}
+                formData={{ firstName, lastName, phone, bvn, nin, dob }}
             />
         </div>
     )
