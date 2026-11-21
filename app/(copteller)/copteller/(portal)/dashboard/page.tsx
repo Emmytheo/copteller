@@ -18,6 +18,7 @@ import { useRouter } from "next/navigation"
 import { ClientPortal } from "@/components/copteller/client-portal"
 import { DynamicServiceForm } from "@/components/copteller/dynamic-service-form"
 import { MemberCashflowChart } from "@/components/charts/member-cashflow-chart"
+import { PartnerEscrowInlineLabel } from "@/components/copteller/partner-bank-escrow-badge"
 
 // ── Mini sparkline bars ──────────────────────────────────────────────────────
 function Sparkline({ data, color = "#10b981" }: { data: number[], color?: string }) {
@@ -371,7 +372,7 @@ function MemberDashboardContent() {
                                         <Sparkles className="h-2.5 w-2.5" /> State Parastatal Welfare
                                     </span>
                                     <span className="text-[10px] font-mono text-muted-foreground">
-                                        Escrow Account #3000881920
+                                        <PartnerEscrowInlineLabel prefix="Settlement" />
                                     </span>
                                 </div>
                                 <h3 className="text-xs font-black text-foreground mt-0.5">

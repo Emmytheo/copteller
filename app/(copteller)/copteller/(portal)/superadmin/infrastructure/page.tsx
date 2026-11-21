@@ -4,7 +4,7 @@ import * as React from "react"
 import { motion, AnimatePresence } from "framer-motion"
 import {
     Settings, Save, RefreshCw, Cpu, Layers, Database, ShieldCheck,
-    Play, Activity, Terminal, AlertCircle, CheckCircle2, Server, HelpCircle
+    Play, Activity, Terminal, AlertCircle, CheckCircle2, Server, HelpCircle, Building2, Globe
 } from "lucide-react"
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
@@ -44,6 +44,12 @@ export default function SuperadminInfrastructurePage() {
         cbnReportingWorkflow: '',
     })
 
+    // Partner Bank Settlement Rail state (Bank-Agnostic: BankSuite / Kuda / Qore / Generic MFB)
+    const [partnerBank, setPartnerBank] = React.useState<any>(null)
+    const [supportedProviders, setSupportedProviders] = React.useState<any[]>([])
+    const [escrowPools, setEscrowPools] = React.useState<any[]>([])
+    const [switchingProvider, setSwitchingProvider] = React.useState<string | null>(null)
+
     // Telemetry log stream simulation states
     const [isSimulating, setIsSimulating] = React.useState(false)
     const [logs, setLogs] = React.useState<{ msg: string; type: 'info' | 'success' | 'warn' | 'error' | 'cmd'; timestamp: string }[]>([])
@@ -58,15 +64,24 @@ export default function SuperadminInfrastructurePage() {
     const fetchConfig = async () => {
         try {
             setLoading(true)
-            const [epRes, wfRes, configRes] = await Promise.all([
+            const [epRes, wfRes, configRes, pbRes] = await Promise.all([
                 fetch('/api/endpoints?limit=250'),
                 fetch('/api/workflows?limit=250'),
-                fetch('/api/copteller/infrastructure')
+                fetch('/api/copteller/infrastructure'),
+                fetch('/api/copteller/partner-bank').catch(() => null),
             ])
 
             const epData = await epRes.json()
             const wfData = await wfRes.json()
             const configData = await configRes.json()
+            if (pbRes && pbRes.ok) {
+                const pbData = await pbRes.json().catch(() => null)
+                if (pbData?.success) {
+                    setPartnerBank(pbData.partnerBank)
+                    setSupportedProviders(pbData.supportedProviders || [])
+                    setEscrowPools(pbData.escrowPools || [])
+                }
+            }
 
             if (epData.docs) {
                 setEndpoints(epData.docs.map((e: any) => ({
@@ -107,6 +122,28 @@ export default function SuperadminInfrastructurePage() {
     React.useEffect(() => {
         fetchConfig()
     }, [])
+
+    const handleSwitchPartnerBank = async (providerId: string) => {
+        setSwitchingProvider(providerId)
+        try {
+            const res = await fetch('/api/copteller/partner-bank', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ provider: providerId }),
+            })
+            const data = await res.json()
+            if (!res.ok || !data.success) {
+                throw new Error(data.error || 'Failed to switch settlement bank')
+            }
+            setPartnerBank(data.partnerBank)
+            if (data.supportedProviders) setSupportedProviders(data.supportedProviders)
+            toast.success(`Active settlement bank switched to ${data.partnerBank.bankName}`)
+        } catch (err: any) {
+            toast.error(err.message || 'Partner bank switch failed')
+        } finally {
+            setSwitchingProvider(null)
+        }
+    }
 
     const handleSave = async (e: React.FormEvent) => {
         e.preventDefault()
@@ -227,6 +264,92 @@ export default function SuperadminInfrastructurePage() {
             <AnimatePresence mode="wait">
                 {activeTab === 'mappings' && (
                     <motion.div key="mappings" initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -8 }} className="space-y-6">
+                        {/* Bank-Agnostic Partner Bank Settlement Rail Selector */}
+                        <Card className="border-emerald-500/25 bg-white/70 dark:bg-slate-950/70 backdrop-blur-xl">
+                            <CardHeader className="border-b border-slate-100 dark:border-slate-900/60">
+                                <div className="flex flex-wrap items-center justify-between gap-3">
+                                    <div>
+                                        <CardTitle className="text-sm font-black flex items-center gap-2">
+                                            <Building2 className="h-4 w-4 text-emerald-500" />
+                                            Partner Bank Settlement Adapter (Bank-Agnostic Rail)
+                                        </CardTitle>
+                                        <CardDescription className="text-xs mt-0.5">
+                                            Copteller operates independently and plugs into any licensed Partner Bank (BankSuite MFB, Kuda Open API v2.1, Qore CBS, or custom MFB).
+                                        </CardDescription>
+                                    </div>
+                                    {partnerBank && (
+                                        <Badge className="bg-emerald-500/15 text-emerald-700 dark:text-emerald-400 border border-emerald-500/30 font-black text-[10px]">
+                                            ACTIVE: {partnerBank.shortName} · CODE {partnerBank.bankCode}
+                                        </Badge>
+                                    )}
+                                </div>
+                            </CardHeader>
+                            <CardContent className="p-6 space-y-4">
+                                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-3">
+                                    {supportedProviders.map((p: any) => {
+                                        const isActive = partnerBank?.provider === p.provider
+                                        return (
+                                            <button
+                                                key={p.provider}
+                                                type="button"
+                                                disabled={switchingProvider !== null}
+                                                onClick={() => handleSwitchPartnerBank(p.provider)}
+                                                className={`text-left p-4 rounded-xl border transition-all flex flex-col justify-between gap-3 ${
+                                                    isActive
+                                                        ? 'border-emerald-500 bg-emerald-500/10 ring-1 ring-emerald-500/40'
+                                                        : 'border-slate-200 dark:border-slate-800 hover:border-emerald-500/50 bg-slate-50/50 dark:bg-slate-900/40'
+                                                }`}
+                                            >
+                                                <div className="space-y-1.5">
+                                                    <div className="flex items-center justify-between gap-2">
+                                                        <span className="text-xs font-black text-foreground">{p.shortName}</span>
+                                                        <span
+                                                            className={`text-[9px] font-black uppercase px-1.5 py-0.5 rounded-full ${
+                                                                p.configured
+                                                                    ? 'bg-emerald-500/15 text-emerald-600 dark:text-emerald-400'
+                                                                    : 'bg-amber-500/15 text-amber-600 dark:text-amber-400'
+                                                            }`}
+                                                        >
+                                                            {p.configured ? 'Ready' : 'Env Required'}
+                                                        </span>
+                                                    </div>
+                                                    <p className="text-[11px] text-muted-foreground leading-relaxed line-clamp-3">
+                                                        {p.description}
+                                                    </p>
+                                                </div>
+                                                <div className="flex items-center justify-between pt-2 border-t border-slate-200/70 dark:border-slate-800/70 text-[10px] font-bold">
+                                                    <span className="font-mono text-muted-foreground">CBN {p.bankCode}</span>
+                                                    <span className={isActive ? 'text-emerald-600 dark:text-emerald-400 font-black' : 'text-slate-500'}>
+                                                        {switchingProvider === p.provider ? 'Switching...' : isActive ? '● Active Rail' : 'Activate →'}
+                                                    </span>
+                                                </div>
+                                            </button>
+                                        )
+                                    })}
+                                </div>
+                                {escrowPools.length > 0 && (
+                                    <div className="rounded-xl border border-slate-200 dark:border-slate-800 p-3.5 bg-slate-50/60 dark:bg-slate-900/50">
+                                        <p className="text-[10px] font-black uppercase tracking-wider text-muted-foreground mb-2 flex items-center gap-1.5">
+                                            <Globe className="h-3.5 w-3.5 text-emerald-500" />
+                                            Provisioned Cooperative Escrow Pools ({escrowPools.length})
+                                        </p>
+                                        <div className="flex flex-wrap gap-2">
+                                            {escrowPools.map((pool: any) => (
+                                                <span
+                                                    key={pool.cooperativeId}
+                                                    className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-white dark:bg-slate-950 border border-slate-200 dark:border-slate-800 text-[11px] font-semibold"
+                                                >
+                                                    <span className="font-bold">{pool.cooperativeName}</span>
+                                                    <span className="font-mono text-emerald-600 dark:text-emerald-400 font-black">#{pool.escrowNuban}</span>
+                                                    <span className="text-[10px] text-muted-foreground">({pool.partnerBankName})</span>
+                                                </span>
+                                            ))}
+                                        </div>
+                                    </div>
+                                )}
+                            </CardContent>
+                        </Card>
+
                         <Card className="border-slate-200 dark:border-slate-900 bg-white/60 dark:bg-slate-950/60 backdrop-blur-xl">
                             <CardHeader className="border-b border-slate-100 dark:border-slate-900/60">
                                 <CardTitle className="text-sm font-black flex items-center gap-2"><Cpu className="h-4 w-4 text-emerald-500" /> API Gateway Mappings</CardTitle>

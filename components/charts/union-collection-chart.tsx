@@ -1,6 +1,7 @@
 "use client"
 
 import * as React from "react"
+import { PartnerEscrowInlineLabel } from "@/components/copteller/partner-bank-escrow-badge"
 import { motion } from "framer-motion"
 import {
     CircleDollarSign,
@@ -135,7 +136,7 @@ export function UnionCollectionChart({
                         Weekly Collections, Thrift & Escrow Remittance
                     </h3>
                     <p className="text-xs text-muted-foreground font-semibold mt-0.5">
-                        Real-time tracking of weekly member collections reconciled directly into Partner MFB Escrow Vault #3000881920.
+                        Real-time tracking of weekly member collections reconciled directly into <PartnerEscrowInlineLabel prefix="Escrow Vault" />.
                     </p>
                 </div>
 

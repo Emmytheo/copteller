@@ -384,6 +384,69 @@ export default function CoptellerPortalLayout({
 }) {
     const pathname = usePathname()
     const segments = pathname.split('/').filter(Boolean)
+    const [isEmbedded, setIsEmbedded] = React.useState(false)
+
+    React.useEffect(() => {
+        if (typeof window === 'undefined') return
+        const params = new URLSearchParams(window.location.search)
+        if (params.get('embed') === '1') {
+            sessionStorage.setItem('copteller_embed', '1')
+            setIsEmbedded(true)
+        } else if (params.get('embed') === '0') {
+            sessionStorage.removeItem('copteller_embed')
+            setIsEmbedded(false)
+        } else if (sessionStorage.getItem('copteller_embed') === '1') {
+            setIsEmbedded(true)
+        }
+    }, [pathname])
+
+    if (isEmbedded) {
+        return (
+            <ScopeProvider>
+                <div className="flex flex-col w-full min-h-[100dvh] bg-background text-foreground">
+                    <div className="sticky top-0 z-40 flex h-11 items-center justify-between gap-2 border-b border-border/70 bg-card/95 px-3 backdrop-blur-md text-xs">
+                        <div className="flex items-center gap-1.5 overflow-x-auto">
+                            <span className="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-full bg-emerald-500/10 border border-emerald-500/25 text-[10px] font-black uppercase tracking-wider text-emerald-600 shrink-0">
+                                <span className="size-1.5 rounded-full bg-emerald-500" /> Copteller Headless Module
+                            </span>
+                            {[
+                                { label: "Overview", href: "/copteller/admin?embed=1" },
+                                { label: "Members", href: "/copteller/admin/members?embed=1" },
+                                { label: "Schemes", href: "/copteller/admin/schemes?embed=1" },
+                                { label: "Unions", href: "/copteller/superadmin/unions?embed=1" },
+                                { label: "Settings & Forms", href: "/copteller/admin/settings?embed=1" },
+                            ].map((nav) => (
+                                <Link
+                                    key={nav.href}
+                                    href={nav.href}
+                                    className={`px-2.5 py-1 rounded-lg font-bold whitespace-nowrap transition-colors ${
+                                        pathname === nav.href.split("?")[0]
+                                            ? "bg-primary text-primary-foreground"
+                                            : "text-muted-foreground hover:bg-muted hover:text-foreground"
+                                    }`}
+                                >
+                                    {nav.label}
+                                </Link>
+                            ))}
+                        </div>
+                        <a
+                            href={`${pathname}?embed=0`}
+                            target="_blank"
+                            rel="noreferrer"
+                            className="text-[10px] font-black uppercase tracking-wider text-primary hover:underline shrink-0"
+                        >
+                            Full Window ↗
+                        </a>
+                    </div>
+                    <main className="flex-1 overflow-x-hidden overflow-y-auto pb-8">
+                        <PortalRoleGuard>
+                            {children}
+                        </PortalRoleGuard>
+                    </main>
+                </div>
+            </ScopeProvider>
+        )
+    }
 
     return (
         <ScopeProvider>

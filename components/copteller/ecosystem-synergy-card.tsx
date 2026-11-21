@@ -14,6 +14,7 @@ const fmt = (n: number) => `₦${Number(n || 0).toLocaleString()}`
 
 interface EcosystemSynergyCardProps {
     partnerName?: string
+    partnerBankName?: string
     partnerSector?: string
     escrowAccountNumber?: string
     availableFloat?: number
@@ -25,9 +26,10 @@ interface EcosystemSynergyCardProps {
 
 export function EcosystemSynergyCard({
     partnerName = "Abia State Health Insurance Agency (ABSHIA)",
+    partnerBankName = "Partner MFB",
     partnerShortName = "ABSHIA Social Health",
     partnerSector = "Healthcare & Social Protection",
-    escrowAccountNumber = "3000881920",
+    escrowAccountNumber = "Live Provisioned Escrow NUBAN",
     availableFloat = 101500000,
     syndicatedInvestorYield = "+16.5% p.a.",
     activeEnrollees = 3420,
@@ -54,8 +56,8 @@ export function EcosystemSynergyCard({
         },
         {
             num: "3",
-            title: "Partner MFB Escrow",
-            org: `Dedicated Account ${escrowAccountNumber}`,
+            title: `${partnerBankName} Escrow`,
+            org: escrowAccountNumber.startsWith("Live") ? escrowAccountNumber : `Dedicated NUBAN ${escrowAccountNumber}`,
             icon: ShieldCheck,
             color: "text-purple-500 bg-purple-500/10 border-purple-500/20",
             summary: "Automated liquidity pre-payments to accredited hospitals & inspection hubs.",

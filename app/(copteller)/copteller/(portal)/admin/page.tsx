@@ -12,6 +12,7 @@ import { toast } from "sonner"
 import { useRouter } from "next/navigation"
 import Link from "next/link"
 import { UnionCollectionChart } from "@/components/charts/union-collection-chart"
+import { PartnerEscrowInlineLabel } from "@/components/copteller/partner-bank-escrow-badge"
 
 const fmt = (n: number) => `₦${Number(n || 0).toLocaleString()}`
 
@@ -567,7 +568,7 @@ export default function CooperativeAdminConsole() {
                                 <div className="bg-emerald-500 h-full rounded-full" style={{ width: "94.8%" }} />
                             </div>
                             <p className="text-[10px] text-muted-foreground font-semibold">
-                                Weekly automated settlement &bull; Escrow Account #3000881920
+                                Weekly automated settlement &bull; <PartnerEscrowInlineLabel prefix="Custody" />
                             </p>
                         </div>
                     </div>
