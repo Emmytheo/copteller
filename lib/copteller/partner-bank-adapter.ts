@@ -48,7 +48,7 @@ export const PARTNER_BANK_PRESETS: Record<
         defaultApiBaseUrl:
             process.env.BANKSUITE_API_URL ||
             process.env.NEXT_PUBLIC_BANKSUITE_URL ||
-            'http://localhost:3000',
+            (process.env.NODE_ENV === 'development' ? 'http://localhost:3000' : ''),
         supportsVirtualEscrow: true,
         supportsTransfers: true,
         supportsHeadlessBridge: true,
