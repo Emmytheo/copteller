@@ -31,6 +31,11 @@ export interface CoopMemberFormSpec {
      * - "lite": minimal field capture (retains essential BVN & NIN identity fields while omitting cooperative statutory registration metadata, account class checkboxes, email, and DOB)
      */
     formMode?: "standard" | "lite"
+    /**
+     * Optional toggle to hide the Part A – Part D section heading bars on printed/previewed forms
+     * and replace them with subtle hairline dividers for a cleaner, minimal layout.
+     */
+    hideSectionHeadings?: boolean
     requirePassportPhoto: boolean
     requireBvn: boolean
     /**
@@ -136,6 +141,7 @@ export function resolveMemberFormSpec(
         // Partner Bank / MFB signature is optional (false by default)
         requireBankSignature: typeof rawSpec?.requireBankSignature === "boolean" ? rawSpec.requireBankSignature : false,
         formMode: rawSpec?.formMode === "lite" ? "lite" : "standard",
+        hideSectionHeadings: Boolean(rawSpec?.hideSectionHeadings),
         requirePassportPhoto: typeof rawSpec?.requirePassportPhoto === "boolean" ? rawSpec.requirePassportPhoto : true,
         requireBvn: typeof rawSpec?.requireBvn === "boolean" ? rawSpec.requireBvn : true,
         contributionFieldLabel: rawSpec?.contributionFieldLabel?.trim() || "Target Contribution Amount (₦)",

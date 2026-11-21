@@ -84,6 +84,7 @@ export function PrintableForm({
     const requireUnionClearance = resolvedSpec.requireUnionClearance !== false
     const requireBankSignature = Boolean(resolvedSpec.requireBankSignature)
     const showPassportBox = resolvedSpec.requirePassportPhoto !== false
+    const hideSectionHeadings = Boolean(resolvedSpec.hideSectionHeadings)
 
     const signatureCount = 1 + (requireUnionClearance ? 1 : 0) + (requireBankSignature ? 1 : 0)
     const signatureGridCls =
@@ -201,11 +202,13 @@ export function PrintableForm({
 
                 {/* Part A: Personal Identity Info */}
                 <div className={isLite ? "space-y-3" : "space-y-2.5"}>
-                    <h3 className="text-[10px] font-black uppercase bg-[#064E3B] text-white px-2.5 py-1 tracking-[0.12em] rounded-sm">
-                        {isLite
-                            ? "Part A: Member Identity Information (Fill in BLOCK LETTERS)"
-                            : "Part A: Applicant Personal & Identity Details (Fill in BLOCK LETTERS)"}
-                    </h3>
+                    {!hideSectionHeadings && (
+                        <h3 className="text-[10px] font-black uppercase bg-[#064E3B] text-white px-2.5 py-1 tracking-[0.12em] rounded-sm">
+                            {isLite
+                                ? "Part A: Member Identity Information (Fill in BLOCK LETTERS)"
+                                : "Part A: Applicant Personal & Identity Details (Fill in BLOCK LETTERS)"}
+                        </h3>
+                    )}
                     <div className={`grid grid-cols-2 gap-x-5 ${isLite ? "gap-y-3" : "gap-y-2.5"}`}>
                         <div>
                             <label className="text-[8.5px] font-black text-slate-500 uppercase tracking-wider">First Name &amp; Middle Name</label>
@@ -272,12 +275,14 @@ export function PrintableForm({
                 </div>
 
                 {/* Part B: Cooperative Society & Operational Details */}
-                <div className={isLite ? "space-y-3.5" : "space-y-2.5"}>
-                    <h3 className="text-[10px] font-black uppercase bg-[#064E3B] text-white px-2.5 py-1 tracking-[0.12em] rounded-sm">
-                        {isLite
-                            ? "Part B: Cooperative & Member Operational Details"
-                            : "Part B: Cooperative Society & Operational Profile"}
-                    </h3>
+                <div className={`${isLite ? "space-y-3.5" : "space-y-2.5"} ${hideSectionHeadings ? "border-t border-slate-200 pt-3" : ""}`}>
+                    {!hideSectionHeadings && (
+                        <h3 className="text-[10px] font-black uppercase bg-[#064E3B] text-white px-2.5 py-1 tracking-[0.12em] rounded-sm">
+                            {isLite
+                                ? "Part B: Cooperative & Member Operational Details"
+                                : "Part B: Cooperative Society & Operational Profile"}
+                        </h3>
+                    )}
                     {isLite ? (
                         <div>
                             <label className="text-[8.5px] font-black text-slate-500 uppercase tracking-wider">Cooperative Society Name</label>
@@ -319,9 +324,11 @@ export function PrintableForm({
                     {/* Cooperative-specific operational & guarantor fields */}
                     {customFields.length > 0 && (
                         <div className="pt-1 space-y-2">
-                            <p className="text-[8.5px] font-black text-amber-800 uppercase tracking-[0.14em]">
-                                Member Operational &amp; Next-of-Kin Specifications
-                            </p>
+                            {!hideSectionHeadings && (
+                                <p className="text-[8.5px] font-black text-amber-800 uppercase tracking-[0.14em]">
+                                    Member Operational &amp; Next-of-Kin Specifications
+                                </p>
+                            )}
                             <div className={`grid grid-cols-2 gap-x-5 ${isLite ? "gap-y-3.5" : "gap-y-2.5"}`}>
                                 {customFields.map((field) => (
                                     <div key={field.id}>
@@ -339,10 +346,12 @@ export function PrintableForm({
                 </div>
 
                 {/* Part C: Financial Contribution Selection */}
-                <div className="space-y-2.5">
-                    <h3 className="text-[10px] font-black uppercase bg-[#064E3B] text-white px-2.5 py-1 tracking-[0.12em] rounded-sm">
-                        Part C: Contribution &amp; Thrift Plan Selection
-                    </h3>
+                <div className={`space-y-2.5 ${hideSectionHeadings ? "border-t border-slate-200 pt-3" : ""}`}>
+                    {!hideSectionHeadings && (
+                        <h3 className="text-[10px] font-black uppercase bg-[#064E3B] text-white px-2.5 py-1 tracking-[0.12em] rounded-sm">
+                            Part C: Contribution &amp; Thrift Plan Selection
+                        </h3>
+                    )}
                     <div className="grid grid-cols-12 gap-x-5 gap-y-2">
                         <div className="col-span-5">
                             <label className="text-[8.5px] font-black text-slate-500 uppercase tracking-wider">
@@ -381,10 +390,12 @@ export function PrintableForm({
                 </div>
 
                 {/* Part D: Declaration & Official Signatures */}
-                <div className="space-y-3">
-                    <h3 className="text-[10px] font-black uppercase bg-[#064E3B] text-white px-2.5 py-1 tracking-[0.12em] rounded-sm">
-                        Part D: Member Declaration &amp; Official Signatures
-                    </h3>
+                <div className={`space-y-3 ${hideSectionHeadings ? "border-t border-slate-200 pt-3" : ""}`}>
+                    {!hideSectionHeadings && (
+                        <h3 className="text-[10px] font-black uppercase bg-[#064E3B] text-white px-2.5 py-1 tracking-[0.12em] rounded-sm">
+                            Part D: Member Declaration &amp; Official Signatures
+                        </h3>
+                    )}
                     <p className="text-[9.5px] text-slate-700 font-semibold leading-relaxed">
                         I hereby apply for membership and declare that all information provided above is true and accurate for the purposes of{" "}
                         <span className="font-extrabold text-slate-950">{cleanDeclarationPurpose}</span>. I agree to abide by the bye-laws of the Society and authorize Copteller Cooperative OS and its licensed partner financial institution settlement rails to record my contributions, dues, and scheduled scheme repayments transparently in my cooperative ledger.
@@ -469,6 +480,7 @@ export function PrintableFormDialog({
     const [unionSigOverride, setUnionSigOverride] = React.useState<boolean | null>(null)
     const [bankSigOverride, setBankSigOverride] = React.useState<boolean | null>(null)
     const [formModeOverride, setFormModeOverride] = React.useState<"standard" | "lite" | null>(null)
+    const [hideHeadingsOverride, setHideHeadingsOverride] = React.useState<boolean | null>(null)
     const [amountOverride, setAmountOverride] = React.useState<string>("")
     const [amountTouched, setAmountTouched] = React.useState(false)
     const [contributionLabelOverride, setContributionLabelOverride] = React.useState<string>("")
@@ -497,6 +509,7 @@ export function PrintableFormDialog({
         // Reset per-preview overrides whenever the user switches cooperatives
         setUnionSigOverride(null)
         setBankSigOverride(null)
+        setHideHeadingsOverride(null)
         setAmountOverride("")
         setAmountTouched(false)
         setContributionLabelOverride("")
@@ -567,6 +580,7 @@ export function PrintableFormDialog({
 
     const effectiveUnionSig = unionSigOverride !== null ? unionSigOverride : baseResolvedSpec.requireUnionClearance
     const effectiveBankSig = bankSigOverride !== null ? bankSigOverride : baseResolvedSpec.requireBankSignature
+    const effectiveHideHeadings = hideHeadingsOverride !== null ? hideHeadingsOverride : Boolean(baseResolvedSpec.hideSectionHeadings)
     const effectiveFormMode: "standard" | "lite" =
         formModeOverride || formProps.formMode || baseResolvedSpec.formMode || "standard"
     const cleanedAmountDigits = amountOverride.replace(/[^0-9.]/g, "")
@@ -591,6 +605,7 @@ export function PrintableFormDialog({
         formSpec: {
             ...baseResolvedSpec,
             formMode: effectiveFormMode,
+            hideSectionHeadings: effectiveHideHeadings,
             requireUnionClearance: effectiveUnionSig,
             requireBankSignature: effectiveBankSig,
             contributionFieldLabel: contributionLabelOverride.trim() || baseResolvedSpec.contributionFieldLabel,
@@ -806,6 +821,15 @@ export function PrintableFormDialog({
                                         />
                                         <Landmark className="h-3.5 w-3.5 text-amber-400" />
                                         <span>Partner Bank Signature (Optional)</span>
+                                    </label>
+                                    <label className="inline-flex items-center gap-2 px-2.5 py-1 rounded-lg border border-slate-700 bg-slate-950/80 text-slate-200 font-bold cursor-pointer hover:border-emerald-500/60 transition-colors">
+                                        <input
+                                            type="checkbox"
+                                            checked={effectiveHideHeadings}
+                                            onChange={(e) => setHideHeadingsOverride(e.target.checked)}
+                                            className="accent-emerald-500 h-3.5 w-3.5"
+                                        />
+                                        <span>Hide Section Headings</span>
                                     </label>
                                 </div>
 
