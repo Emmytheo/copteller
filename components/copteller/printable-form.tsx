@@ -389,13 +389,13 @@ export function PrintableForm({
                     </div>
                 </div>
 
-                {/* Part D: Declaration & Official Signatures */}
-                <div className={`space-y-3 ${hideSectionHeadings ? "border-t border-slate-200 pt-3" : ""}`}>
-                    {!hideSectionHeadings && (
-                        <h3 className="text-[10px] font-black uppercase bg-[#064E3B] text-white px-2.5 py-1 tracking-[0.12em] rounded-sm">
-                            Part D: Member Declaration &amp; Official Signatures
-                        </h3>
-                    )}
+                {/* Part D: Declaration & Official Signatures (always retains heading for legal prominence) */}
+                <div className="space-y-3">
+                    <h3 className="text-[10px] font-black uppercase bg-[#064E3B] text-white px-2.5 py-1 tracking-[0.12em] rounded-sm">
+                        {hideSectionHeadings
+                            ? "Member Declaration & Official Signatures"
+                            : "Part D: Member Declaration & Official Signatures"}
+                    </h3>
                     <p className="text-[9.5px] text-slate-700 font-semibold leading-relaxed">
                         I hereby apply for membership and declare that all information provided above is true and accurate for the purposes of{" "}
                         <span className="font-extrabold text-slate-950">{cleanDeclarationPurpose}</span>. I agree to abide by the bye-laws of the Society and authorize Copteller Cooperative OS and its licensed partner financial institution settlement rails to record my contributions, dues, and scheduled scheme repayments transparently in my cooperative ledger.
@@ -829,7 +829,7 @@ export function PrintableFormDialog({
                                             onChange={(e) => setHideHeadingsOverride(e.target.checked)}
                                             className="accent-emerald-500 h-3.5 w-3.5"
                                         />
-                                        <span>Hide Section Headings</span>
+                                        <span>Hide Part A&#8211;C Headings</span>
                                     </label>
                                 </div>
 

@@ -32,8 +32,8 @@ export interface CoopMemberFormSpec {
      */
     formMode?: "standard" | "lite"
     /**
-     * Optional toggle to hide the Part A – Part D section heading bars on printed/previewed forms
-     * and replace them with subtle hairline dividers for a cleaner, minimal layout.
+     * Optional toggle to hide the Part A – Part C section heading bars on printed/previewed forms
+     * and replace them with subtle hairline dividers, while always retaining the Member Declaration heading.
      */
     hideSectionHeadings?: boolean
     requirePassportPhoto: boolean

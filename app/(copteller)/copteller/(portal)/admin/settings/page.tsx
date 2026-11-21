@@ -279,7 +279,7 @@ export default function AdminSettingsPage() {
                         <div className="max-w-md">
                             <p className="font-bold text-sm">Hide Form Section Headings (Optional)</p>
                             <p className="text-[10px] text-slate-500 font-medium mt-0.5 leading-relaxed">
-                                Optional minimal layout: removes the dark green Part A – Part D section heading bars and separates groups with crisp hairline dividers.
+                                Optional minimal layout: hides the dark green Part A – Part C section heading bars with crisp hairline dividers, while always retaining the Member Declaration &amp; Official Signatures heading.
                             </p>
                         </div>
                         <label className="relative inline-flex items-center cursor-pointer shrink-0">
