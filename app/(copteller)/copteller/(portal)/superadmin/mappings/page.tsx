@@ -8,7 +8,6 @@ import { Badge } from "@/components/ui/badge"
 import { Label } from "@/components/ui/label"
 import { Loader2, Save, AlertCircle, CheckCircle2, Link2, Hash, Trash2, Plus, X, RefreshCw } from "lucide-react"
 import { toast } from "sonner"
-import { CoptellerSubsystemNav } from "@/components/copteller/subsystem-nav"
 
 interface ProviderMapping {
     id: string
@@ -142,7 +141,7 @@ export default function CoptellerProviderMappingsPage() {
     const coverage = productTypes.length > 0 ? Math.min(100, Math.round((mappedCount / productTypes.length) * 100)) : 100
 
     return (
-        <div className="p-4 sm:p-8 max-w-7xl mx-auto flex flex-col gap-6 font-sans pb-24">
+        <div className="w-full min-w-0 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-5 sm:py-8 space-y-6 font-sans pb-24">
             <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
                 <div className="space-y-1">
                     <div className="inline-flex items-center gap-2 px-2.5 py-0.5 rounded-full bg-emerald-500/10 border border-emerald-500/25 text-emerald-600 dark:text-emerald-400 text-[10px] font-black uppercase tracking-wider">
@@ -163,7 +162,6 @@ export default function CoptellerProviderMappingsPage() {
                 </div>
             </div>
 
-            <CoptellerSubsystemNav group="automation" />
 
             <div className="grid grid-cols-2 lg:grid-cols-3 gap-3.5">
                 {[

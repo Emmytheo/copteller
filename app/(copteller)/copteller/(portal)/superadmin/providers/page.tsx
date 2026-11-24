@@ -8,7 +8,6 @@ import {
 import { ProviderActions } from './client-actions'
 import { ProviderEditor } from './provider-editor'
 import { Badge } from '@/components/ui/badge'
-import { CoptellerSubsystemNav } from '@/components/copteller/subsystem-nav'
 
 const CATEGORY_COLORS: Record<string, string> = {
     PAYMENT: 'bg-emerald-500',
@@ -59,7 +58,6 @@ export default async function CoptellerProvidersManagerPage({
 
     return (
         <div className="flex flex-col h-[calc(100vh-theme(spacing.16))] w-full overflow-hidden bg-muted/10">
-            <CoptellerSubsystemNav group="automation" compact />
             <div className="flex flex-1 min-h-0 w-full overflow-hidden">
 
             {/* ── LEFT: Provider List ────────────────────────────────── */}
@@ -136,6 +134,18 @@ export default async function CoptellerProvidersManagerPage({
             `}>
                 {selectedId ? (
                     <div className="flex-1 flex flex-col md:flex-row min-h-0">
+                        {/* Mobile back bar */}
+                        <div className="flex items-center gap-2.5 px-4 h-12 border-b bg-background md:hidden shrink-0">
+                            <Link
+                                href="/copteller/superadmin/providers"
+                                className="inline-flex items-center gap-1.5 text-xs font-bold text-muted-foreground hover:text-foreground"
+                            >
+                                <ArrowLeft size={15} /> All Providers
+                            </Link>
+                            {selectedProvider && (
+                                <span className="text-xs font-black text-foreground truncate">· {selectedProvider.name}</span>
+                            )}
+                        </div>
                         {/* Editor Panel */}
                         <div className="flex-1 flex flex-col min-h-0">
                             {selectedId === 'new' ? (

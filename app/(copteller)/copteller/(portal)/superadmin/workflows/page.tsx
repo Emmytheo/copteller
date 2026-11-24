@@ -2,15 +2,13 @@
 
 import * as React from "react"
 import Link from "next/link"
-import { useRouter } from "next/navigation"
 import {
     PlusCircle, Edit2, Play, RefreshCw, Loader2, Search, Copy,
-    Trash2, ToggleLeft, Upload, X, Check, Building2, Workflow, History, Clock
+    Trash2, ToggleLeft, Upload, X, Check, Building2, Workflow
 } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
 import { toast } from "sonner"
-import { CoptellerSubsystemNav } from "@/components/copteller/subsystem-nav"
 
 interface WorkflowRow {
     id: string
@@ -28,7 +26,6 @@ interface WorkflowRow {
 }
 
 export default function SuperadminWorkflowsPage() {
-    const router = useRouter()
     const [workflows, setWorkflows] = React.useState<WorkflowRow[]>([])
     const [cooperatives, setCooperatives] = React.useState<any[]>([])
     const [loading, setLoading] = React.useState(true)
@@ -88,9 +85,7 @@ export default function SuperadminWorkflowsPage() {
                     })
                 )
             }
-            if (Array.isArray(coopsData.cooperatives)) {
-                setCooperatives(coopsData.cooperatives)
-            }
+            if (Array.isArray(coopsData.cooperatives)) setCooperatives(coopsData.cooperatives)
         } catch {
             toast.error("Failed to load workflow pipelines")
         } finally {
@@ -256,10 +251,10 @@ export default function SuperadminWorkflowsPage() {
     const failedCount = workflows.filter((w) => w.lastRunStatus === "FAILED").length
 
     return (
-        <div className="p-4 sm:p-8 max-w-7xl mx-auto flex flex-col gap-6 font-sans">
+        <div className="w-full min-w-0 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-5 sm:py-8 space-y-6 font-sans">
             {/* Header */}
             <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
-                <div className="space-y-1">
+                <div className="space-y-1 min-w-0">
                     <div className="inline-flex items-center gap-2 px-2.5 py-0.5 rounded-full bg-emerald-500/10 border border-emerald-500/25 text-emerald-600 dark:text-emerald-400 text-[10px] font-black uppercase tracking-wider">
                         <Workflow className="h-3 w-3" /> Automation Engine &bull; Visual DAG Orchestrator
                     </div>
@@ -270,7 +265,7 @@ export default function SuperadminWorkflowsPage() {
                 </div>
 
                 <div className="flex flex-wrap items-center gap-2 shrink-0">
-                    <Button variant="outline" size="sm" onClick={() => setShowImportModal(true)} className="h-9 rounded-xl text-xs font-bold gap-1.5">
+                    <Button variant="outline" size="sm" onClick={() => setShowImportModal(true)} className="h-9 rounded-xl text-xs font-bold gap-1.5 whitespace-nowrap">
                         <Upload className="h-3.5 w-3.5" /> Import SDL
                     </Button>
                     <Button
@@ -278,41 +273,39 @@ export default function SuperadminWorkflowsPage() {
                         size="sm"
                         disabled={bootstrapping}
                         onClick={handleBootstrapOlivePay}
-                        className="h-9 rounded-xl border-emerald-500/30 text-emerald-600 dark:text-emerald-400 hover:bg-emerald-500/10 text-xs font-black gap-1.5"
+                        className="h-9 rounded-xl border-emerald-500/30 text-emerald-600 dark:text-emerald-400 hover:bg-emerald-500/10 text-xs font-black gap-1.5 whitespace-nowrap"
                     >
                         <RefreshCw className={`h-3.5 w-3.5 ${bootstrapping ? "animate-spin" : ""}`} />
                         Bootstrap OlivePay
                     </Button>
                     <Link
                         href="/copteller/superadmin/workflows/new/edit"
-                        className="bg-primary text-primary-foreground hover:bg-primary/90 inline-flex items-center justify-center font-black text-xs h-9 px-4 rounded-xl shadow-sm gap-1.5"
+                        className="bg-primary text-primary-foreground hover:bg-primary/90 inline-flex items-center justify-center font-black text-xs h-9 px-4 rounded-xl shadow-sm gap-1.5 whitespace-nowrap"
                     >
                         <PlusCircle className="h-4 w-4" /> Create Workflow
                     </Link>
                 </div>
             </div>
 
-            <CoptellerSubsystemNav group="automation" />
-
             {/* KPI Strip */}
-            <div className="grid grid-cols-2 lg:grid-cols-4 gap-3.5">
+            <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
                 {[
                     { label: "Total Workflows", value: workflows.length, sub: "Registered DAG pipelines" },
                     { label: "Published Live", value: publishedCount, sub: `${workflows.length - publishedCount} draft` },
                     { label: "Healthy Last Runs", value: healthyCount, sub: "Completed without error" },
                     { label: "Attention Required", value: failedCount, sub: failedCount > 0 ? "Inspect Run History" : "All active runs clean" },
                 ].map((k) => (
-                    <div key={k.label} className="rounded-2xl border border-border/80 bg-card p-4 shadow-sm space-y-1">
-                        <p className="text-[10px] font-black uppercase tracking-wider text-muted-foreground">{k.label}</p>
+                    <div key={k.label} className="rounded-2xl border border-border/80 bg-card p-4 shadow-sm space-y-1 min-w-0">
+                        <p className="text-[10px] font-black uppercase tracking-wider text-muted-foreground truncate">{k.label}</p>
                         <p className="text-2xl font-black font-mono text-foreground">{k.value}</p>
-                        <p className="text-[11px] text-muted-foreground">{k.sub}</p>
+                        <p className="text-[11px] text-muted-foreground truncate">{k.sub}</p>
                     </div>
                 ))}
             </div>
 
             {/* Filter Bar */}
-            <div className="flex flex-col sm:flex-row gap-3">
-                <div className="relative flex-1">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-12 gap-2.5">
+                <div className="relative sm:col-span-2 lg:col-span-6">
                     <Search size={15} className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground pointer-events-none" />
                     <input
                         type="text"
@@ -330,7 +323,7 @@ export default function SuperadminWorkflowsPage() {
                 <select
                     value={statusFilter}
                     onChange={(e) => setStatusFilter(e.target.value)}
-                    className="h-10 px-3 text-xs font-bold rounded-xl border bg-background"
+                    className="h-10 px-3 text-xs font-bold rounded-xl border bg-background lg:col-span-3"
                 >
                     <option value="ALL">All Statuses</option>
                     <option value="PUBLISHED">Published</option>
@@ -339,7 +332,7 @@ export default function SuperadminWorkflowsPage() {
                 <select
                     value={coopFilter}
                     onChange={(e) => setCoopFilter(e.target.value)}
-                    className="h-10 px-3 text-xs font-bold rounded-xl border bg-background"
+                    className="h-10 px-3 text-xs font-bold rounded-xl border bg-background lg:col-span-3"
                 >
                     <option value="ALL">All Cooperatives &amp; Global</option>
                     <option value="GLOBAL">Global / System-Wide Only</option>
@@ -347,164 +340,204 @@ export default function SuperadminWorkflowsPage() {
                         <option key={c.id} value={c.id}>{c.name}</option>
                     ))}
                 </select>
-                <div className="flex items-center gap-1.5">
-                    <Link
-                        href="/copteller/superadmin/workflows/runs"
-                        className="h-10 px-3 rounded-xl border bg-card hover:bg-muted inline-flex items-center gap-1.5 text-xs font-bold"
-                    >
-                        <History size={14} /> Run History
-                    </Link>
-                    <Link
-                        href="/copteller/superadmin/workflows/scheduled-jobs"
-                        className="h-10 px-3 rounded-xl border bg-card hover:bg-muted inline-flex items-center gap-1.5 text-xs font-bold"
-                    >
-                        <Clock size={14} /> Schedules
-                    </Link>
-                </div>
             </div>
 
-            {/* Table */}
-            <div className="border rounded-2xl shadow-sm bg-card overflow-x-auto">
-                {loading && workflows.length === 0 ? (
-                    <div className="p-16 flex justify-center">
-                        <Loader2 className="h-7 w-7 animate-spin text-muted-foreground" />
-                    </div>
-                ) : filtered.length === 0 ? (
-                    <div className="p-12 text-center text-muted-foreground space-y-2">
-                        <Workflow className="h-10 w-10 mx-auto opacity-30" />
-                        <p className="font-semibold text-foreground">No workflows found</p>
-                        <p className="text-xs">Click &quot;Bootstrap OlivePay&quot; to seed 8 production workflows or create one visually.</p>
-                    </div>
-                ) : (
-                    <table className="w-full text-sm text-left min-w-[820px]">
-                        <thead className="text-[11px] text-muted-foreground uppercase bg-muted/50 border-b">
-                            <tr>
-                                <th className="px-5 py-3.5 font-bold">Workflow Name</th>
-                                <th className="px-4 py-3.5 font-bold">Status</th>
-                                <th className="px-4 py-3.5 font-bold">Trigger</th>
-                                <th className="px-4 py-3.5 font-bold">Scope</th>
-                                <th className="px-4 py-3.5 font-bold">Nodes</th>
-                                <th className="px-4 py-3.5 font-bold">Last Run</th>
-                                <th className="px-5 py-3.5 font-bold text-right">Actions</th>
-                            </tr>
-                        </thead>
-                        <tbody className="divide-y">
-                            {filtered.map((wf) => {
-                                const coopObj = cooperatives.find((c) => String(c.id) === String(wf.cooperativeId))
-                                const isBusy = busyId === wf.id
-                                return (
-                                    <tr key={wf.id} className="hover:bg-muted/30 transition-colors">
-                                        <td className="px-5 py-3.5 max-w-xs">
-                                            {renamingId === wf.id ? (
-                                                <div className="flex items-center gap-1">
-                                                    <input
-                                                        autoFocus
-                                                        value={renameVal}
-                                                        onChange={(e) => setRenameVal(e.target.value)}
-                                                        onKeyDown={(e) => {
-                                                            if (e.key === "Enter") handleRenameSave(wf.id)
-                                                            if (e.key === "Escape") setRenamingId(null)
-                                                        }}
-                                                        className="px-2 py-0.5 text-sm font-semibold border rounded bg-background w-full"
-                                                    />
-                                                    <button onClick={() => handleRenameSave(wf.id)} className="p-1 text-emerald-600"><Check size={14} /></button>
-                                                    <button onClick={() => setRenamingId(null)} className="p-1 text-muted-foreground"><X size={14} /></button>
-                                                </div>
-                                            ) : (
-                                                <div
-                                                    onDoubleClick={() => { setRenamingId(wf.id); setRenameVal(wf.name) }}
-                                                    title="Double-click to rename"
-                                                    className="font-bold text-foreground cursor-pointer hover:text-primary truncate"
-                                                >
-                                                    {wf.name}
-                                                </div>
-                                            )}
-                                            <p className="text-xs text-muted-foreground truncate mt-0.5">{wf.description || "Visual DAG pipeline"}</p>
-                                        </td>
-                                        <td className="px-4 py-3.5">
-                                            <Badge variant={wf.status === "PUBLISHED" ? "default" : "secondary"} className="text-[10px] font-bold">
+            {/* Content */}
+            {loading && workflows.length === 0 ? (
+                <div className="border rounded-2xl bg-card p-16 flex justify-center">
+                    <Loader2 className="h-7 w-7 animate-spin text-muted-foreground" />
+                </div>
+            ) : filtered.length === 0 ? (
+                <div className="border rounded-2xl bg-card p-12 text-center text-muted-foreground space-y-2">
+                    <Workflow className="h-10 w-10 mx-auto opacity-30" />
+                    <p className="font-semibold text-foreground">No workflows found</p>
+                    <p className="text-xs">Click &quot;Bootstrap OlivePay&quot; to seed 8 production workflows or create one visually.</p>
+                </div>
+            ) : (
+                <>
+                    {/* MOBILE & TABLET CARDS (< lg) */}
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 lg:hidden">
+                        {filtered.map((wf) => {
+                            const coopObj = cooperatives.find((c) => String(c.id) === String(wf.cooperativeId))
+                            const isBusy = busyId === wf.id
+                            return (
+                                <div key={wf.id} className="rounded-2xl border border-border bg-card p-4 shadow-sm flex flex-col justify-between gap-3.5 min-w-0">
+                                    <div className="space-y-2 min-w-0">
+                                        <div className="flex items-start justify-between gap-2">
+                                            <Link href={`/copteller/superadmin/workflows/${wf.id}/edit`} className="font-bold text-sm text-foreground hover:text-primary leading-snug line-clamp-2">
+                                                {wf.name}
+                                            </Link>
+                                            <Badge variant={wf.status === "PUBLISHED" ? "default" : "secondary"} className="text-[10px] font-bold shrink-0 whitespace-nowrap">
                                                 {wf.status === "PUBLISHED" ? "Published" : "Draft"}
                                             </Badge>
-                                        </td>
-                                        <td className="px-4 py-3.5">
-                                            <span className="inline-flex items-center rounded-md border px-2 py-0.5 text-[11px] font-mono bg-background">
+                                        </div>
+                                        <p className="text-xs text-muted-foreground line-clamp-2">{wf.description || "Visual DAG pipeline"}</p>
+                                        <div className="flex flex-wrap items-center gap-1.5 pt-0.5">
+                                            <span className="inline-flex items-center rounded-md border px-2 py-0.5 text-[10px] font-mono bg-background whitespace-nowrap">
                                                 {wf.trigger}
-                                                {wf.cronExpression ? ` (${wf.cronExpression})` : ""}
                                             </span>
-                                        </td>
-                                        <td className="px-4 py-3.5">
-                                            <Badge variant="outline" className="text-[10px] gap-1">
-                                                <Building2 size={10} />
-                                                {coopObj?.name || "Global"}
+                                            <span className="text-[11px] font-mono text-muted-foreground whitespace-nowrap">
+                                                {wf.nodeCount} nodes
+                                            </span>
+                                            <Badge variant="outline" className="text-[10px] gap-1 whitespace-nowrap">
+                                                <Building2 size={10} /> {coopObj?.name || "Global"}
                                             </Badge>
-                                        </td>
-                                        <td className="px-4 py-3.5 text-xs font-mono text-muted-foreground">
-                                            {wf.nodeCount} node{wf.nodeCount !== 1 ? "s" : ""}
-                                        </td>
-                                        <td className="px-4 py-3.5 text-xs">
-                                            {wf.lastRunAt ? (
-                                                <div>
-                                                    <div className="text-foreground">{new Date(wf.lastRunAt).toLocaleString()}</div>
-                                                    <div className={`text-[10px] font-bold ${
-                                                        wf.lastRunStatus === "COMPLETED" ? "text-emerald-600" : wf.lastRunStatus === "FAILED" ? "text-red-500" : "text-amber-500"
-                                                    }`}>
-                                                        {wf.lastRunStatus}
-                                                    </div>
-                                                </div>
-                                            ) : (
-                                                <span className="text-muted-foreground italic">Never run</span>
-                                            )}
-                                        </td>
-                                        <td className="px-5 py-3.5 text-right">
-                                            <div className="flex items-center justify-end gap-1">
-                                                <Link
-                                                    href={`/copteller/superadmin/workflows/${wf.id}/edit`}
-                                                    className="inline-flex items-center gap-1 px-2.5 py-1.5 rounded-lg bg-emerald-600/10 text-emerald-700 dark:text-emerald-400 hover:bg-emerald-600/20 text-xs font-bold transition-colors"
-                                                    title="Open Visual Flow Studio"
-                                                >
-                                                    <Edit2 size={13} /> Studio
-                                                </Link>
-                                                <button
-                                                    disabled={isBusy}
-                                                    onClick={() => handleExecute(wf)}
-                                                    className="p-1.5 rounded-lg hover:bg-muted text-emerald-600 transition-colors disabled:opacity-40"
-                                                    title="Execute Now"
-                                                >
-                                                    <Play size={14} />
-                                                </button>
-                                                <button
-                                                    disabled={isBusy}
-                                                    onClick={() => handleToggleStatus(wf)}
-                                                    className="p-1.5 rounded-lg hover:bg-muted text-muted-foreground hover:text-foreground transition-colors"
-                                                    title={wf.status === "PUBLISHED" ? "Unpublish" : "Publish"}
-                                                >
-                                                    <ToggleLeft size={14} />
-                                                </button>
-                                                <button
-                                                    disabled={isBusy}
-                                                    onClick={() => handleDuplicate(wf)}
-                                                    className="p-1.5 rounded-lg hover:bg-muted text-muted-foreground hover:text-foreground transition-colors"
-                                                    title="Duplicate Workflow"
-                                                >
-                                                    <Copy size={14} />
-                                                </button>
-                                                <button
-                                                    disabled={isBusy}
-                                                    onClick={() => handleDelete(wf)}
-                                                    className="p-1.5 rounded-lg hover:bg-destructive/10 text-muted-foreground hover:text-destructive transition-colors"
-                                                    title="Delete Workflow"
-                                                >
-                                                    <Trash2 size={14} />
-                                                </button>
-                                            </div>
-                                        </td>
+                                        </div>
+                                    </div>
+
+                                    <div className="flex items-center justify-between gap-2 pt-3 border-t border-border/60">
+                                        <Link
+                                            href={`/copteller/superadmin/workflows/${wf.id}/edit`}
+                                            className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-emerald-600/10 text-emerald-700 dark:text-emerald-400 hover:bg-emerald-600/20 text-xs font-bold whitespace-nowrap"
+                                        >
+                                            <Edit2 size={13} /> Open Studio
+                                        </Link>
+                                        <div className="flex items-center gap-1 shrink-0">
+                                            <button disabled={isBusy} onClick={() => handleExecute(wf)} className="p-1.5 rounded-lg hover:bg-muted text-emerald-600" title="Execute Now">
+                                                <Play size={14} />
+                                            </button>
+                                            <button disabled={isBusy} onClick={() => handleToggleStatus(wf)} className="p-1.5 rounded-lg hover:bg-muted text-muted-foreground" title={wf.status === "PUBLISHED" ? "Unpublish" : "Publish"}>
+                                                <ToggleLeft size={14} />
+                                            </button>
+                                            <button disabled={isBusy} onClick={() => handleDuplicate(wf)} className="p-1.5 rounded-lg hover:bg-muted text-muted-foreground" title="Duplicate">
+                                                <Copy size={14} />
+                                            </button>
+                                            <button disabled={isBusy} onClick={() => handleDelete(wf)} className="p-1.5 rounded-lg hover:bg-destructive/10 text-muted-foreground hover:text-destructive" title="Delete">
+                                                <Trash2 size={14} />
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
+                            )
+                        })}
+                    </div>
+
+                    {/* DESKTOP TABLE (lg+) */}
+                    <div className="hidden lg:block w-full border rounded-2xl shadow-sm bg-card overflow-hidden">
+                        <div className="w-full overflow-x-auto">
+                            <table className="w-full text-sm text-left table-auto">
+                                <thead className="text-[11px] text-muted-foreground uppercase bg-muted/50 border-b">
+                                    <tr>
+                                        <th className="px-4 py-3.5 font-bold whitespace-nowrap">Workflow Name</th>
+                                        <th className="px-3 py-3.5 font-bold whitespace-nowrap">Status &amp; Trigger</th>
+                                        <th className="px-3 py-3.5 font-bold whitespace-nowrap">Nodes</th>
+                                        <th className="px-3 py-3.5 font-bold whitespace-nowrap">Last Run</th>
+                                        <th className="px-4 py-3.5 font-bold text-right whitespace-nowrap">Actions</th>
                                     </tr>
-                                )
-                            })}
-                        </tbody>
-                    </table>
-                )}
-            </div>
+                                </thead>
+                                <tbody className="divide-y divide-border/70">
+                                    {filtered.map((wf) => {
+                                        const coopObj = cooperatives.find((c) => String(c.id) === String(wf.cooperativeId))
+                                        const isBusy = busyId === wf.id
+                                        return (
+                                            <tr key={wf.id} className="hover:bg-muted/30 transition-colors">
+                                                <td className="px-4 py-3.5 max-w-[300px]">
+                                                    {renamingId === wf.id ? (
+                                                        <div className="flex items-center gap-1">
+                                                            <input
+                                                                autoFocus
+                                                                value={renameVal}
+                                                                onChange={(e) => setRenameVal(e.target.value)}
+                                                                onKeyDown={(e) => {
+                                                                    if (e.key === "Enter") handleRenameSave(wf.id)
+                                                                    if (e.key === "Escape") setRenamingId(null)
+                                                                }}
+                                                                className="px-2 py-0.5 text-sm font-semibold border rounded bg-background w-full"
+                                                            />
+                                                            <button onClick={() => handleRenameSave(wf.id)} className="p-1 text-emerald-600"><Check size={14} /></button>
+                                                            <button onClick={() => setRenamingId(null)} className="p-1 text-muted-foreground"><X size={14} /></button>
+                                                        </div>
+                                                    ) : (
+                                                        <div
+                                                            onDoubleClick={() => { setRenamingId(wf.id); setRenameVal(wf.name) }}
+                                                            title="Double-click to rename"
+                                                            className="font-bold text-foreground cursor-pointer hover:text-primary truncate"
+                                                        >
+                                                            {wf.name}
+                                                        </div>
+                                                    )}
+                                                    <p className="text-xs text-muted-foreground truncate mt-0.5">{wf.description || "Visual DAG pipeline"}</p>
+                                                </td>
+                                                <td className="px-3 py-3.5 whitespace-nowrap">
+                                                    <div className="flex items-center gap-2">
+                                                        <Badge variant={wf.status === "PUBLISHED" ? "default" : "secondary"} className="text-[10px] font-bold">
+                                                            {wf.status === "PUBLISHED" ? "Published" : "Draft"}
+                                                        </Badge>
+                                                        <span className="inline-flex items-center rounded-md border px-2 py-0.5 text-[10px] font-mono bg-background">
+                                                            {wf.trigger}
+                                                        </span>
+                                                        <span className="text-[10px] text-muted-foreground">· {coopObj?.name || "Global"}</span>
+                                                    </div>
+                                                </td>
+                                                <td className="px-3 py-3.5 text-xs font-mono text-muted-foreground whitespace-nowrap">
+                                                    {wf.nodeCount} node{wf.nodeCount !== 1 ? "s" : ""}
+                                                </td>
+                                                <td className="px-3 py-3.5 text-xs whitespace-nowrap">
+                                                    {wf.lastRunAt ? (
+                                                        <div>
+                                                            <div className="text-foreground">{new Date(wf.lastRunAt).toLocaleString()}</div>
+                                                            <div className={`text-[10px] font-bold ${
+                                                                wf.lastRunStatus === "COMPLETED" ? "text-emerald-600" : wf.lastRunStatus === "FAILED" ? "text-red-500" : "text-amber-500"
+                                                            }`}>
+                                                                {wf.lastRunStatus}
+                                                            </div>
+                                                        </div>
+                                                    ) : (
+                                                        <span className="text-muted-foreground italic">Never run</span>
+                                                    )}
+                                                </td>
+                                                <td className="px-4 py-3.5 text-right whitespace-nowrap">
+                                                    <div className="inline-flex items-center justify-end gap-1.5">
+                                                        <Link
+                                                            href={`/copteller/superadmin/workflows/${wf.id}/edit`}
+                                                            className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-emerald-600/10 text-emerald-700 dark:text-emerald-400 hover:bg-emerald-600/20 text-xs font-bold whitespace-nowrap shrink-0 transition-colors"
+                                                            title="Open Visual Flow Studio"
+                                                        >
+                                                            <Edit2 size={13} className="shrink-0" /> Studio
+                                                        </Link>
+                                                        <button
+                                                            disabled={isBusy}
+                                                            onClick={() => handleExecute(wf)}
+                                                            className="p-1.5 rounded-lg hover:bg-muted text-emerald-600 shrink-0 disabled:opacity-40"
+                                                            title="Execute Now"
+                                                        >
+                                                            <Play size={14} />
+                                                        </button>
+                                                        <button
+                                                            disabled={isBusy}
+                                                            onClick={() => handleToggleStatus(wf)}
+                                                            className="p-1.5 rounded-lg hover:bg-muted text-muted-foreground hover:text-foreground shrink-0"
+                                                            title={wf.status === "PUBLISHED" ? "Unpublish" : "Publish"}
+                                                        >
+                                                            <ToggleLeft size={14} />
+                                                        </button>
+                                                        <button
+                                                            disabled={isBusy}
+                                                            onClick={() => handleDuplicate(wf)}
+                                                            className="p-1.5 rounded-lg hover:bg-muted text-muted-foreground hover:text-foreground shrink-0"
+                                                            title="Duplicate Workflow"
+                                                        >
+                                                            <Copy size={14} />
+                                                        </button>
+                                                        <button
+                                                            disabled={isBusy}
+                                                            onClick={() => handleDelete(wf)}
+                                                            className="p-1.5 rounded-lg hover:bg-destructive/10 text-muted-foreground hover:text-destructive shrink-0"
+                                                            title="Delete Workflow"
+                                                        >
+                                                            <Trash2 size={14} />
+                                                        </button>
+                                                    </div>
+                                                </td>
+                                            </tr>
+                                        )
+                                    })}
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </>
+            )}
 
             {/* Import SDL Modal */}
             {showImportModal && (

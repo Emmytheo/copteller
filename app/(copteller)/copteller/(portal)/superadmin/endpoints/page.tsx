@@ -9,7 +9,6 @@ import {
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
 import { toast } from "sonner"
-import { CoptellerSubsystemNav } from "@/components/copteller/subsystem-nav"
 
 const METHOD_BADGE: Record<string, string> = {
     GET: "bg-blue-500/10 text-blue-600 dark:text-blue-400 border-blue-500/25",
@@ -178,14 +177,16 @@ export default function SuperadminEndpointsPage() {
     })
 
     const activeCount = endpoints.filter((e) => e.status === "active").length
-    const olivePayCount = endpoints.filter((e) => e.providerName.toLowerCase().includes("olive") || e.authOverride.startsWith("OLIVEPAY")).length
+    const olivePayCount = endpoints.filter(
+        (e) => e.providerName.toLowerCase().includes("olive") || e.authOverride.startsWith("OLIVEPAY")
+    ).length
     const healthyCount = Object.values(healthMap).filter((h) => h.state === "healthy").length
 
     return (
-        <div className="p-4 sm:p-8 max-w-7xl mx-auto flex flex-col gap-6 font-sans">
+        <div className="w-full min-w-0 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-5 sm:py-8 space-y-6 font-sans">
             {/* Header */}
             <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
-                <div className="space-y-1">
+                <div className="space-y-1 min-w-0">
                     <div className="inline-flex items-center gap-2 px-2.5 py-0.5 rounded-full bg-emerald-500/10 border border-emerald-500/25 text-emerald-600 dark:text-emerald-400 text-[10px] font-black uppercase tracking-wider">
                         <Globe className="h-3 w-3" /> Integration Gateway &bull; API Registry
                     </div>
@@ -195,40 +196,38 @@ export default function SuperadminEndpointsPage() {
                     </p>
                 </div>
 
-                <div className="flex items-center gap-2 shrink-0">
-                    <Button variant="outline" size="sm" onClick={fetchEndpoints} className="h-9 rounded-xl text-xs font-bold gap-1.5">
+                <div className="flex flex-wrap items-center gap-2 shrink-0">
+                    <Button variant="outline" size="sm" onClick={fetchEndpoints} className="h-9 rounded-xl text-xs font-bold gap-1.5 whitespace-nowrap">
                         <RefreshCw className={`h-3.5 w-3.5 ${loading ? "animate-spin" : ""}`} /> Refresh
                     </Button>
                     <Link
                         href="/copteller/superadmin/endpoints/new"
-                        className="bg-primary text-primary-foreground hover:bg-primary/90 inline-flex items-center justify-center font-black text-xs h-9 px-4 rounded-xl shadow-sm gap-1.5"
+                        className="bg-primary text-primary-foreground hover:bg-primary/90 inline-flex items-center justify-center font-black text-xs h-9 px-4 rounded-xl shadow-sm gap-1.5 whitespace-nowrap"
                     >
                         <PlusCircle className="h-4 w-4" /> Create API Endpoint
                     </Link>
                 </div>
             </div>
 
-            <CoptellerSubsystemNav group="automation" />
-
             {/* KPI Strip */}
-            <div className="grid grid-cols-2 lg:grid-cols-4 gap-3.5">
+            <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
                 {[
-                    { label: "Total Endpoints", value: endpoints.length, sub: `Across ${providers.length} service providers` },
+                    { label: "Total Endpoints", value: endpoints.length, sub: `Across ${providers.length} providers` },
                     { label: "Active Specs", value: activeCount, sub: `${endpoints.length - activeCount} draft / deprecated` },
                     { label: "OlivePay Rail Specs", value: olivePayCount, sub: "JWT + HMAC + Collections" },
-                    { label: "Verified Healthy", value: healthyCount, sub: "Click ping icon to probe live" },
+                    { label: "Verified Healthy", value: healthyCount, sub: "Tap Ping to probe live" },
                 ].map((k) => (
-                    <div key={k.label} className="rounded-2xl border border-border/80 bg-card p-4 shadow-sm space-y-1">
-                        <p className="text-[10px] font-black uppercase tracking-wider text-muted-foreground">{k.label}</p>
+                    <div key={k.label} className="rounded-2xl border border-border/80 bg-card p-4 shadow-sm space-y-1 min-w-0">
+                        <p className="text-[10px] font-black uppercase tracking-wider text-muted-foreground truncate">{k.label}</p>
                         <p className="text-2xl font-black font-mono text-foreground">{k.value}</p>
-                        <p className="text-[11px] text-muted-foreground">{k.sub}</p>
+                        <p className="text-[11px] text-muted-foreground truncate">{k.sub}</p>
                     </div>
                 ))}
             </div>
 
             {/* Filter Bar */}
-            <div className="flex flex-col sm:flex-row flex-wrap gap-2.5">
-                <div className="relative flex-1 min-w-[220px]">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-12 gap-2.5">
+                <div className="relative sm:col-span-2 lg:col-span-5">
                     <Search size={15} className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground pointer-events-none" />
                     <input
                         type="text"
@@ -246,7 +245,7 @@ export default function SuperadminEndpointsPage() {
                 <select
                     value={providerFilter}
                     onChange={(e) => setProviderFilter(e.target.value)}
-                    className="h-10 px-3 text-xs font-bold rounded-xl border bg-background"
+                    className="h-10 px-3 text-xs font-bold rounded-xl border bg-background lg:col-span-2"
                 >
                     <option value="ALL">All Providers</option>
                     {providers.map((p) => (
@@ -256,7 +255,7 @@ export default function SuperadminEndpointsPage() {
                 <select
                     value={methodFilter}
                     onChange={(e) => setMethodFilter(e.target.value)}
-                    className="h-10 px-3 text-xs font-mono font-bold rounded-xl border bg-background"
+                    className="h-10 px-3 text-xs font-mono font-bold rounded-xl border bg-background lg:col-span-2"
                 >
                     <option value="ALL">All Methods</option>
                     {["GET", "POST", "PUT", "PATCH", "DELETE"].map((m) => (
@@ -266,9 +265,9 @@ export default function SuperadminEndpointsPage() {
                 <select
                     value={statusFilter}
                     onChange={(e) => setStatusFilter(e.target.value)}
-                    className="h-10 px-3 text-xs font-bold rounded-xl border bg-background"
+                    className="h-10 px-3 text-xs font-bold rounded-xl border bg-background lg:col-span-1"
                 >
-                    <option value="ALL">All Statuses</option>
+                    <option value="ALL">Status</option>
                     <option value="active">Active</option>
                     <option value="draft">Draft</option>
                     <option value="deprecated">Deprecated</option>
@@ -276,7 +275,7 @@ export default function SuperadminEndpointsPage() {
                 <select
                     value={coopFilter}
                     onChange={(e) => setCoopFilter(e.target.value)}
-                    className="h-10 px-3 text-xs font-bold rounded-xl border bg-background"
+                    className="h-10 px-3 text-xs font-bold rounded-xl border bg-background lg:col-span-2"
                 >
                     <option value="ALL">All Tenancies</option>
                     <option value="GLOBAL">Global Only</option>
@@ -286,124 +285,209 @@ export default function SuperadminEndpointsPage() {
                 </select>
             </div>
 
-            {/* Table */}
-            <div className="border rounded-2xl shadow-sm bg-card overflow-x-auto">
-                {loading && endpoints.length === 0 ? (
-                    <div className="p-16 flex justify-center">
-                        <Loader2 className="h-7 w-7 animate-spin text-muted-foreground" />
-                    </div>
-                ) : filtered.length === 0 ? (
-                    <div className="p-12 text-center text-muted-foreground space-y-2">
-                        <Globe className="h-10 w-10 mx-auto opacity-30" />
-                        <p className="font-semibold text-foreground">No endpoints match your filters</p>
-                        <p className="text-xs">Create a custom API endpoint or bootstrap OlivePay from Infrastructure / Workflows.</p>
-                    </div>
-                ) : (
-                    <table className="w-full text-sm text-left min-w-[920px]">
-                        <thead className="text-[11px] text-muted-foreground uppercase bg-muted/50 border-b">
-                            <tr>
-                                <th className="px-5 py-3.5 font-bold">Endpoint</th>
-                                <th className="px-4 py-3.5 font-bold">Provider</th>
-                                <th className="px-4 py-3.5 font-bold">Method &amp; Path</th>
-                                <th className="px-4 py-3.5 font-bold">Auth Mode</th>
-                                <th className="px-4 py-3.5 font-bold">Scope</th>
-                                <th className="px-4 py-3.5 font-bold">Health</th>
-                                <th className="px-5 py-3.5 font-bold text-right">Actions</th>
-                            </tr>
-                        </thead>
-                        <tbody className="divide-y">
-                            {filtered.map((ep) => {
-                                const coopObj = cooperatives.find((c) => String(c.id) === String(ep.cooperativeId))
-                                const health = healthMap[ep.id]
-                                return (
-                                    <tr key={ep.id} className="hover:bg-muted/30 transition-colors">
-                                        <td className="px-5 py-3.5 max-w-xs">
-                                            <Link href={`/copteller/superadmin/endpoints/${ep.id}`} className="font-bold text-foreground hover:text-primary block truncate">
+            {/* Loading / Empty */}
+            {loading && endpoints.length === 0 ? (
+                <div className="border rounded-2xl bg-card p-16 flex justify-center">
+                    <Loader2 className="h-7 w-7 animate-spin text-muted-foreground" />
+                </div>
+            ) : filtered.length === 0 ? (
+                <div className="border rounded-2xl bg-card p-12 text-center text-muted-foreground space-y-2">
+                    <Globe className="h-10 w-10 mx-auto opacity-30" />
+                    <p className="font-semibold text-foreground">No endpoints match your filters</p>
+                    <p className="text-xs">Create a custom API endpoint or bootstrap OlivePay from Infrastructure / Workflows.</p>
+                </div>
+            ) : (
+                <>
+                    {/* MOBILE & TABLET CARD VIEW (< lg) */}
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 lg:hidden">
+                        {filtered.map((ep) => {
+                            const coopObj = cooperatives.find((c) => String(c.id) === String(ep.cooperativeId))
+                            const health = healthMap[ep.id]
+                            return (
+                                <div key={ep.id} className="rounded-2xl border border-border bg-card p-4 shadow-sm flex flex-col justify-between gap-3.5 min-w-0">
+                                    <div className="space-y-2 min-w-0">
+                                        <div className="flex items-start justify-between gap-2">
+                                            <Link href={`/copteller/superadmin/endpoints/${ep.id}`} className="font-bold text-sm text-foreground hover:text-primary leading-snug line-clamp-2">
                                                 {ep.name}
                                             </Link>
-                                            <p className="text-xs text-muted-foreground truncate mt-0.5">{ep.description || "REST endpoint specification"}</p>
-                                        </td>
-                                        <td className="px-4 py-3.5">
-                                            <Badge variant="outline" className="font-mono text-[10px]">{ep.providerName}</Badge>
-                                        </td>
-                                        <td className="px-4 py-3.5">
-                                            <div className="flex items-center gap-2 max-w-[260px]">
-                                                <span className={`font-mono text-[10px] font-black px-2 py-0.5 rounded-md border shrink-0 ${METHOD_BADGE[ep.method] || "bg-muted text-foreground"}`}>
-                                                    {ep.method}
-                                                </span>
-                                                <span className="font-mono text-xs text-muted-foreground truncate" title={ep.path}>
-                                                    {ep.path}
-                                                </span>
-                                            </div>
-                                        </td>
-                                        <td className="px-4 py-3.5">
-                                            <span className="font-mono text-[10px] px-2 py-0.5 rounded bg-muted text-foreground">
+                                            <span className={`font-mono text-[10px] font-black px-2 py-0.5 rounded-md border shrink-0 ${METHOD_BADGE[ep.method] || "bg-muted text-foreground"}`}>
+                                                {ep.method}
+                                            </span>
+                                        </div>
+                                        <p className="font-mono text-[11px] text-muted-foreground bg-muted/40 px-2.5 py-1.5 rounded-lg truncate" title={ep.path}>
+                                            {ep.path}
+                                        </p>
+                                        {ep.description && (
+                                            <p className="text-xs text-muted-foreground line-clamp-2">{ep.description}</p>
+                                        )}
+                                        <div className="flex flex-wrap items-center gap-1.5 pt-0.5">
+                                            <Badge variant="outline" className="font-mono text-[10px] max-w-[170px] truncate">{ep.providerName}</Badge>
+                                            <span className="font-mono text-[10px] px-2 py-0.5 rounded-md bg-muted text-foreground whitespace-nowrap">
                                                 {ep.authOverride}
                                             </span>
-                                        </td>
-                                        <td className="px-4 py-3.5">
-                                            <Badge variant="outline" className="text-[10px] gap-1">
+                                            <Badge variant="outline" className="text-[10px] gap-1 whitespace-nowrap">
                                                 <Building2 size={10} /> {coopObj?.name || "Global"}
                                             </Badge>
-                                        </td>
-                                        <td className="px-4 py-3.5">
-                                            <button
-                                                onClick={() => pingHealth(ep.id)}
-                                                className="inline-flex items-center gap-1.5 px-2 py-1 rounded-lg border bg-background hover:bg-muted text-[11px] font-mono transition-colors"
-                                                title="Run live health probe"
+                                        </div>
+                                    </div>
+
+                                    <div className="flex items-center justify-between gap-2 pt-3 border-t border-border/60">
+                                        <button
+                                            onClick={() => pingHealth(ep.id)}
+                                            className="inline-flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg border bg-background hover:bg-muted text-xs font-mono whitespace-nowrap"
+                                        >
+                                            {health?.state === "checking" ? (
+                                                <Loader2 size={12} className="animate-spin text-primary" />
+                                            ) : health?.state === "healthy" ? (
+                                                <CheckCircle2 size={12} className="text-emerald-500" />
+                                            ) : health?.state === "unhealthy" ? (
+                                                <XCircle size={12} className="text-red-500" />
+                                            ) : (
+                                                <Activity size={12} className="text-muted-foreground" />
+                                            )}
+                                            <span>{health?.state === "checking" ? "Ping..." : health ? `${health.ms ?? 0}ms` : "Ping"}</span>
+                                        </button>
+
+                                        <div className="flex items-center gap-1.5 shrink-0">
+                                            <Link
+                                                href={`/copteller/superadmin/endpoints/${ep.id}`}
+                                                className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-emerald-600/10 text-emerald-700 dark:text-emerald-400 hover:bg-emerald-600/20 text-xs font-bold whitespace-nowrap"
                                             >
-                                                {health?.state === "checking" ? (
-                                                    <Loader2 size={12} className="animate-spin text-primary" />
-                                                ) : health?.state === "healthy" ? (
-                                                    <CheckCircle2 size={12} className="text-emerald-500" />
-                                                ) : health?.state === "unhealthy" ? (
-                                                    <XCircle size={12} className="text-red-500" />
-                                                ) : (
-                                                    <Activity size={12} className="text-muted-foreground" />
-                                                )}
-                                                <span>
-                                                    {health?.state === "checking"
-                                                        ? "Ping..."
-                                                        : health
-                                                          ? `${health.ms ?? 0}ms`
-                                                          : "Ping"}
-                                                </span>
+                                                <Terminal size={13} /> Edit &amp; Test
+                                            </Link>
+                                            <button
+                                                disabled={busyId === ep.id}
+                                                onClick={() => handleClone(ep)}
+                                                className="p-1.5 rounded-lg hover:bg-muted text-muted-foreground"
+                                                title="Clone"
+                                            >
+                                                <Copy size={14} />
                                             </button>
-                                        </td>
-                                        <td className="px-5 py-3.5 text-right">
-                                            <div className="flex items-center justify-end gap-1">
-                                                <Link
-                                                    href={`/copteller/superadmin/endpoints/${ep.id}`}
-                                                    className="inline-flex items-center gap-1 px-2.5 py-1.5 rounded-lg bg-emerald-600/10 text-emerald-700 dark:text-emerald-400 hover:bg-emerald-600/20 text-xs font-bold transition-colors"
-                                                    title="Edit Schema & Run Test Console"
-                                                >
-                                                    <Terminal size={13} /> Edit &amp; Test
-                                                </Link>
-                                                <button
-                                                    disabled={busyId === ep.id}
-                                                    onClick={() => handleClone(ep)}
-                                                    className="p-1.5 rounded-lg hover:bg-muted text-muted-foreground hover:text-foreground"
-                                                    title="Clone Endpoint"
-                                                >
-                                                    <Copy size={14} />
-                                                </button>
-                                                <button
-                                                    disabled={busyId === ep.id}
-                                                    onClick={() => handleDelete(ep)}
-                                                    className="p-1.5 rounded-lg hover:bg-destructive/10 text-muted-foreground hover:text-destructive"
-                                                    title="Delete Endpoint"
-                                                >
-                                                    <Trash2 size={14} />
-                                                </button>
-                                            </div>
-                                        </td>
+                                            <button
+                                                disabled={busyId === ep.id}
+                                                onClick={() => handleDelete(ep)}
+                                                className="p-1.5 rounded-lg hover:bg-destructive/10 text-muted-foreground hover:text-destructive"
+                                                title="Delete"
+                                            >
+                                                <Trash2 size={14} />
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
+                            )
+                        })}
+                    </div>
+
+                    {/* DESKTOP TABLE VIEW (lg+) — Zero Clipping, Zero Wrapped Buttons */}
+                    <div className="hidden lg:block w-full border rounded-2xl shadow-sm bg-card overflow-hidden">
+                        <div className="w-full overflow-x-auto">
+                            <table className="w-full text-sm text-left table-auto">
+                                <thead className="text-[11px] text-muted-foreground uppercase bg-muted/50 border-b">
+                                    <tr>
+                                        <th className="px-4 py-3.5 font-bold whitespace-nowrap">Endpoint</th>
+                                        <th className="px-3 py-3.5 font-bold whitespace-nowrap">Method &amp; Path</th>
+                                        <th className="px-3 py-3.5 font-bold whitespace-nowrap">Provider &amp; Auth</th>
+                                        <th className="px-3 py-3.5 font-bold whitespace-nowrap">Health</th>
+                                        <th className="px-4 py-3.5 font-bold text-right whitespace-nowrap">Actions</th>
                                     </tr>
-                                )
-                            })}
-                        </tbody>
-                    </table>
-                )}
-            </div>
+                                </thead>
+                                <tbody className="divide-y divide-border/70">
+                                    {filtered.map((ep) => {
+                                        const coopObj = cooperatives.find((c) => String(c.id) === String(ep.cooperativeId))
+                                        const health = healthMap[ep.id]
+                                        return (
+                                            <tr key={ep.id} className="hover:bg-muted/30 transition-colors">
+                                                <td className="px-4 py-3.5 max-w-[260px]">
+                                                    <Link
+                                                        href={`/copteller/superadmin/endpoints/${ep.id}`}
+                                                        className="font-bold text-foreground hover:text-primary block truncate"
+                                                        title={ep.name}
+                                                    >
+                                                        {ep.name}
+                                                    </Link>
+                                                    <p className="text-xs text-muted-foreground truncate mt-0.5" title={ep.description}>
+                                                        {ep.description || "REST endpoint specification"}
+                                                    </p>
+                                                </td>
+                                                <td className="px-3 py-3.5 max-w-[260px]">
+                                                    <div className="flex items-center gap-2 min-w-0">
+                                                        <span className={`font-mono text-[10px] font-black px-2 py-0.5 rounded-md border shrink-0 ${METHOD_BADGE[ep.method] || "bg-muted text-foreground"}`}>
+                                                            {ep.method}
+                                                        </span>
+                                                        <span className="font-mono text-xs text-muted-foreground truncate" title={ep.path}>
+                                                            {ep.path}
+                                                        </span>
+                                                    </div>
+                                                </td>
+                                                <td className="px-3 py-3.5">
+                                                    <div className="flex flex-col gap-1 items-start">
+                                                        <Badge variant="outline" className="font-mono text-[10px] whitespace-nowrap max-w-[180px] truncate">
+                                                            {ep.providerName}
+                                                        </Badge>
+                                                        <div className="flex items-center gap-1.5">
+                                                            <span className="font-mono text-[10px] px-1.5 py-0.5 rounded bg-muted text-foreground whitespace-nowrap">
+                                                                {ep.authOverride}
+                                                            </span>
+                                                            <span className="text-[10px] text-muted-foreground whitespace-nowrap">
+                                                                · {coopObj?.name || "Global"}
+                                                            </span>
+                                                        </div>
+                                                    </div>
+                                                </td>
+                                                <td className="px-3 py-3.5 whitespace-nowrap">
+                                                    <button
+                                                        onClick={() => pingHealth(ep.id)}
+                                                        className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg border bg-background hover:bg-muted text-xs font-mono whitespace-nowrap transition-colors"
+                                                        title="Run live health probe"
+                                                    >
+                                                        {health?.state === "checking" ? (
+                                                            <Loader2 size={12} className="animate-spin text-primary" />
+                                                        ) : health?.state === "healthy" ? (
+                                                            <CheckCircle2 size={12} className="text-emerald-500" />
+                                                        ) : health?.state === "unhealthy" ? (
+                                                            <XCircle size={12} className="text-red-500" />
+                                                        ) : (
+                                                            <Activity size={12} className="text-muted-foreground" />
+                                                        )}
+                                                        <span>{health?.state === "checking" ? "Ping..." : health ? `${health.ms ?? 0}ms` : "Ping"}</span>
+                                                    </button>
+                                                </td>
+                                                <td className="px-4 py-3.5 text-right whitespace-nowrap">
+                                                    <div className="inline-flex items-center justify-end gap-1.5">
+                                                        <Link
+                                                            href={`/copteller/superadmin/endpoints/${ep.id}`}
+                                                            className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-emerald-600/10 text-emerald-700 dark:text-emerald-400 hover:bg-emerald-600/20 text-xs font-bold whitespace-nowrap shrink-0 transition-colors"
+                                                            title="Edit Schema & Run Test Console"
+                                                        >
+                                                            <Terminal size={13} className="shrink-0" /> Edit &amp; Test
+                                                        </Link>
+                                                        <button
+                                                            disabled={busyId === ep.id}
+                                                            onClick={() => handleClone(ep)}
+                                                            className="p-1.5 rounded-lg hover:bg-muted text-muted-foreground hover:text-foreground shrink-0"
+                                                            title="Clone Endpoint"
+                                                        >
+                                                            <Copy size={14} />
+                                                        </button>
+                                                        <button
+                                                            disabled={busyId === ep.id}
+                                                            onClick={() => handleDelete(ep)}
+                                                            className="p-1.5 rounded-lg hover:bg-destructive/10 text-muted-foreground hover:text-destructive shrink-0"
+                                                            title="Delete Endpoint"
+                                                        >
+                                                            <Trash2 size={14} />
+                                                        </button>
+                                                    </div>
+                                                </td>
+                                            </tr>
+                                        )
+                                    })}
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </>
+            )}
         </div>
     )
 }

@@ -14,7 +14,6 @@ import { Input } from "@/components/ui/input"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Badge } from "@/components/ui/badge"
 import { toast } from "sonner"
-import { CoptellerSubsystemNav } from "@/components/copteller/subsystem-nav"
 
 interface EndpointSpec {
     id: string
@@ -383,7 +382,7 @@ export default function SuperadminInfrastructurePage() {
     }
 
     return (
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 py-8 space-y-6 font-sans">
+        <div className="w-full min-w-0 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-5 sm:py-8 space-y-6 font-sans">
             <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
                 <div>
                     <span className="text-[10px] font-black bg-rose-500/10 text-rose-600 dark:text-rose-400 border border-rose-500/20 px-2 py-0.5 rounded-full uppercase tracking-wider">
@@ -406,7 +405,6 @@ export default function SuperadminInfrastructurePage() {
                 </div>
             </div>
 
-            <CoptellerSubsystemNav group="automation" />
 
             {/* Tabs */}
             <div className="flex gap-1 bg-slate-100 dark:bg-slate-900 p-1 rounded-xl w-fit overflow-x-auto">

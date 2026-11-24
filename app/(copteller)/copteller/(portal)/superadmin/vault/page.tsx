@@ -9,7 +9,6 @@ import {
 import { Button } from "@/components/ui/button"
 import { toast } from "sonner"
 import { SidePanelWrapper } from "@/components/side-panel-wrapper"
-import { CoptellerSubsystemNav } from "@/components/copteller/subsystem-nav"
 
 interface VaultSecret {
     id: string
@@ -208,7 +207,7 @@ export default function SuperadminVaultPage() {
     }
 
     return (
-        <div className="max-w-7xl mx-auto px-3 sm:px-6 py-4 sm:py-8 space-y-6 font-sans">
+        <div className="w-full min-w-0 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-5 sm:py-8 space-y-6 font-sans">
             <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-rose-500/10 pb-6">
                 <div>
                     <span className="text-[10px] font-black bg-rose-500/10 text-rose-600 dark:text-rose-400 border border-rose-500/20 px-2 py-0.5 rounded-full uppercase tracking-wider">
@@ -224,7 +223,6 @@ export default function SuperadminVaultPage() {
                 </Button>
             </div>
 
-            <CoptellerSubsystemNav group="automation" />
 
             {/* One-time rotated key banner */}
             {lastRotatedPlaintext && (
