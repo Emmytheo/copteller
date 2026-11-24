@@ -46,6 +46,13 @@ const formatSegment = (segment: string) => {
         settlements: "Float & Margin",
         governance: "Governance & Escrow",
         settings: "Governance Settings",
+        infrastructure: "System Infrastructure",
+        workflows: "Workflow Automations",
+        runs: "Run History",
+        "scheduled-jobs": "Scheduled Jobs",
+        endpoints: "API Endpoints",
+        vault: "Secret Vault",
+        mappings: "Provider Mappings",
     }
     return maps[segment] || segment.charAt(0).toUpperCase() + segment.slice(1)
 }

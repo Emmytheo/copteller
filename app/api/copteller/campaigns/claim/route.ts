@@ -1,5 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { getCoptellerPool } from '@/lib/copteller/pg'
+import { olivePayClient } from '@/lib/copteller/olivepay-client'
+import { ensureMemberOlivePaySubWallet } from '@/lib/copteller/olivepay-sync'
 
 export const dynamic = 'force-dynamic'
 
@@ -278,18 +280,65 @@ export async function POST(req: NextRequest) {
 
             await client.query('COMMIT')
 
+            // Dispatch live/sandbox OlivePay settlement rail (zero-priced SWF for wallet_credit, signed NIP payout for direct_bank_transfer)
+            let olivePaySettlement: any = null
+            try {
+                if (payoutMethod === 'wallet_credit') {
+                    const sw = await ensureMemberOlivePaySubWallet({
+                        userId: `CITIZEN_${(phoneNumber || recipient.phone_number || recipient.id).toString().trim()}`,
+                        email: `${(phoneNumber || recipient.phone_number || recipient.id).toString().trim()}@copteller.citizen.ng`,
+                        fullName: recipient.full_name,
+                        phoneNumber: String(phoneNumber || recipient.phone_number || '08000000000'),
+                        accountId: targetAccountId ? Number(targetAccountId) : null,
+                        customerId: targetCustomerId ? Number(targetCustomerId) : null,
+                    })
+                    const swf = await olivePayClient.fundSubWalletFromMain({
+                        subWalletId: sw.olivepay_sub_wallet_id,
+                        amountKobo,
+                        narration: `Grant ${recipient.claim_reference}`,
+                        idempotencyKey: txRef,
+                    })
+                    olivePaySettlement = {
+                        rail: 'subwallet_funding',
+                        railMode: swf.railMode,
+                        reference: swf.data?.reference || txRef,
+                        status: swf.data?.status || 'SETTLED',
+                        subWalletId: sw.olivepay_sub_wallet_id,
+                        virtualAccountNumber: sw.virtual_account_number,
+                    }
+                } else if (bankCode && accountNumber) {
+                    const payout = await olivePayClient.sendMerchantPayout({
+                        amountKobo,
+                        destinationBankCode: String(bankCode),
+                        destinationAccountNumber: String(accountNumber),
+                        beneficiaryName: String(accountName || recipient.full_name),
+                        narration: `Grant ${recipient.claim_reference}`,
+                        idempotencyKey: txRef,
+                    })
+                    olivePaySettlement = {
+                        rail: 'merchant_payout',
+                        railMode: payout.railMode,
+                        reference: payout.data?.reference || txRef,
+                        status: payout.data?.status || (payout.isPending ? 'PENDING' : 'SUCCESS'),
+                    }
+                }
+            } catch (opErr: any) {
+                console.warn('[Campaign Claim] OlivePay settlement mirror warning:', opErr.message)
+            }
+
             return NextResponse.json({
                 success: true,
                 claimReference: recipient.claim_reference,
                 transactionReference: txRef,
+                olivePaySettlement,
                 amount,
                 payoutMethod,
                 newlyProvisioned,
                 walletInfo: newlyProvisioned ? {
-                    accountNumber: assignedAccountNumber,
+                    accountNumber: olivePaySettlement?.virtualAccountNumber || assignedAccountNumber,
                     balance: amount,
                     owner: recipient.full_name,
-                    note: 'Your new Copteller Tier-1 wallet is ready with zero fees.'
+                    note: 'Your new Copteller OlivePay SubWallet is ready with zero fees.'
                 } : null,
                 message: `Successfully claimed ₦${amount.toLocaleString()} from ${recipient.campaign_title}.`
             })

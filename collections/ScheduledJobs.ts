@@ -1,4 +1,5 @@
 import type { CollectionConfig } from 'payload'
+import { coptellerAdminAccess } from './access'
 
 export const ScheduledJobs: CollectionConfig = {
     slug: 'scheduled-jobs',
@@ -9,10 +10,10 @@ export const ScheduledJobs: CollectionConfig = {
         description: 'Cron, one-time, and interval schedules for automated workflow runs.',
     },
     access: {
-        read: ({ req }) => req.user?.role === 'admin',
-        create: ({ req }) => req.user?.role === 'admin',
-        update: () => true,
-        delete: ({ req }) => req.user?.role === 'admin',
+        read: coptellerAdminAccess,
+        create: coptellerAdminAccess,
+        update: coptellerAdminAccess,
+        delete: coptellerAdminAccess,
     },
     fields: [
         {

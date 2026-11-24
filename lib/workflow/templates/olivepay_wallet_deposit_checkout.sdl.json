@@ -1,0 +1,18 @@
+{
+  "name": "OlivePay: Hosted Checkout & Recurring Mandate Collection",
+  "description": "Initializes OlivePay Hosted Checkout or Recurring Mandate for card/transfer funding and dues auto-debit.",
+  "trigger": "MANUAL",
+  "steps": [
+    {
+      "id": "init_checkout",
+      "type": "OLIVEPAY_INITIALIZE_COLLECTION",
+      "inputs": {
+        "amount": "{{TRIGGER_PAYLOAD.amount}}",
+        "email": "{{TRIGGER_PAYLOAD.email}}",
+        "name": "{{TRIGGER_PAYLOAD.name}}",
+        "callbackUrl": "{{TRIGGER_PAYLOAD.callbackUrl}}",
+        "reccurringID": "{{TRIGGER_PAYLOAD.reccurringID}}"
+      }
+    }
+  ]
+}

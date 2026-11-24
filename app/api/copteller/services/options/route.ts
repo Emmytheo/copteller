@@ -1,11 +1,19 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { getDb } from '@/lib/copteller/db'
 import { getCoptellerAuth } from '@/lib/copteller/auth'
-import { resolveSecret } from '@/lib/workflow/secrets/secretResolver'
-import { NIGERIAN_BANKS } from '@/lib/data/nigerian-banks'
+import { queryCopteller } from '@/lib/copteller/pg'
+import { ensureOlivePayTables, NIGERIAN_NIP_BANKS_6DIGIT } from '@/lib/copteller/olivepay-schema'
+import { executeResolvedEndpoint } from '@/lib/workflow/utils/apiResolver'
 
 export const dynamic = 'force-dynamic'
 
+/**
+ * GET /api/copteller/services/options?endpointId=...&textKey=name&valueKey=code
+ * Fixed to:
+ *  - Serve live 6-digit NIP banks from `copteller.olivepay_banks_cache` for bank selectors
+ *  - Execute any custom `api_select` endpoint via unified `executeResolvedEndpoint()` (supporting OlivePay JWT+HMAC & Sandbox)
+ *  - Never leak bogus hardcoded bank lists for unrelated failing endpoints!
+ */
 export async function GET(req: NextRequest) {
     try {
         const auth = await getCoptellerAuth(req)
@@ -20,105 +28,69 @@ export async function GET(req: NextRequest) {
             return NextResponse.json({ error: 'endpointId is required' }, { status: 400 })
         }
 
-        const payload = await getDb()
-
-        // 1. Fetch Endpoint specification
-        const endpointDoc = await payload.findByID({
-            collection: 'endpoints',
-            id: endpointId,
-            depth: 2,
-            overrideAccess: true,
-        }).catch(() => null)
-
-        if (!endpointDoc) {
-            // Fallback for banks lookup if endpoint isn't seeded
-            if (endpointId === 'banks' || endpointId === '2') {
-                return NextResponse.json({
-                    success: true,
-                    options: NIGERIAN_BANKS.map(b => ({ label: b.name, value: b.code }))
-                })
-            }
-            return NextResponse.json({ error: 'Endpoint specification not found' }, { status: 404 })
-        }
-
-        const provider = typeof endpointDoc.provider === 'object' ? endpointDoc.provider : null
-
-        // If this is the "Get Bank List" endpoint (Endpoint 2)
-        if (endpointDoc.name?.toLowerCase().includes('bank list') || endpointDoc.id === 2 || endpointDoc.id === '2') {
+        // Fast-path for NIP Bank dropdowns (6-digit NIP codes for OlivePay!)
+        if (endpointId === 'banks' || endpointId === 'olivepay_banks') {
+            await ensureOlivePayTables().catch(() => {})
+            const banksRes = await queryCopteller(
+                `SELECT bank_code AS code, bank_name AS name FROM copteller.olivepay_banks_cache WHERE is_active = TRUE ORDER BY bank_name ASC`
+            ).catch(() => ({ rows: [] as any[] }))
+            const rows = banksRes.rows.length > 0 ? banksRes.rows : NIGERIAN_NIP_BANKS_6DIGIT
             return NextResponse.json({
                 success: true,
-                options: NIGERIAN_BANKS.map(b => ({ label: b.name, value: b.code }))
+                source: 'olivepay_nip_banks',
+                options: rows.map((b: any) => ({
+                    label: String(b.name),
+                    value: String(b.code),
+                })),
             })
         }
 
-        // 2. Resolve Vault Credentials
-        let secretValue: string | null = null
-        if (provider?.secret) {
-            const secretId = typeof provider.secret === 'object' ? provider.secret.id : provider.secret
-            try {
-                secretValue = await resolveSecret(String(secretId))
-            } catch (err: any) {
-                console.warn('[Options API] Failed to decrypt vault secret:', err.message)
-            }
+        const payload = await getDb()
+        let endpointDoc: any = null
+        if (/^\d+$/.test(endpointId)) {
+            endpointDoc = await payload
+                .findByID({ collection: 'endpoints', id: Number(endpointId), depth: 2, overrideAccess: true })
+                .catch(() => null)
         }
-
-        // 3. Compose External URL
-        const basePath = provider?.baseUrl?.replace(/\/$/, '') || ''
-        const sep = endpointDoc.path.startsWith('/') ? '' : '/'
-        const url = `${basePath}${sep}${endpointDoc.path}`
-
-        const headers: Record<string, string> = {
-            'Accept': 'application/json',
-            'Content-Type': 'application/json'
-        }
-
-        if (secretValue && provider?.authType === 'BEARER') {
-            headers['Authorization'] = `Bearer ${secretValue}`
-        }
-
-        // 4. Fetch options from external endpoint with safe timeout
-        try {
-            const controller = new AbortController()
-            const timeout = setTimeout(() => controller.abort(), 3500)
-
-            const apiRes = await fetch(url, {
-                method: endpointDoc.method || 'GET',
-                headers,
-                signal: controller.signal
+        if (!endpointDoc) {
+            const byName = await payload.find({
+                collection: 'endpoints',
+                where: { name: { equals: endpointId } },
+                depth: 2,
+                limit: 1,
+                overrideAccess: true,
             })
-            clearTimeout(timeout)
-
-            if (apiRes.ok) {
-                const data = await apiRes.json()
-                const items = Array.isArray(data) ? data : (data.data || data.items || data.result || [])
-                
-                const formatted = items.map((item: any) => ({
-                    label: String(item[textKey] || item.label || item.name || item.title || item[valueKey] || ''),
-                    value: String(item[valueKey] || item.value || item.id || item.code || item[textKey] || '')
-                })).filter((o: any) => o.label && o.value)
-
-                if (formatted.length > 0) {
-                    return NextResponse.json({ success: true, options: formatted })
-                }
-            }
-        } catch (fetchErr: any) {
-            console.warn(`[Options API] Provider fetch failed: ${fetchErr.message}. Using structured fallbacks.`)
+            endpointDoc = byName.docs[0] || null
         }
 
-        // 5. Fallback if offline/sandbox
+        if (!endpointDoc) {
+            return NextResponse.json({ error: `Endpoint specification "${endpointId}" not found` }, { status: 404 })
+        }
+
+        const exec = await executeResolvedEndpoint(endpointDoc, { query: {} })
+        if (!exec.ok) {
+            return NextResponse.json(
+                { success: false, options: [], error: `Upstream endpoint returned HTTP ${exec.status}` },
+                { status: 502 }
+            )
+        }
+
+        const raw = exec.data
+        const items = Array.isArray(raw) ? raw : Array.isArray(raw?.data) ? raw.data : raw?.items || raw?.result || []
+        const formatted = (Array.isArray(items) ? items : [])
+            .map((item: any) => ({
+                label: String(item[textKey] || item.label || item.name || item.bankName || item.title || item[valueKey] || ''),
+                value: String(item[valueKey] || item.value || item.code || item.bankCode || item.id || item[textKey] || ''),
+            }))
+            .filter((o: any) => o.label && o.value)
+
         return NextResponse.json({
             success: true,
-            options: [
-                { label: 'Partner MFB Primary Settlement', value: '044' },
-                { label: 'Access Bank', value: '044' },
-                { label: 'First Bank of Nigeria', value: '011' },
-                { label: 'Zenith Bank', value: '057' },
-                { label: 'United Bank for Africa (UBA)', value: '033' },
-                { label: 'Guaranty Trust Bank (GTB)', value: '058' }
-            ]
+            railMode: exec.railMode,
+            options: formatted,
         })
     } catch (err: any) {
         console.error('Options API error:', err)
-        return NextResponse.json({ error: err.message || 'Failed to fetch options' }, { status: 500 })
+        return NextResponse.json({ error: err.message || 'Failed to fetch options', options: [] }, { status: 500 })
     }
 }

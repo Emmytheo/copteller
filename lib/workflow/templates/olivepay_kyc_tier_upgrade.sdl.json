@@ -1,0 +1,25 @@
+{
+  "name": "OlivePay: KYC Tier 2 / Tier 3 Upgrade Pipeline",
+  "description": "Upgrades a member SubWallet from Tier 1 to Tier 2 (synchronous NIN) or Tier 3 (Delegated KYC / document verification) and unlocks tier-locked wallets.",
+  "trigger": "MANUAL",
+  "steps": [
+    {
+      "id": "upgrade_tier",
+      "type": "OLIVEPAY_UPGRADE_TIER",
+      "inputs": {
+        "subWalletId": "{{TRIGGER_PAYLOAD.subWalletId}}",
+        "targetTier": "{{TRIGGER_PAYLOAD.targetTier}}",
+        "nin": "{{TRIGGER_PAYLOAD.nin}}",
+        "address": "{{TRIGGER_PAYLOAD.address}}"
+      },
+      "next": "refresh_wallet"
+    },
+    {
+      "id": "refresh_wallet",
+      "type": "OLIVEPAY_GET_SUBWALLET",
+      "inputs": {
+        "subWalletId": "{{TRIGGER_PAYLOAD.subWalletId}}"
+      }
+    }
+  ]
+}

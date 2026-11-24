@@ -1,4 +1,5 @@
 import type { CollectionConfig } from 'payload'
+import { coptellerAdminAccess } from './access'
 
 export const Services: CollectionConfig = {
     slug: 'services',
@@ -10,9 +11,9 @@ export const Services: CollectionConfig = {
     },
     access: {
         read: () => true, // Client needs to read available services
-        create: ({ req }) => req.user?.role === 'admin',
-        update: ({ req }) => req.user?.role === 'admin',
-        delete: ({ req }) => req.user?.role === 'admin',
+        create: coptellerAdminAccess,
+        update: coptellerAdminAccess,
+        delete: coptellerAdminAccess,
     },
     fields: [
         {

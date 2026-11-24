@@ -1,6 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { getCoptellerAuth } from '@/lib/copteller/auth'
 import { queryCopteller, getCoptellerPool } from '@/lib/copteller/pg'
+import { olivePayClient } from '@/lib/copteller/olivepay-client'
+import { ensureMemberOlivePaySubWallet, ensureCooperativeTreasurySubWallet } from '@/lib/copteller/olivepay-sync'
 
 export const dynamic = 'force-dynamic'
 
@@ -191,9 +193,40 @@ export async function POST(req: NextRequest) {
             WHERE member = $2 OR member = $3
         `, [amountKobo, auth.userId, String(userAcc.customer_id || -1)])
 
+        // 5. Mirror dues settlement onto OlivePay / Sandbox SubWallet W2W (Member -> Cooperative Treasury)
+        let olivePayRef: string | null = null
+        try {
+            const [memberSw, treasurySw] = await Promise.all([
+                ensureMemberOlivePaySubWallet({
+                    userId: auth.userId,
+                    email: auth.email,
+                    fullName: `${userAcc.first_name || ''} ${userAcc.last_name || ''}`.trim() || auth.displayName,
+                    accountId: Number(userAcc.id),
+                    customerId: userAcc.customer_id ? Number(userAcc.customer_id) : null,
+                }),
+                ensureCooperativeTreasurySubWallet({
+                    cooperativeId: 'union_dues_treasury',
+                    cooperativeName: 'Cooperative Union Dues',
+                }),
+            ])
+            if (memberSw?.olivepay_sub_wallet_id && treasurySw?.olivepay_sub_wallet_id) {
+                const w2w = await olivePayClient.transferSubWallet({
+                    sourceSubWalletId: memberSw.olivepay_sub_wallet_id,
+                    destinationSubWalletId: treasurySw.olivepay_sub_wallet_id,
+                    amountKobo,
+                    narration: `Union Dues ${description}`.slice(0, 25),
+                    idempotencyKey: reference,
+                })
+                if (w2w.ok) olivePayRef = w2w.data?.reference || reference
+            }
+        } catch (opErr: any) {
+            console.warn('[POST /api/copteller/dues] OlivePay W2W mirror skipped:', opErr?.message)
+        }
+
         return NextResponse.json({
             success: true,
             message: `₦${amountNaira.toLocaleString()} dues successfully paid and reconciled on union ledger!`,
+            olivePayReference: olivePayRef,
             receipt: {
                 reference,
                 receiptNumber,

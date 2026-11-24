@@ -15,9 +15,7 @@ export function invalidateCategoriesCache() {
 export async function GET(req: NextRequest) {
     try {
         const auth = await getCoptellerAuth(req)
-        if (!auth) {
-            return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
-        }
+        if (auth instanceof NextResponse) return auth
 
         const now = Date.now()
         if (cachedCategoriesList && now < cachedCategoriesListExpiresAt) {

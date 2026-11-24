@@ -1,45 +1,36 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { requireCoptellerRole } from '@/lib/copteller/auth'
 import { queryCopteller } from '@/lib/copteller/pg'
+import { encryptSecret } from '@/lib/workflow/secrets/encryption'
+import { ensureOlivePayTables } from '@/lib/copteller/olivepay-schema'
 import crypto from 'crypto'
 
 export const dynamic = 'force-dynamic'
 
-function getVaultEncryptionKey(): Buffer {
-    const raw = process.env.WORKFLOW_ENCRYPTION_KEY || ''
-    if (/^[0-9a-fA-F]{64}$/.test(raw)) {
-        return Buffer.from(raw, 'hex')
-    }
-    const fallbackSeed = process.env.PAYLOAD_SECRET || process.env.ADMIN_SECRET
-    if (!fallbackSeed) {
-        throw new Error('WORKFLOW_ENCRYPTION_KEY (or PAYLOAD_SECRET) is required to encrypt vault secrets.')
-    }
-    return crypto.createHash('sha256').update(`copteller-vault:${fallbackSeed}`).digest()
-}
+const VALID_SECRET_CATEGORIES = new Set([
+    'API_KEY',
+    'QORE_API_TOKEN',
+    'SMTP',
+    'OAUTH_TOKEN',
+    'DATABASE_URI',
+    'WEBHOOK_SECRET',
+    'CUSTOM',
+])
 
-function encryptVaultValue(plaintext: string): { ciphertext: string; iv: string; tag: string } {
-    const key = getVaultEncryptionKey()
-    const iv = crypto.randomBytes(12)
-    const cipher = crypto.createCipheriv('aes-256-gcm', key, iv)
-    const encrypted = Buffer.concat([cipher.update(plaintext, 'utf8'), cipher.final()])
-    const tag = cipher.getAuthTag()
-    return {
-        ciphertext: encrypted.toString('base64'),
-        iv: iv.toString('base64'),
-        tag: tag.toString('base64'),
-    }
-}
-
-function maskPreview(val?: string | null, isEncrypted?: boolean): string {
-    if (isEncrypted) return 'aes256gcm:••••••••••••••••'
-    if (!val) return '••••••••••••••••'
-    if (val.length <= 8) return '••••••••'
-    return `${val.slice(0, 6)}••••••••••••${val.slice(-2)}`
+function normalizeCategory(raw?: string): string {
+    const upper = String(raw || 'API_KEY').trim().toUpperCase()
+    if (VALID_SECRET_CATEGORIES.has(upper)) return upper
+    if (upper.includes('WEBHOOK')) return 'WEBHOOK_SECRET'
+    if (upper.includes('OAUTH')) return 'OAUTH_TOKEN'
+    if (upper.includes('SMTP') || upper.includes('EMAIL')) return 'SMTP'
+    if (upper.includes('QORE')) return 'QORE_API_TOKEN'
+    if (upper.includes('DB') || upper.includes('DATABASE')) return 'DATABASE_URI'
+    return 'API_KEY'
 }
 
 /**
  * GET /api/copteller/superadmin/vault
- * Fetches masked vault secret metadata and rotation/audit history.
+ * Fetches masked AES-256-GCM vault secrets, real OlivePay webhook delivery logs, and rotation audit history.
  * Plaintext secrets are NEVER returned on GET.
  */
 export async function GET(req: NextRequest) {
@@ -47,46 +38,68 @@ export async function GET(req: NextRequest) {
         const auth = await requireCoptellerRole(req, ['superadmin', 'bank_staff'])
         if (auth instanceof NextResponse) return auth
 
-        const secretsRes = await queryCopteller(`
-            SELECT id, name, category, description,
-                   (encrypted_value IS NOT NULL AND iv IS NOT NULL AND tag IS NOT NULL) AS encrypted,
-                   CASE WHEN encrypted_value IS NOT NULL THEN NULL ELSE LEFT(COALESCE(value, ''), 6) END AS legacy_prefix,
-                   last_rotated_at, created_at, updated_at
-            FROM copteller.secrets
-            ORDER BY created_at DESC
-        `)
+        await ensureOlivePayTables().catch(() => {})
+
+        const [secretsRes, auditRes, webhookRes, providersRes] = await Promise.all([
+            queryCopteller(`
+                SELECT id, name, category, description,
+                       (encrypted_value IS NOT NULL AND iv IS NOT NULL AND tag IS NOT NULL) AS encrypted,
+                       expires_at, last_rotated_at, created_at, updated_at
+                FROM copteller.secrets
+                ORDER BY updated_at DESC NULLS LAST, created_at DESC
+            `),
+            queryCopteller(`
+                SELECT id, actor_name, action, entity_type, entity_id, metadata, created_at
+                FROM copteller.copteller_audit_logs
+                WHERE action LIKE '%WEBHOOK%' OR action LIKE '%SECRET%' OR action LIKE '%API%' OR action LIKE '%OLIVEPAY%'
+                ORDER BY created_at DESC
+                LIMIT 25
+            `).catch(() => ({ rows: [] as any[] })),
+            queryCopteller(`
+                SELECT id, event_type, dedupe_reference, signature_valid, processing_status, error_message, rail_mode, processed_at, created_at
+                FROM copteller.olivepay_webhook_events
+                ORDER BY created_at DESC
+                LIMIT 40
+            `).catch(() => ({ rows: [] as any[] })),
+            queryCopteller(`
+                SELECT id, name, slug, secret_id, metadata
+                FROM copteller.service_providers
+            `).catch(() => ({ rows: [] as any[] })),
+        ])
+
+        const providerLinksBySecret = new Map<string, string[]>()
+        for (const p of providersRes.rows) {
+            const linkedKeys = [
+                p.secret_id ? String(p.secret_id) : null,
+                p.metadata?.secondarySecretId ? String(p.metadata.secondarySecretId) : null,
+                p.metadata?.webhookSecretId ? String(p.metadata.webhookSecretId) : null,
+            ].filter(Boolean) as string[]
+            for (const sid of linkedKeys) {
+                const list = providerLinksBySecret.get(sid) || []
+                if (!list.includes(p.name)) list.push(p.name)
+                providerLinksBySecret.set(sid, list)
+            }
+        }
 
         const sanitizedSecrets = secretsRes.rows.map((row) => ({
-            id: row.id,
+            id: String(row.id),
             name: row.name,
-            category: row.category,
-            description: row.description,
+            category: row.category || 'API_KEY',
+            description: row.description || '',
             encrypted: Boolean(row.encrypted),
-            value: row.encrypted
-                ? 'aes256gcm:••••••••••••••••'
-                : row.legacy_prefix
-                    ? `${row.legacy_prefix}••••••••••••`
-                    : '••••••••••••••••',
-            masked_value: row.encrypted
-                ? 'aes256gcm:••••••••••••••••'
-                : maskPreview(row.legacy_prefix, false),
+            masked_value: row.encrypted ? 'aes256gcm:••••••••••••••••' : 'unencrypted:••••••••',
+            linkedProviders: providerLinksBySecret.get(String(row.id)) || [],
+            expires_at: row.expires_at,
             last_rotated_at: row.last_rotated_at,
             created_at: row.created_at,
             updated_at: row.updated_at,
         }))
 
-        const eventsRes = await queryCopteller(`
-            SELECT id, action, entity_type, entity_id, metadata, created_at
-            FROM copteller.copteller_audit_logs
-            WHERE action LIKE '%WEBHOOK%' OR action LIKE '%SECRET%' OR action LIKE '%API%'
-            ORDER BY created_at DESC
-            LIMIT 15
-        `)
-
         return NextResponse.json({
             success: true,
             secrets: sanitizedSecrets,
-            events: eventsRes.rows,
+            webhooks: webhookRes.rows,
+            events: auditRes.rows,
         })
     } catch (error: any) {
         console.error('[Superadmin Vault GET] Error:', error)
@@ -96,7 +109,7 @@ export async function GET(req: NextRequest) {
 
 /**
  * POST /api/copteller/superadmin/vault
- * Encrypts and stores a new credential/API key using AES-256-GCM (never stores plaintext in `value`).
+ * Encrypts and stores a new credential using canonical AES-256-GCM (never stores plaintext in `value`).
  */
 export async function POST(req: NextRequest) {
     try {
@@ -104,43 +117,44 @@ export async function POST(req: NextRequest) {
         if (auth instanceof NextResponse) return auth
 
         const body = await req.json()
-        const { name, category = 'API_KEY', description = '', value, webhookUrl = '' } = body
+        const { name, category = 'API_KEY', description = '', value } = body
 
         if (!name || !value) {
-            return NextResponse.json({ error: 'Name and key value are required' }, { status: 400 })
+            return NextResponse.json({ error: 'Secret name and value are required' }, { status: 400 })
         }
 
-        const { ciphertext, iv, tag } = encryptVaultValue(String(value))
+        const safeCategory = normalizeCategory(category)
+        const { ciphertext, iv, tag } = await encryptSecret(String(value).trim())
 
-        const insertRes = await queryCopteller(`
-            INSERT INTO copteller.secrets (
+        const insertRes = await queryCopteller(
+            `INSERT INTO copteller.secrets (
                 name, category, description, value, encrypted_value, iv, tag,
                 last_rotated_at, created_at, updated_at
             ) VALUES (
                 $1, $2, $3, NULL, $4, $5, $6, NOW(), NOW(), NOW()
-            ) RETURNING id, name, category, description, last_rotated_at, created_at, updated_at
-        `, [String(name).trim(), category, description, ciphertext, iv, tag])
+            ) RETURNING id, name, category, description, last_rotated_at, created_at, updated_at`,
+            [String(name).trim(), safeCategory, String(description || ''), ciphertext, iv, tag]
+        )
 
         const secret = insertRes.rows[0]
 
-        await queryCopteller(`
-            INSERT INTO copteller.copteller_audit_logs (
+        await queryCopteller(
+            `INSERT INTO copteller.copteller_audit_logs (
                 actor_id, actor_role, actor_name, action, entity_type, entity_id,
                 metadata, created_at, updated_at
-            ) VALUES (
-                $1, 'superadmin', $2, 'SECRET_KEY_ADDED', 'SECRET', $3,
-                $4, NOW(), NOW()
-            )
-        `, [
-            auth.userId,
-            auth.email || 'Superadmin',
-            String(secret.id),
-            JSON.stringify({ name: secret.name, category: secret.category, encrypted: true, webhookUrl }),
-        ])
+            ) VALUES ($1, $2, $3, 'SECRET_KEY_ADDED', 'SECRET', $4, $5, NOW(), NOW())`,
+            [
+                auth.userId,
+                auth.role,
+                auth.displayName || auth.email || 'Superadmin',
+                String(secret.id),
+                JSON.stringify({ name: secret.name, category: secret.category, encrypted: true }),
+            ]
+        ).catch(() => {})
 
         return NextResponse.json({
             success: true,
-            secret: { ...secret, encrypted: true, value: 'aes256gcm:••••••••••••••••' },
+            secret: { ...secret, id: String(secret.id), encrypted: true, masked_value: 'aes256gcm:••••••••••••••••' },
         })
     } catch (error: any) {
         console.error('[Superadmin Vault POST] Error:', error)
@@ -149,9 +163,87 @@ export async function POST(req: NextRequest) {
 }
 
 /**
+ * PUT /api/copteller/superadmin/vault
+ * Updates/replaces an existing secret's encrypted value in-place (for third-party keys like OlivePay
+ * public/secret/rotated webhook secret) without breaking provider foreign-key links!
+ */
+export async function PUT(req: NextRequest) {
+    try {
+        const auth = await requireCoptellerRole(req, ['superadmin', 'bank_staff'])
+        if (auth instanceof NextResponse) return auth
+
+        const body = await req.json()
+        const { id, name, value, category, description } = body
+
+        if (!id && !name) {
+            return NextResponse.json({ error: 'Secret id or name is required' }, { status: 400 })
+        }
+        if (!value || !String(value).trim()) {
+            return NextResponse.json({ error: 'New secret value is required' }, { status: 400 })
+        }
+
+        const { ciphertext, iv, tag } = await encryptSecret(String(value).trim())
+        const isNumericId = id !== undefined && /^\d+$/.test(String(id))
+
+        const updateRes = await queryCopteller(
+            isNumericId
+                ? `UPDATE copteller.secrets
+                   SET value = NULL, encrypted_value = $1, iv = $2, tag = $3,
+                       category = COALESCE($4, category),
+                       description = COALESCE(NULLIF($5, ''), description),
+                       last_rotated_at = NOW(), updated_at = NOW()
+                   WHERE id = $6
+                   RETURNING id, name, category, description, last_rotated_at, created_at, updated_at`
+                : `UPDATE copteller.secrets
+                   SET value = NULL, encrypted_value = $1, iv = $2, tag = $3,
+                       category = COALESCE($4, category),
+                       description = COALESCE(NULLIF($5, ''), description),
+                       last_rotated_at = NOW(), updated_at = NOW()
+                   WHERE LOWER(name) = LOWER($6)
+                   RETURNING id, name, category, description, last_rotated_at, created_at, updated_at`,
+            [
+                ciphertext,
+                iv,
+                tag,
+                category ? normalizeCategory(category) : null,
+                description || '',
+                isNumericId ? Number(id) : String(name || id).trim(),
+            ]
+        )
+
+        const updated = updateRes.rows[0]
+        if (!updated) {
+            return NextResponse.json({ error: 'Secret not found' }, { status: 404 })
+        }
+
+        await queryCopteller(
+            `INSERT INTO copteller.copteller_audit_logs (
+                actor_id, actor_role, actor_name, action, entity_type, entity_id,
+                metadata, created_at, updated_at
+            ) VALUES ($1, $2, $3, 'SECRET_VALUE_UPDATED', 'SECRET', $4, $5, NOW(), NOW())`,
+            [
+                auth.userId,
+                auth.role,
+                auth.displayName || auth.email || 'Superadmin',
+                String(updated.id),
+                JSON.stringify({ name: updated.name, category: updated.category, updated_in_place: true }),
+            ]
+        ).catch(() => {})
+
+        return NextResponse.json({
+            success: true,
+            secret: { ...updated, id: String(updated.id), encrypted: true, masked_value: 'aes256gcm:••••••••••••••••' },
+        })
+    } catch (error: any) {
+        console.error('[Superadmin Vault PUT] Error:', error)
+        return NextResponse.json({ error: error.message || 'Internal server error' }, { status: 500 })
+    }
+}
+
+/**
  * PATCH /api/copteller/superadmin/vault
- * Cryptographically rotates a secret key, encrypts it with AES-256-GCM, clears plaintext `value`,
- * records rotation history, and returns the rotated key ONCE to the caller.
+ * Cryptographically generates and rotates an internal secret key using canonical AES-256-GCM,
+ * returning the newly generated key ONCE to the caller.
  */
 export async function PATCH(req: NextRequest) {
     try {
@@ -166,7 +258,7 @@ export async function PATCH(req: NextRequest) {
         }
 
         const newSecret = `${prefix}${crypto.randomBytes(24).toString('hex')}`
-        const { ciphertext, iv, tag } = encryptVaultValue(newSecret)
+        const { ciphertext, iv, tag } = await encryptSecret(newSecret)
 
         const isNumericId = /^\d+$/.test(String(id))
         const updateRes = await queryCopteller(
@@ -179,7 +271,7 @@ export async function PATCH(req: NextRequest) {
                 : `UPDATE copteller.secrets
                    SET value = NULL, encrypted_value = $1, iv = $2, tag = $3,
                        last_rotated_at = NOW(), updated_at = NOW()
-                   WHERE name = $4
+                   WHERE LOWER(name) = LOWER($4)
                    RETURNING id, name, category, description, last_rotated_at, created_at, updated_at`,
             [ciphertext, iv, tag, isNumericId ? Number(id) : String(id)]
         )
@@ -189,37 +281,77 @@ export async function PATCH(req: NextRequest) {
             return NextResponse.json({ error: 'Secret not found' }, { status: 404 })
         }
 
-        const rotationId = `rot_${Date.now()}`
-        await queryCopteller(`
-            INSERT INTO copteller.secrets_rotation_history (
+        await queryCopteller(
+            `INSERT INTO copteller.secrets_rotation_history (
                 _order, _parent_id, id, rotated_at, note
-            ) VALUES (
-                1, $1, $2, NOW(), 'AES-256-GCM cryptographic key rotation executed from Superadmin Vault'
-            )
-        `, [updated.id, rotationId]).catch(() => {})
+            ) VALUES (1, $1, $2, NOW(), 'AES-256-GCM cryptographic key rotation from Superadmin Vault')`,
+            [updated.id, `rot_${Date.now()}`]
+        ).catch(() => {})
 
-        await queryCopteller(`
-            INSERT INTO copteller.copteller_audit_logs (
+        await queryCopteller(
+            `INSERT INTO copteller.copteller_audit_logs (
                 actor_id, actor_role, actor_name, action, entity_type, entity_id,
                 metadata, created_at, updated_at
-            ) VALUES (
-                $1, 'superadmin', $2, 'SECRET_KEY_ROTATED', 'SECRET', $3,
-                $4, NOW(), NOW()
-            )
-        `, [
-            auth.userId,
-            auth.email || 'Superadmin',
-            String(updated.id),
-            JSON.stringify({ name: updated.name, encrypted: true, rotated_at: new Date().toISOString() }),
-        ])
+            ) VALUES ($1, $2, $3, 'SECRET_KEY_ROTATED', 'SECRET', $4, $5, NOW(), NOW())`,
+            [
+                auth.userId,
+                auth.role,
+                auth.displayName || auth.email || 'Superadmin',
+                String(updated.id),
+                JSON.stringify({ name: updated.name, encrypted: true, rotated_at: new Date().toISOString() }),
+            ]
+        ).catch(() => {})
 
         return NextResponse.json({
             success: true,
             rotatedKey: newSecret,
-            secret: { ...updated, encrypted: true, value: 'aes256gcm:••••••••••••••••' },
+            secret: { ...updated, id: String(updated.id), encrypted: true, masked_value: 'aes256gcm:••••••••••••••••' },
         })
     } catch (error: any) {
         console.error('[Superadmin Vault PATCH] Error:', error)
+        return NextResponse.json({ error: error.message || 'Internal server error' }, { status: 500 })
+    }
+}
+
+/**
+ * DELETE /api/copteller/superadmin/vault?id=...
+ * Deletes a vault secret after unlinking any provider references.
+ */
+export async function DELETE(req: NextRequest) {
+    try {
+        const auth = await requireCoptellerRole(req, ['superadmin', 'bank_staff'])
+        if (auth instanceof NextResponse) return auth
+
+        const { searchParams } = new URL(req.url)
+        const id = searchParams.get('id')
+        if (!id || !/^\d+$/.test(id)) {
+            return NextResponse.json({ error: 'Valid numeric secret id is required' }, { status: 400 })
+        }
+
+        const numId = Number(id)
+        await queryCopteller(`UPDATE copteller.service_providers SET secret_id = NULL WHERE secret_id = $1`, [numId]).catch(() => {})
+        const delRes = await queryCopteller(`DELETE FROM copteller.secrets WHERE id = $1 RETURNING id, name`, [numId])
+        if (delRes.rows.length === 0) {
+            return NextResponse.json({ error: 'Secret not found' }, { status: 404 })
+        }
+
+        await queryCopteller(
+            `INSERT INTO copteller.copteller_audit_logs (
+                actor_id, actor_role, actor_name, action, entity_type, entity_id,
+                metadata, created_at, updated_at
+            ) VALUES ($1, $2, $3, 'SECRET_KEY_DELETED', 'SECRET', $4, $5, NOW(), NOW())`,
+            [
+                auth.userId,
+                auth.role,
+                auth.displayName || auth.email || 'Superadmin',
+                String(numId),
+                JSON.stringify({ name: delRes.rows[0].name }),
+            ]
+        ).catch(() => {})
+
+        return NextResponse.json({ success: true, deleted: delRes.rows[0] })
+    } catch (error: any) {
+        console.error('[Superadmin Vault DELETE] Error:', error)
         return NextResponse.json({ error: error.message || 'Internal server error' }, { status: 500 })
     }
 }

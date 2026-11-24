@@ -1,0 +1,37 @@
+{
+  "name": "OlivePay: Verified SubWallet Bank Withdrawal (NIP)",
+  "description": "Runs mandatory NIP Name Enquiry, calculates fee + VAT via Fee Estimate, and executes an idempotent SubWallet NIP payout.",
+  "trigger": "MANUAL",
+  "steps": [
+    {
+      "id": "name_enquiry",
+      "type": "OLIVEPAY_NAME_ENQUIRY",
+      "inputs": {
+        "bankCode": "{{TRIGGER_PAYLOAD.destinationBankCode}}",
+        "accountNumber": "{{TRIGGER_PAYLOAD.destinationAccountNumber}}"
+      },
+      "next": "fee_estimate"
+    },
+    {
+      "id": "fee_estimate",
+      "type": "OLIVEPAY_FEE_ESTIMATE",
+      "inputs": {
+        "amount": "{{TRIGGER_PAYLOAD.amount}}"
+      },
+      "next": "execute_payout"
+    },
+    {
+      "id": "execute_payout",
+      "type": "OLIVEPAY_SUBWALLET_PAYOUT",
+      "inputs": {
+        "subWalletId": "{{TRIGGER_PAYLOAD.subWalletId}}",
+        "amount": "{{TRIGGER_PAYLOAD.amount}}",
+        "destinationBankCode": "{{TRIGGER_PAYLOAD.destinationBankCode}}",
+        "destinationAccountNumber": "{{TRIGGER_PAYLOAD.destinationAccountNumber}}",
+        "beneficiaryName": "{{name_enquiry.accountName}}",
+        "narration": "{{TRIGGER_PAYLOAD.narration}}",
+        "idempotencyKey": "{{TRIGGER_PAYLOAD.idempotencyKey}}"
+      }
+    }
+  ]
+}

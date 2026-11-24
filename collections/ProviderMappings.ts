@@ -1,4 +1,5 @@
 import type { CollectionConfig } from 'payload'
+import { coptellerAdminAccess } from './access'
 
 export const ProviderMappings: CollectionConfig = {
     slug: 'provider-mappings',
@@ -9,7 +10,10 @@ export const ProviderMappings: CollectionConfig = {
         defaultColumns: ['internalName', 'provider', 'relatedEntity', 'externalCode', 'lastAutoSync'],
     },
     access: {
-        read: () => true,
+        read: coptellerAdminAccess,
+        create: coptellerAdminAccess,
+        update: coptellerAdminAccess,
+        delete: coptellerAdminAccess,
     },
     fields: [
         {

@@ -1,0 +1,504 @@
+{
+  "apiVersion": "v1",
+  "name": "OlivePay Unified Financial Infrastructure",
+  "description": "Complete 24-endpoint declarative integration for OlivePay Collections, API Payouts (HMAC-SHA256), SubWallets & KYC Tiers 1-3, Escrow Holds, and One-Time Dynamic Virtual Accounts.",
+  "provider": {
+    "name": "OlivePay",
+    "slug": "olivepay",
+    "description": "Primary financial infrastructure powering Copteller SubWallets, Escrow Holds, NIP Payouts, Dynamic Virtual Accounts, and Hosted/Recurring Collections.",
+    "category": "PAYMENT",
+    "baseUrl": "https://api.olivepayment.com",
+    "authType": "OLIVEPAY_JWT",
+    "secretName": "OLIVEPAY_PUBLIC_KEY",
+    "secondarySecretName": "OLIVEPAY_SECRET_KEY",
+    "webhookSecretName": "OLIVEPAY_WEBHOOK_SECRET",
+    "healthCheckUrl": "https://api.olivepayment.com/api/v1/merchant-api/payouts/banks",
+    "priority": 1,
+    "groupTag": "olivepay",
+    "metadata": {
+      "responseWrapper": "OlivePay-Standard",
+      "successPath": "responseCode",
+      "successValue": "00",
+      "dataPath": "data",
+      "webhookPath": "/api/webhooks/olivepay",
+      "supportsSandboxRail": true
+    }
+  },
+  "endpoints": [
+    {
+      "name": "OlivePay: Get Bearer Token",
+      "description": "Exchanges public_key and private_key (x-www-form-urlencoded) for a 60-minute JWT Bearer token. Requires IP whitelist.",
+      "path": "/api/v1/auth/token",
+      "method": "POST",
+      "authOverride": "NONE",
+      "headers": [{ "key": "Content-Type", "value": "application/x-www-form-urlencoded" }],
+      "bodySchema": {
+        "type": "object",
+        "properties": {
+          "public_key": { "type": "string", "description": "OlivePay Public Key (P-...-K)" },
+          "private_key": { "type": "string", "description": "OlivePay Secret Key (S-...-K)" }
+        },
+        "required": ["public_key", "private_key"]
+      },
+      "responseSchema": { "dataPath": "data", "outputs": { "token": "data" } }
+    },
+    {
+      "name": "OlivePay: Initialize Payment",
+      "description": "Initializes a hosted checkout collection session. Amount is Naira string (e.g. '1000.00'). Public key auth; no IP whitelist required.",
+      "path": "/api/v1/Payments/Initialize",
+      "method": "POST",
+      "authOverride": "OLIVEPAY_PUBLIC_BEARER",
+      "bodySchema": {
+        "type": "object",
+        "properties": {
+          "transactionId": { "type": "string", "description": "Unique 6-30 char idempotency reference" },
+          "amount": { "type": "string", "description": "Amount in Naira string format e.g. 5000.00" },
+          "currency": { "type": "string", "description": "NGN" },
+          "email": { "type": "string" },
+          "name": { "type": "string" },
+          "phoneNumber": { "type": "string" },
+          "callbackUrl": { "type": "string" },
+          "isSplitPayment": { "type": "boolean" },
+          "applyConviniencyCharge": { "type": "boolean" },
+          "metadata": { "type": "object" }
+        },
+        "required": ["transactionId", "amount", "email", "callbackUrl"]
+      },
+      "responseSchema": {
+        "dataPath": "data",
+        "outputs": {
+          "paymentUrl": "data.paymentUrl",
+          "accessCode": "data.accessCode",
+          "transactionId": "data.transactionId"
+        }
+      }
+    },
+    {
+      "name": "OlivePay: Initialize Recurring Payment",
+      "description": "Initializes a recurring mandate collection using exact OlivePay fields reccurringID and isSplitpayment.",
+      "path": "/api/v1/Payments/InitializeRecurring",
+      "method": "POST",
+      "authOverride": "OLIVEPAY_PUBLIC_BEARER",
+      "bodySchema": {
+        "type": "object",
+        "properties": {
+          "transactionId": { "type": "string" },
+          "amount": { "type": "string", "description": "Naira string e.g. 20000.00" },
+          "currency": { "type": "string" },
+          "email": { "type": "string" },
+          "reccurringID": { "type": "string", "description": "OlivePay recurring plan ID (double-c spelling)" },
+          "callbackUrl": { "type": "string" },
+          "isSplitpayment": { "type": "boolean", "description": "Exact OlivePay lowercase-p spelling" },
+          "applyConviniencyCharge": { "type": "boolean" }
+        },
+        "required": ["transactionId", "amount", "email", "reccurringID", "callbackUrl"]
+      },
+      "responseSchema": {
+        "dataPath": "data",
+        "outputs": { "paymentUrl": "data.paymentUrl", "accessCode": "data.accessCode" }
+      }
+    },
+    {
+      "name": "OlivePay: Verify Payment",
+      "description": "Server-side payment verification for Collections transactions (429 rate-limited — call once on callback or reconcile).",
+      "path": "/api/v1/Payments/VerifyPayment",
+      "method": "POST",
+      "authOverride": "OLIVEPAY_PUBLIC_BEARER",
+      "bodySchema": {
+        "type": "object",
+        "properties": {
+          "transactionId": { "type": "string" }
+        },
+        "required": ["transactionId"]
+      },
+      "responseSchema": {
+        "dataPath": "data",
+        "outputs": {
+          "isSuccessful": "data.isSuccessful",
+          "status": "data.status",
+          "amount": "data.amount",
+          "paymentReference": "data.paymentReference"
+        }
+      }
+    },
+    {
+      "name": "OlivePay: Get NIP Bank List",
+      "description": "Fetches official 6-digit NIP bank codes for Nigerian interbank payouts (signed GET). Cache daily.",
+      "path": "/api/v1/merchant-api/payouts/banks",
+      "method": "GET",
+      "authOverride": "OLIVEPAY_JWT_HMAC",
+      "responseSchema": { "dataPath": "data", "outputs": { "banks": "data" } }
+    },
+    {
+      "name": "OlivePay: Account Name Enquiry",
+      "description": "Free NIP account name resolution (30 rpm rate limit). Mandatory before first payout to any recipient.",
+      "path": "/api/v1/merchant-api/payouts/name-enquiry",
+      "method": "POST",
+      "authOverride": "OLIVEPAY_JWT_HMAC",
+      "bodySchema": {
+        "type": "object",
+        "properties": {
+          "bankCode": { "type": "string", "description": "6-digit NIP bank code e.g. 000014" },
+          "accountNumber": { "type": "string", "description": "10-digit NUBAN" }
+        },
+        "required": ["bankCode", "accountNumber"]
+      },
+      "responseSchema": {
+        "dataPath": "data",
+        "outputs": {
+          "accountName": "data.accountName",
+          "accountNumber": "data.accountNumber",
+          "bankCode": "data.bankCode"
+        }
+      }
+    },
+    {
+      "name": "OlivePay: Master Wallet Balance",
+      "description": "Returns OlivePay merchant master treasury available_balance and status (ACTIVE|FROZEN|LOCKED).",
+      "path": "/api/v1/merchant-api/payouts/balance",
+      "method": "GET",
+      "authOverride": "OLIVEPAY_JWT_HMAC",
+      "responseSchema": {
+        "dataPath": "data",
+        "outputs": {
+          "availableBalance": "data.available_balance",
+          "status": "data.status",
+          "currency": "data.currency"
+        }
+      }
+    },
+    {
+      "name": "OlivePay: Payout Fee Estimate",
+      "description": "Computes exact processingFee, vat, and totalDebit in Naira before initiating a NIP payout.",
+      "path": "/api/v1/merchant-api/payouts/fee-estimate",
+      "method": "POST",
+      "authOverride": "OLIVEPAY_JWT_HMAC",
+      "bodySchema": {
+        "type": "object",
+        "properties": {
+          "amount": { "type": "number", "description": "Amount in Naira" }
+        },
+        "required": ["amount"]
+      },
+      "responseSchema": {
+        "dataPath": "data",
+        "outputs": {
+          "processingFee": "data.processingFee",
+          "vat": "data.vat",
+          "totalDebit": "data.totalDebit"
+        }
+      }
+    },
+    {
+      "name": "OlivePay: Send Merchant Payout",
+      "description": "Signed NIP payout from Master Wallet to external bank account. Requires Idempotency-Key header and <=25 char narration.",
+      "path": "/api/v1/merchant-api/payouts",
+      "method": "POST",
+      "authOverride": "OLIVEPAY_JWT_HMAC",
+      "bodySchema": {
+        "type": "object",
+        "properties": {
+          "amount": { "type": "number", "description": "Amount in Naira" },
+          "destinationBankCode": { "type": "string" },
+          "destinationAccountNumber": { "type": "string" },
+          "beneficiaryName": { "type": "string" },
+          "narration": { "type": "string", "description": "Max 25 chars [A-Za-z0-9 ._-]" }
+        },
+        "required": ["amount", "destinationBankCode", "destinationAccountNumber", "beneficiaryName", "narration"]
+      },
+      "responseSchema": {
+        "dataPath": "data",
+        "outputs": {
+          "reference": "data.reference",
+          "status": "data.status",
+          "totalDebit": "data.totalDebit"
+        }
+      }
+    },
+    {
+      "name": "OlivePay: Check Merchant Payout Status",
+      "description": "Polls settlement status for a signed Merchant NIP payout reference.",
+      "path": "/api/v1/merchant-api/payouts/{reference}/status",
+      "method": "GET",
+      "authOverride": "OLIVEPAY_JWT_HMAC",
+      "responseSchema": {
+        "dataPath": "data",
+        "outputs": { "status": "data.status", "providerReference": "data.providerReference" }
+      }
+    },
+    {
+      "name": "OlivePay: List Saved Beneficiaries",
+      "description": "Searches previously verified payout beneficiaries.",
+      "path": "/api/v1/merchant-api/payouts/beneficiaries",
+      "method": "GET",
+      "authOverride": "OLIVEPAY_JWT_HMAC",
+      "queryParamsSchema": {
+        "type": "object",
+        "properties": { "search": { "type": "string" } }
+      },
+      "responseSchema": { "dataPath": "data", "outputs": { "beneficiaries": "data" } }
+    },
+    {
+      "name": "OlivePay: Create SubWallet",
+      "description": "Provisions a Member or Cooperative Treasury SubWallet with static virtual account (async NUBAN assignment).",
+      "path": "/api/v1/subwallet",
+      "method": "POST",
+      "authOverride": "OLIVEPAY_JWT",
+      "bodySchema": {
+        "type": "object",
+        "properties": {
+          "walletHolderReference": { "type": "string" },
+          "firstName": { "type": "string" },
+          "lastName": { "type": "string" },
+          "email": { "type": "string" },
+          "phoneNumber": { "type": "string" },
+          "bvn": { "type": "string" },
+          "nin": { "type": "string" },
+          "canPayout": { "type": "boolean" },
+          "tier": { "type": "object" }
+        },
+        "required": ["walletHolderReference", "firstName", "lastName", "email", "phoneNumber"]
+      },
+      "responseSchema": {
+        "dataPath": "data",
+        "outputs": {
+          "subWalletId": "data.id",
+          "virtualAccountNumber": "data.virtual_account_number",
+          "status": "data.status",
+          "tier": "data.tier"
+        }
+      }
+    },
+    {
+      "name": "OlivePay: List SubWallets",
+      "description": "Lists all provisioned SubWallets on the merchant platform.",
+      "path": "/api/v1/subwallet",
+      "method": "GET",
+      "authOverride": "OLIVEPAY_JWT",
+      "responseSchema": { "dataPath": "data", "outputs": { "subWallets": "data" } }
+    },
+    {
+      "name": "OlivePay: Get SubWallet Details",
+      "description": "Fetches live SubWallet balances (available, lien, ledger), tier limits, tier lock state, and virtual account number.",
+      "path": "/api/v1/subwallet/{id}",
+      "method": "GET",
+      "authOverride": "OLIVEPAY_JWT",
+      "responseSchema": {
+        "dataPath": "data",
+        "outputs": {
+          "availableBalance": "data.available_balance",
+          "lienBalance": "data.lien_balance",
+          "ledgerBalance": "data.ledger_balance",
+          "virtualAccountNumber": "data.virtual_account_number",
+          "tier": "data.tier",
+          "isTierLocked": "data.is_tier_locked"
+        }
+      }
+    },
+    {
+      "name": "OlivePay: Upgrade SubWallet Tier",
+      "description": "Upgrades a SubWallet to Tier 2 (synchronous via NIN) or initiates Tier 3 (with optional Delegated KYC attestation).",
+      "path": "/api/v1/subwallet/{id}/tier-upgrade",
+      "method": "POST",
+      "authOverride": "OLIVEPAY_JWT",
+      "bodySchema": {
+        "type": "object",
+        "properties": {
+          "targetTier": { "type": "number", "description": "2 or 3" },
+          "nin": { "type": "string" },
+          "address": { "type": "string" },
+          "attestation": { "type": "object" }
+        },
+        "required": ["targetTier"]
+      },
+      "responseSchema": {
+        "dataPath": "data",
+        "outputs": { "tier": "data.tier", "requestId": "data.requestId", "status": "data.status" }
+      }
+    },
+    {
+      "name": "OlivePay: Upload Tier 3 Document",
+      "description": "Uploads KYC supporting document (proof_of_address, source_of_funds, government_id, selfie) via multipart/form-data (<=10MB).",
+      "path": "/api/v1/subwallet/{id}/tier-upgrade/documents",
+      "method": "POST",
+      "authOverride": "OLIVEPAY_JWT",
+      "bodySchema": {
+        "type": "object",
+        "properties": {
+          "requestId": { "type": "string" },
+          "documentType": { "type": "string", "enum": ["proof_of_address", "source_of_funds", "government_id", "selfie"] }
+        },
+        "required": ["requestId", "documentType"]
+      },
+      "responseSchema": { "dataPath": "data", "outputs": { "status": "data.status" } }
+    },
+    {
+      "name": "OlivePay: Wallet-to-Wallet Transfer",
+      "description": "Instant internal transfer between two OlivePay SubWallets (Member <-> Member or Member <-> Union Treasury). Zero NIP fee.",
+      "path": "/api/v1/subwallet/transfer",
+      "method": "POST",
+      "authOverride": "OLIVEPAY_JWT",
+      "bodySchema": {
+        "type": "object",
+        "properties": {
+          "sourceSubWalletId": { "type": "string" },
+          "destinationSubWalletId": { "type": "string" },
+          "amount": { "type": "number", "description": "Amount in Naira" },
+          "narration": { "type": "string" },
+          "idempotencyKey": { "type": "string" }
+        },
+        "required": ["sourceSubWalletId", "destinationSubWalletId", "amount", "idempotencyKey"]
+      },
+      "responseSchema": {
+        "dataPath": "data",
+        "outputs": { "reference": "data.reference", "status": "data.status", "commission": "data.commission_amount" }
+      }
+    },
+    {
+      "name": "OlivePay: SubWallet External Payout",
+      "description": "Withdraws from a Member or Union SubWallet to an external Nigerian bank via NIP. Checks tier limits and available_balance.",
+      "path": "/api/v1/subwallet/{id}/payout",
+      "method": "POST",
+      "authOverride": "OLIVEPAY_JWT",
+      "bodySchema": {
+        "type": "object",
+        "properties": {
+          "amount": { "type": "number", "description": "Amount in Naira" },
+          "destinationBankCode": { "type": "string" },
+          "destinationAccountNumber": { "type": "string" },
+          "beneficiaryName": { "type": "string" },
+          "narration": { "type": "string" },
+          "idempotencyKey": { "type": "string" }
+        },
+        "required": ["amount", "destinationBankCode", "destinationAccountNumber", "beneficiaryName", "idempotencyKey"]
+      },
+      "responseSchema": {
+        "dataPath": "data",
+        "outputs": { "reference": "data.reference", "status": "data.status", "totalDebit": "data.totalDebit" }
+      }
+    },
+    {
+      "name": "OlivePay: Fund SubWallet From Main Wallet",
+      "description": "Zero-priced signed transfer from Master Merchant Wallet into a Beneficiary SubWallet (SWF-... lifecycle).",
+      "path": "/api/v1/merchant-api/subwallet-funding",
+      "method": "POST",
+      "authOverride": "OLIVEPAY_JWT_HMAC",
+      "bodySchema": {
+        "type": "object",
+        "properties": {
+          "subWalletId": { "type": "string" },
+          "amount": { "type": "number", "description": "Amount in Naira" },
+          "narration": { "type": "string" }
+        },
+        "required": ["subWalletId", "amount", "narration"]
+      },
+      "responseSchema": {
+        "dataPath": "data",
+        "outputs": { "reference": "data.reference", "status": "data.status" }
+      }
+    },
+    {
+      "name": "OlivePay: Place Escrow Hold",
+      "description": "Freezes funds in a SubWallet (available_balance -> lien_balance). Holds never expire automatically — must be captured or released.",
+      "path": "/api/v1/subwallet/{id}/holds",
+      "method": "POST",
+      "authOverride": "OLIVEPAY_JWT",
+      "bodySchema": {
+        "type": "object",
+        "properties": {
+          "amount": { "type": "number", "description": "Amount in Naira" },
+          "reason": { "type": "string" },
+          "idempotencyKey": { "type": "string" },
+          "externalReference": { "type": "string" }
+        },
+        "required": ["amount", "reason", "idempotencyKey"]
+      },
+      "responseSchema": {
+        "dataPath": "data",
+        "outputs": { "holdId": "data.id", "reference": "data.reference", "status": "data.status" }
+      }
+    },
+    {
+      "name": "OlivePay: Capture Escrow Hold",
+      "description": "Settles an active hold (full or partial captureAmount) into destinationSubWalletId with optional commissionAmount.",
+      "path": "/api/v1/subwallet/holds/{holdId}/capture",
+      "method": "POST",
+      "authOverride": "OLIVEPAY_JWT",
+      "bodySchema": {
+        "type": "object",
+        "properties": {
+          "destinationSubWalletId": { "type": "string" },
+          "captureAmount": { "type": "number" },
+          "commissionAmount": { "type": "number" },
+          "narration": { "type": "string" }
+        }
+      },
+      "responseSchema": {
+        "dataPath": "data",
+        "outputs": { "status": "data.status", "capturedAmount": "data.capturedAmount" }
+      }
+    },
+    {
+      "name": "OlivePay: Release Escrow Hold",
+      "description": "Cancels an active hold and returns frozen lien_balance back to member available_balance.",
+      "path": "/api/v1/subwallet/holds/{holdId}/release",
+      "method": "POST",
+      "authOverride": "OLIVEPAY_JWT",
+      "bodySchema": {
+        "type": "object",
+        "properties": { "reason": { "type": "string" } }
+      },
+      "responseSchema": { "dataPath": "data", "outputs": { "status": "data.status" } }
+    },
+    {
+      "name": "OlivePay: Create One-Time Virtual Account",
+      "description": "Generates a single-use dynamic virtual account. CRITICAL: wire amount is INTEGER KOBO (e.g. 2500000 = NGN 25,000).",
+      "path": "/api/v1/merchant/virtual-accounts",
+      "method": "POST",
+      "authOverride": "OLIVEPAY_JWT",
+      "bodySchema": {
+        "type": "object",
+        "amountsInKobo": true,
+        "properties": {
+          "transactionId": { "type": "string" },
+          "amount": { "type": "number", "description": "INTEGER KOBO (e.g. 2500000 for NGN 25,000)" },
+          "customerName": { "type": "string" },
+          "customerEmail": { "type": "string" },
+          "bank": { "type": "string", "enum": ["OLIVEPAY", "WEMA"] },
+          "expiresInMinutes": { "type": "number", "description": "Default 30, max 1440" },
+          "applyConvenienceCharge": { "type": "boolean" }
+        },
+        "required": ["transactionId", "amount", "customerName", "customerEmail"]
+      },
+      "responseSchema": {
+        "dataPath": "data",
+        "outputs": {
+          "accountNumber": "data.accountNumber",
+          "bankName": "data.bankName",
+          "amountPayable": "data.amountPayable",
+          "expiresAt": "data.expiresAt",
+          "status": "data.status"
+        }
+      }
+    },
+    {
+      "name": "OlivePay: Check Virtual Account Status",
+      "description": "Polls payment status for a dynamic one-time virtual account by transactionId.",
+      "path": "/api/v1/merchant/virtual-accounts/{transactionId}",
+      "method": "GET",
+      "authOverride": "OLIVEPAY_JWT",
+      "responseSchema": {
+        "dataPath": "data",
+        "outputs": { "status": "data.status", "paidAmount": "data.paidAmount", "paidAt": "data.paidAt" }
+      }
+    }
+  ],
+  "mappings": [
+    {
+      "internalName": "NIP_BANKS",
+      "syncEndpoint": "OlivePay: Get NIP Bank List",
+      "syncKeyPath": "data",
+      "matchOn": "name"
+    }
+  ]
+}

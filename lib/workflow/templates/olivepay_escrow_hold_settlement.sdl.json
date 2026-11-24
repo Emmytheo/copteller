@@ -1,0 +1,18 @@
+{
+  "name": "OlivePay: Escrow Hold Placement & Settlement",
+  "description": "Locks member available_balance into lien_balance for Asset HP downpayments, Target Pockets, or Marketplace orders, then captures upon verification.",
+  "trigger": "MANUAL",
+  "steps": [
+    {
+      "id": "place_hold",
+      "type": "OLIVEPAY_PLACE_HOLD",
+      "inputs": {
+        "subWalletId": "{{TRIGGER_PAYLOAD.subWalletId}}",
+        "amount": "{{TRIGGER_PAYLOAD.amount}}",
+        "reason": "{{TRIGGER_PAYLOAD.reason}}",
+        "idempotencyKey": "{{TRIGGER_PAYLOAD.idempotencyKey}}",
+        "externalReference": "{{TRIGGER_PAYLOAD.externalReference}}"
+      }
+    }
+  ]
+}

@@ -1,6 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { getCoptellerAuth } from '@/lib/copteller/auth'
-import { getCoptellerPool } from '@/lib/copteller/pg'
+import { getCoptellerPool, queryCopteller } from '@/lib/copteller/pg'
+import { olivePayClient } from '@/lib/copteller/olivepay-client'
+import { ensureMemberOlivePaySubWallet } from '@/lib/copteller/olivepay-sync'
 
 export const dynamic = 'force-dynamic'
 
@@ -109,11 +111,43 @@ export async function POST(
 
             await client.query('COMMIT')
 
+            // Place matching OlivePay Escrow Hold (lien) when holds are enabled on active rail
+            let escrowHold: any = null
+            try {
+                const sw = await ensureMemberOlivePaySubWallet({
+                    userId: auth.userId,
+                    email: auth.email,
+                    fullName: auth.displayName,
+                    accountId: Number(pocket.acc_id),
+                })
+                if (sw?.rail_mode === 'sandbox_simulator') {
+                    await queryCopteller(
+                        `UPDATE copteller.olivepay_subwallets SET available_balance_kobo = GREATEST(available_balance_kobo, $1), ledger_balance_kobo = GREATEST(ledger_balance_kobo, $1) WHERE olivepay_sub_wallet_id = $2`,
+                        [primaryBalanceKobo, sw.olivepay_sub_wallet_id]
+                    )
+                }
+                const hRes = await olivePayClient.placeHold({
+                    subWalletId: sw.olivepay_sub_wallet_id,
+                    amountKobo,
+                    reason: `Target Pocket Stash: ${pocket.name}`,
+                    idempotencyKey: ref,
+                    externalReference: `pocket_${pocketId}`,
+                })
+                if (hRes.ok && hRes.data?.id) {
+                    escrowHold = { holdId: hRes.data.id, reference: hRes.data.reference, railMode: hRes.railMode }
+                    await queryCopteller(
+                        `UPDATE copteller.olivepay_holds SET entity_type = 'pocket', entity_id = $1 WHERE olivepay_hold_id = $2`,
+                        [String(pocketId), hRes.data.id]
+                    ).catch(() => {})
+                }
+            } catch {}
+
             return NextResponse.json({
                 success: true,
                 message: `Successfully stashed ₦${amountNum.toLocaleString()} into "${pocket.name}"`,
                 pocket: updatePocketRes.rows[0],
-                primaryBalanceNaira: newAccBalanceKobo / 100
+                primaryBalanceNaira: newAccBalanceKobo / 100,
+                escrowHold,
             })
         } catch (txErr) {
             await client.query('ROLLBACK')

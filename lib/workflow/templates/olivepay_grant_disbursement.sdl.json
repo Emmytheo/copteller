@@ -1,0 +1,17 @@
+{
+  "name": "OlivePay: Grant & Loan Disbursement (Master -> SubWallet)",
+  "description": "Zero-priced HMAC-signed transfer from Platform Master Wallet directly into a Beneficiary SubWallet (SWF-... rail).",
+  "trigger": "MANUAL",
+  "steps": [
+    {
+      "id": "fund_subwallet",
+      "type": "OLIVEPAY_FUND_SUBWALLET",
+      "inputs": {
+        "subWalletId": "{{TRIGGER_PAYLOAD.subWalletId}}",
+        "amount": "{{TRIGGER_PAYLOAD.amount}}",
+        "narration": "{{TRIGGER_PAYLOAD.narration}}",
+        "idempotencyKey": "{{TRIGGER_PAYLOAD.idempotencyKey}}"
+      }
+    }
+  ]
+}

@@ -1,6 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { getCoptellerAuth } from '@/lib/copteller/auth'
 import { getCoptellerPool } from '@/lib/copteller/pg'
+import { olivePayClient } from '@/lib/copteller/olivepay-client'
+import { ensureMemberOlivePaySubWallet, ensureCooperativeTreasurySubWallet } from '@/lib/copteller/olivepay-sync'
 
 export const dynamic = 'force-dynamic'
 
@@ -151,10 +153,40 @@ export async function POST(
 
             await client.query('COMMIT')
 
+            // Best-effort zero-fee OlivePay / Sandbox W2W disbursement from Treasury -> Recipient SubWallet
+            let olivePayRef: string | null = null
+            try {
+                const [treasurySw, recipientSw] = await Promise.all([
+                    ensureCooperativeTreasurySubWallet({
+                        cooperativeId: circle.cooperative_id || `circle_${circleId}`,
+                        cooperativeName: circle.name || `Circle ${circleId}`,
+                    }),
+                    ensureMemberOlivePaySubWallet({
+                        userId: String(recipient.user_id || recipientAcc.user_id || `member_${recipient.id}`),
+                        email: recipient.email || `member_${recipient.id}@copteller.app`,
+                        fullName: recipient.name || 'Circle Member',
+                        accountId: Number(recipientAcc.id),
+                    }),
+                ])
+                if (treasurySw?.olivepay_sub_wallet_id && recipientSw?.olivepay_sub_wallet_id) {
+                    const w2w = await olivePayClient.transferSubWallet({
+                        sourceSubWalletId: treasurySw.olivepay_sub_wallet_id,
+                        destinationSubWalletId: recipientSw.olivepay_sub_wallet_id,
+                        amountKobo: payoutKobo,
+                        narration: `Circle Payout R${circle.current_round}`.slice(0, 25),
+                        idempotencyKey: txRef,
+                    })
+                    if (w2w.ok) olivePayRef = w2w.data?.reference || txRef
+                }
+            } catch (opErr: any) {
+                console.warn('[Circle Payout] OlivePay W2W mirror skipped:', opErr?.message)
+            }
+
             return NextResponse.json({
                 success: true,
                 message: `Disbursed ₦${payoutAmount.toLocaleString()} to ${recipient.name} successfully!`,
                 reference: txRef,
+                olivePayReference: olivePayRef,
                 recipientName: recipient.name,
                 nextRound,
                 remainingPool: newPool

@@ -1,0 +1,18 @@
+{
+  "name": "OlivePay: One-Time Dynamic Virtual Account Deposit",
+  "description": "Generates a single-use exact-amount Virtual Account (kobo wire) for member wallet top-ups, invoices, or donor inflows.",
+  "trigger": "MANUAL",
+  "steps": [
+    {
+      "id": "mint_va",
+      "type": "OLIVEPAY_CREATE_VIRTUAL_ACCOUNT",
+      "inputs": {
+        "amount": "{{TRIGGER_PAYLOAD.amount}}",
+        "customerName": "{{TRIGGER_PAYLOAD.customerName}}",
+        "customerEmail": "{{TRIGGER_PAYLOAD.customerEmail}}",
+        "bank": "{{TRIGGER_PAYLOAD.bank}}",
+        "expiresInMinutes": "30"
+      }
+    }
+  ]
+}

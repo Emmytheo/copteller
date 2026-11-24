@@ -1,6 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { getCoptellerAuth } from '@/lib/copteller/auth'
 import { getCoptellerPool } from '@/lib/copteller/pg'
+import { olivePayClient } from '@/lib/copteller/olivepay-client'
+import { ensureMemberOlivePaySubWallet, ensureCooperativeTreasurySubWallet } from '@/lib/copteller/olivepay-sync'
 
 export const dynamic = 'force-dynamic'
 
@@ -137,10 +139,40 @@ export async function POST(
 
             await client.query('COMMIT')
 
+            // Best-effort zero-fee OlivePay / Sandbox SubWallet W2W mirroring to Circle Treasury
+            let olivePayRef: string | null = null
+            try {
+                const [memberSw, treasurySw] = await Promise.all([
+                    ensureMemberOlivePaySubWallet({
+                        userId: auth.userId,
+                        email: auth.email,
+                        fullName: auth.displayName,
+                        accountId: Number(userAcc.id),
+                    }),
+                    ensureCooperativeTreasurySubWallet({
+                        cooperativeId: circle.cooperative_id || `circle_${circleId}`,
+                        cooperativeName: circle.name || `Circle ${circleId}`,
+                    }),
+                ])
+                if (memberSw?.olivepay_sub_wallet_id && treasurySw?.olivepay_sub_wallet_id) {
+                    const w2w = await olivePayClient.transferSubWallet({
+                        sourceSubWalletId: memberSw.olivepay_sub_wallet_id,
+                        destinationSubWalletId: treasurySw.olivepay_sub_wallet_id,
+                        amountKobo: contribKobo,
+                        narration: `Circle ${circle.name || circleId}`.slice(0, 25),
+                        idempotencyKey: txRef,
+                    })
+                    if (w2w.ok) olivePayRef = w2w.data?.reference || txRef
+                }
+            } catch (opErr: any) {
+                console.warn('[Circle Contribute] OlivePay W2W mirror skipped:', opErr?.message)
+            }
+
             return NextResponse.json({
                 success: true,
                 message: `Successfully contributed ₦${contribAmount.toLocaleString()} to ${circle.name}!`,
                 reference: txRef,
+                olivePayReference: olivePayRef,
                 newPoolBalance: newPool,
                 userBalanceNaira: newAccBalKobo / 100
             })

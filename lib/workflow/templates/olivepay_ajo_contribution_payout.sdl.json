@@ -1,0 +1,18 @@
+{
+  "name": "OlivePay: Ajo & Cooperative Union Treasury Settlement",
+  "description": "Instant zero-fee SubWallet-to-SubWallet transfer for Ajo circle contributions, union dues collection, and rotational cycle payouts.",
+  "trigger": "MANUAL",
+  "steps": [
+    {
+      "id": "w2w_settle",
+      "type": "OLIVEPAY_SUBWALLET_TRANSFER",
+      "inputs": {
+        "sourceSubWalletId": "{{TRIGGER_PAYLOAD.sourceSubWalletId}}",
+        "destinationSubWalletId": "{{TRIGGER_PAYLOAD.destinationSubWalletId}}",
+        "amount": "{{TRIGGER_PAYLOAD.amount}}",
+        "narration": "{{TRIGGER_PAYLOAD.narration}}",
+        "idempotencyKey": "{{TRIGGER_PAYLOAD.idempotencyKey}}"
+      }
+    }
+  ]
+}

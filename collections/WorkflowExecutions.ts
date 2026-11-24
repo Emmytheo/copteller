@@ -1,4 +1,5 @@
 import type { CollectionConfig } from 'payload'
+import { coptellerAdminAccess } from './access'
 
 export const WorkflowExecutions: CollectionConfig = {
     slug: 'workflow-executions',
@@ -9,10 +10,10 @@ export const WorkflowExecutions: CollectionConfig = {
         description: 'Individual run records for every workflow execution.',
     },
     access: {
-        read: ({ req }) => req.user?.role === 'admin',
+        read: coptellerAdminAccess,
         create: () => true,  // internal server actions create records
         update: () => true,
-        delete: ({ req }) => req.user?.role === 'admin',
+        delete: coptellerAdminAccess,
     },
     fields: [
         {

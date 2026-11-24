@@ -2,30 +2,41 @@ import { NextRequest, NextResponse } from 'next/server'
 import { requireCoptellerRole } from '@/lib/copteller/auth'
 import { queryCopteller } from '@/lib/copteller/pg'
 import {
-    getActivePartnerBankConfig,
-    listSupportedPartnerBanks,
-    setPartnerBankRuntimeOverride,
+    getActivePartnerBankConfigAsync,
+    listSupportedPartnerBanksAsync,
+    setPartnerBankConfig,
     provisionCooperativeEscrowWithPartnerBank,
     type PartnerBankProvider,
 } from '@/lib/copteller/partner-bank-adapter'
 
 export const dynamic = 'force-dynamic'
 
+const VALID_PROVIDERS: PartnerBankProvider[] = [
+    'olivepay',
+    'sandbox_simulator',
+    'banksuite',
+    'kuda',
+    'qore',
+    'generic_mfb',
+]
+
 /**
  * GET /api/copteller/partner-bank
- * Public/portal-safe descriptor of Copteller's active settlement Partner Bank
- * (BankSuite MFB, Kuda Open API v2.1, Qore CBS, or Generic Partner MFB)
- * and live provisioned cooperative Escrow NUBANs from copteller.cooperatives.metadata.
+ * Public/portal-safe descriptor of Copteller's active settlement Partner Bank / Financial Rail
+ * (OlivePay, Internal Sandbox Testing Rail, BankSuite MFB, Kuda Open API v2.1, Qore CBS, or Generic Partner MFB).
  */
 export async function GET() {
     try {
-        const config = getActivePartnerBankConfig()
-        const coopsRes = await queryCopteller(
-            `SELECT id, name, status, metadata
-             FROM copteller.cooperatives
-             ORDER BY created_at DESC
-             LIMIT 100`
-        ).catch(() => ({ rows: [] as any[] }))
+        const [config, supportedProviders, coopsRes] = await Promise.all([
+            getActivePartnerBankConfigAsync(),
+            listSupportedPartnerBanksAsync(),
+            queryCopteller(
+                `SELECT id, name, status, metadata
+                 FROM copteller.cooperatives
+                 ORDER BY created_at DESC
+                 LIMIT 100`
+            ).catch(() => ({ rows: [] as any[] })),
+        ])
 
         const escrowPools = coopsRes.rows
             .map((c) => {
@@ -36,22 +47,16 @@ export async function GET() {
                     cooperativeId: Number(c.id),
                     cooperativeName: String(c.name),
                     escrowNuban: String(nuban),
+                    olivepaySubWalletId: meta.olivepay_sub_wallet_id || null,
                     partnerBankName: String(meta.partner_bank_name || config.bankName),
                     partnerProvider: String(meta.partner_bank_provider || config.provider),
                     boundAt: meta.escrow_bound_at || null,
                 }
             })
-            .filter(Boolean) as Array<{
-            cooperativeId: number
-            cooperativeName: string
-            escrowNuban: string
-            partnerBankName: string
-            partnerProvider: string
-            boundAt: string | null
-        }>
+            .filter(Boolean)
 
         const primaryEscrowNuban =
-            escrowPools[0]?.escrowNuban || config.escrowAccountNumber || null
+            (escrowPools[0] as any)?.escrowNuban || config.escrowAccountNumber || null
 
         return NextResponse.json({
             success: true,
@@ -61,7 +66,7 @@ export async function GET() {
                 escrowAccountNumber: primaryEscrowNuban || config.escrowAccountNumber || 'Dynamic Escrow Rail',
             },
             escrowPools,
-            supportedProviders: listSupportedPartnerBanks(),
+            supportedProviders,
         })
     } catch (err: any) {
         return NextResponse.json(
@@ -73,9 +78,8 @@ export async function GET() {
 
 /**
  * POST /api/copteller/partner-bank
- * Superadmin endpoint to switch Copteller's active Settlement Partner Bank
- * (BankSuite MFB, Kuda Open API v2.1, Qore CBS, or Generic Partner MFB)
- * or provision a new Partner Bank Virtual Escrow NUBAN for a cooperative.
+ * Superadmin endpoint to persistently switch Copteller's active Settlement Rail
+ * or provision a new Cooperative Escrow SubWallet / NUBAN.
  */
 export async function POST(req: NextRequest) {
     const auth = await requireCoptellerRole(req, ['superadmin', 'bank_staff'])
@@ -108,25 +112,28 @@ export async function POST(req: NextRequest) {
         }
 
         const provider = String(body.provider || '').toLowerCase() as PartnerBankProvider
-        if (!['banksuite', 'kuda', 'qore', 'generic_mfb'].includes(provider)) {
+        if (!VALID_PROVIDERS.includes(provider)) {
             return NextResponse.json(
-                { error: 'provider must be one of: banksuite, kuda, qore, generic_mfb' },
+                { error: `provider must be one of: ${VALID_PROVIDERS.join(', ')}` },
                 { status: 400 }
             )
         }
 
-        const updated = setPartnerBankRuntimeOverride({
-            provider,
-            ...(body.bankName ? { bankName: String(body.bankName).trim() } : {}),
-            ...(body.bankCode ? { bankCode: String(body.bankCode).trim() } : {}),
-            ...(body.apiBaseUrl ? { apiBaseUrl: String(body.apiBaseUrl).trim() } : {}),
-            ...(body.escrowAccountNumber ? { escrowAccountNumber: String(body.escrowAccountNumber).trim() } : {}),
-        })
+        const updated = await setPartnerBankConfig(
+            {
+                provider,
+                ...(body.bankName ? { bankName: String(body.bankName).trim() } : {}),
+                ...(body.bankCode ? { bankCode: String(body.bankCode).trim() } : {}),
+                ...(body.apiBaseUrl ? { apiBaseUrl: String(body.apiBaseUrl).trim() } : {}),
+                ...(body.escrowAccountNumber ? { escrowAccountNumber: String(body.escrowAccountNumber).trim() } : {}),
+            },
+            auth.email || auth.userId
+        )
 
         return NextResponse.json({
             success: true,
             partnerBank: updated,
-            supportedProviders: listSupportedPartnerBanks(),
+            supportedProviders: await listSupportedPartnerBanksAsync(),
         })
     } catch (err: any) {
         return NextResponse.json(

@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server'
 import { getPayload } from 'payload'
 import config from '@payload-config'
 import { compileSDLToFlow } from '@/lib/workflow/sdl'
+import { FlowToExecutionPlan } from '@/lib/workflow/executionPlan'
 import { requireCoptellerCronOrAdmin } from '@/lib/copteller/auth'
 import yaml from 'yaml'
 
@@ -12,57 +13,57 @@ export async function POST(req: NextRequest) {
     try {
         const contentType = req.headers.get('content-type') || ''
         const rawBody = await req.text()
-        
-        let sdlConfig;
+        const publish = new URL(req.url).searchParams.get('publish') !== '0'
 
-        // Support both strict JSON mapping and human-readable YAML
-        if (contentType.includes('yaml') || contentType.includes('x-yaml')) {
-            sdlConfig = yaml.parse(rawBody)
-        } else {
-            sdlConfig = JSON.parse(rawBody)
-        }
+        const sdlConfig =
+            contentType.includes('yaml') || contentType.includes('x-yaml')
+                ? yaml.parse(rawBody)
+                : JSON.parse(rawBody)
 
         if (!sdlConfig || !sdlConfig.name || !sdlConfig.steps) {
             return NextResponse.json({ error: 'Invalid SDL configuration.' }, { status: 400 })
         }
 
-        // Compile to React Flow engine format
         const compiledDoc = compileSDLToFlow(sdlConfig)
-        const payload = await getPayload({ config })
+        const planRes = FlowToExecutionPlan(compiledDoc.definition.nodes, compiledDoc.definition.edges)
+        const dataToSave: any = {
+            ...compiledDoc,
+            status: publish && !planRes.error ? 'PUBLISHED' : 'DRAFT',
+            ...(planRes.executionPlan ? { executionPlan: planRes.executionPlan } : {}),
+        }
 
-        // Check if updating an existing workflow (by name convention) or creating a new one
+        const payload = await getPayload({ config })
         const existingRes = await payload.find({
             collection: 'workflows',
             where: { name: { equals: compiledDoc.name } },
-            limit: 1
+            limit: 1,
+            overrideAccess: true,
         })
 
-        let savedDoc;
-        if (existingRes.docs.length > 0) {
-            const id = existingRes.docs[0].id
-            savedDoc = await payload.update({
-                collection: 'workflows',
-                id,
-                data: compiledDoc as any
-            })
-        } else {
-            savedDoc = await payload.create({
-                collection: 'workflows',
-                data: compiledDoc as any
-            })
-        }
+        const savedDoc =
+            existingRes.docs.length > 0
+                ? await payload.update({
+                      collection: 'workflows',
+                      id: existingRes.docs[0].id,
+                      data: dataToSave,
+                      overrideAccess: true,
+                  })
+                : await payload.create({
+                      collection: 'workflows',
+                      data: dataToSave,
+                      overrideAccess: true,
+                  })
 
         return NextResponse.json({
-            message: 'Workflow successfully compiled and saved.',
-            workflowId: savedDoc.id,
+            success: true,
+            message: 'Workflow successfully compiled, planned, and saved.',
+            workflowId: String(savedDoc.id),
+            status: dataToSave.status,
             nodesGenerated: compiledDoc.definition.nodes.length,
-            edgesGenerated: compiledDoc.definition.edges.length
+            edgesGenerated: compiledDoc.definition.edges.length,
+            phasesCompiled: planRes.executionPlan?.length || 0,
         })
-
     } catch (e: any) {
-        return NextResponse.json({ 
-            error: 'Failed to compile SDL', 
-            details: e.message 
-        }, { status: 500 })
+        return NextResponse.json({ error: 'Failed to compile SDL', details: e.message }, { status: 500 })
     }
 }

@@ -136,12 +136,22 @@ export default function ProductEditorPage() {
     const [isSaving, setIsSaving] = React.useState(false)
     const [isDeleting, setIsDeleting] = React.useState(false)
 
+    const normalizeFromApi = (raw: any) => ({
+        ...EMPTY,
+        ...raw,
+        // CRITICAL FIX (Phase 0.5): Convert stored Kobo -> Naira on load so repeated saves never multiply by 100x!
+        min_amount: raw.min_amount !== undefined && raw.min_amount !== null ? Number(raw.min_amount) / 100 : EMPTY.min_amount,
+        max_amount: raw.max_amount !== undefined && raw.max_amount !== null ? Number(raw.max_amount) / 100 : '',
+        sector_tags: raw.sector_tags || [],
+        form_schema: raw.form_schema || [],
+    })
+
     React.useEffect(() => {
         if (!isNew) {
             fetch(`/api/copteller/products/${id}`)
                 .then(r => r.json())
                 .then(d => {
-                    if (d.data) setProduct({ ...EMPTY, ...d.data, sector_tags: d.data.sector_tags || [], form_schema: d.data.form_schema || [] })
+                    if (d.data) setProduct(normalizeFromApi(d.data))
                 })
                 .catch(() => toast.error("Failed to load product."))
                 .finally(() => setIsLoading(false))
@@ -159,8 +169,10 @@ export default function ProductEditorPage() {
         const tId = toast.loading(isNew ? "Creating product template..." : "Saving changes...")
         const body = {
             ...product,
-            min_amount: Number(product.min_amount) * 100,
-            max_amount: product.max_amount ? Number(product.max_amount) * 100 : undefined,
+            min_amount: Math.round(Number(product.min_amount || 0) * 100),
+            max_amount: product.max_amount !== '' && product.max_amount !== undefined && product.max_amount !== null
+                ? Math.round(Number(product.max_amount) * 100)
+                : undefined,
             max_members_per_cycle: product.max_members_per_cycle ? Number(product.max_members_per_cycle) : undefined,
             max_interest_rate: product.max_interest_rate ? Number(product.max_interest_rate) : undefined,
         }
@@ -171,7 +183,7 @@ export default function ProductEditorPage() {
             if (data.data) {
                 toast.success(isNew ? "Product template created!" : "Saved successfully!", { id: tId })
                 if (isNew) router.push(`/copteller/superadmin/products/${data.data.id}`)
-                else setProduct({ ...EMPTY, ...data.data, sector_tags: data.data.sector_tags || [], form_schema: data.data.form_schema || [] })
+                else setProduct(normalizeFromApi(data.data))
             } else { toast.error(data.error || "Save failed.", { id: tId }) }
         } catch { toast.error("Network error.", { id: tId }) }
         finally { setIsSaving(false) }

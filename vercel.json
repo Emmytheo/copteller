@@ -1,0 +1,12 @@
+{
+  "crons": [
+    {
+      "path": "/api/cron/olivepay-reconcile",
+      "schedule": "*/10 * * * *"
+    },
+    {
+      "path": "/api/cron/workflows-tick",
+      "schedule": "*/15 * * * *"
+    }
+  ]
+}

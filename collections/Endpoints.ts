@@ -1,4 +1,5 @@
 import type { CollectionConfig } from 'payload'
+import { coptellerAdminAccess } from './access'
 
 export const Endpoints: CollectionConfig = {
     slug: 'endpoints',
@@ -9,7 +10,10 @@ export const Endpoints: CollectionConfig = {
         description: 'Dynamic API endpoint specifications enabling the workflow engine to execute generic HTTP requests.',
     },
     access: {
-        read: () => true, // Access logic usually mirrors ServiceProviders in a real app, assuming authenticated users for now
+        read: () => true,
+        create: coptellerAdminAccess,
+        update: coptellerAdminAccess,
+        delete: coptellerAdminAccess,
     },
     fields: [
         {
@@ -79,8 +83,14 @@ export const Endpoints: CollectionConfig = {
                 { label: 'None', value: 'NONE' },
                 { label: 'API Key (Body/Param Name)', value: 'API_KEY' },
                 { label: 'Bearer Token', value: 'BEARER' },
+                { label: 'Custom Header', value: 'HEADER' },
+                { label: 'Basic Auth', value: 'BASIC' },
+                { label: 'OAuth 2.0', value: 'OAUTH2' },
                 { label: 'Query Parameter', value: 'QUERY_PARAM' },
-                { label: 'Body Field', value: 'BODY_FIELD' }
+                { label: 'Body Field', value: 'BODY_FIELD' },
+                { label: 'OlivePay Public Key (Collections)', value: 'OLIVEPAY_PUBLIC_BEARER' },
+                { label: 'OlivePay JWT (SubWallet / Virtual Account)', value: 'OLIVEPAY_JWT' },
+                { label: 'OlivePay JWT + HMAC-SHA256 (Payouts / Funding)', value: 'OLIVEPAY_JWT_HMAC' },
             ],
             defaultValue: 'INHERIT',
             admin: { position: 'sidebar', description: 'Override the default provider auth method for this specific endpoint.' }

@@ -1,110 +1,84 @@
+import { ensureOlivePayTables } from '@/lib/copteller/olivepay-schema'
+import { upsertVaultSecret } from '@/lib/workflow/secrets/secretResolver'
+
 /**
  * Blueprint Ingestion Engine
- * 
+ *
  * Provides `ingestBlueprint()` — the declarative provisioner for API integrations.
- * Resolves all symbolic references (names/slugs) and upserts ServiceProviders,
- * Endpoints, and ProviderMappings in dependency order.
+ * Resolves all symbolic references (names/slugs) and upserts Secrets, ServiceProviders,
+ * Endpoints (preserving authOverride/authQueryParamKey/authBodyFieldKey!), and ProviderMappings.
  */
 
 export interface BlueprintEndpoint {
-    /** Human-readable label, used as symbolic reference in workflows */
     name: string
     description?: string
-    /** Relative path from provider base URL. Supports {variables}. */
     path: string
     method: 'GET' | 'POST' | 'PUT' | 'PATCH' | 'DELETE' | 'HEAD' | 'OPTIONS'
     status?: 'active' | 'deprecated' | 'draft'
-
-    /**
-     * Auth mode override at endpoint level. Inherits from provider if omitted.
-     * - 'QUERY_PARAM': Appends auth as ?authToken=... (Qore Corebanking style)
-     * - 'BODY_FIELD': Injects auth into request body (Qore Channels style)
-     * - 'BEARER': Authorization header override
-     */
-    authOverride?: 'QUERY_PARAM' | 'BODY_FIELD' | 'BEARER' | 'INHERIT'
-    /** If authOverride is QUERY_PARAM, the name of the query param key */
+    authOverride?:
+        | 'INHERIT'
+        | 'NONE'
+        | 'API_KEY'
+        | 'BEARER'
+        | 'HEADER'
+        | 'BASIC'
+        | 'OAUTH2'
+        | 'QUERY_PARAM'
+        | 'BODY_FIELD'
+        | 'OLIVEPAY_PUBLIC_BEARER'
+        | 'OLIVEPAY_JWT'
+        | 'OLIVEPAY_JWT_HMAC'
     authQueryParamKey?: string
-    /** If authOverride is BODY_FIELD, the name of the body field key */
     authBodyFieldKey?: string
-
     headers?: Array<{ key: string; value: string }>
-
     queryParamsSchema?: {
         type: 'object'
-        properties: Record<string, { type: string; description?: string; enum?: string[] }>
+        properties: Record<string, { type: string; description?: string; enum?: string[]; source?: string }>
         required?: string[]
     }
-
     bodySchema?: {
         type: 'object'
         properties: Record<string, { type: string; description?: string; enum?: string[] }>
         required?: string[]
-        /** 
-         * BankOne specific: amounts in kobo?
-         * Documents that this API's amounts must be ×100
-         */
         amountsInKobo?: boolean
     }
-
     responseSchema?: {
-        /**
-         * Dot-notation paths to extract success values from response.
-         * E.g. "IsSuccessful" for BankOne's standard wrapper.
-         */
         successPath?: string
         successValue?: string | boolean
-        /** Dot-notation path to the actual payload data e.g. "Payload" */
         dataPath?: string
-        /** Named output mappings: outputName → dot-notation path in response */
         outputs?: Record<string, string>
     }
 }
 
 export interface BlueprintMapping {
-    /**
-     * Internal name used as symbolic reference — must be unique per provider.
-     * This is also the string used for fuzzy matching during REGISTRY_SYNC.
-     */
     internalName: string
-    /** 
-     * Which endpoint (by name) is used for auto-sync data fetching.
-     * Must match an endpoint.name in this blueprint.
-     */
     syncEndpoint?: string
-    /** 
-     * Dot-notation path into the sync response to find the list of items.
-     * E.g. "Payload" or "Payload.Products"
-     */
     syncKeyPath?: string
-    /**
-     * Which field in each list item to fuzzy-match against internalName.
-     * E.g. "ProductName" or "Name"
-     */
     matchOn?: string
-    /** 
-     * If the externalCode is already known, it can be pre-seeded here.
-     * The REGISTRY_SYNC node will overwrite this if auto-sync succeeds.
-     */
     externalCode?: string
-    /** JSON schema mapping of internal field names → provider field names */
     schemaMapping?: Record<string, string>
 }
 
 export interface BlueprintProvider {
     name: string
-    /** Unique machine identifier — used for upsert matching */
     slug: string
     description?: string
     category: 'SMS' | 'EMAIL' | 'PAYMENT' | 'KYC' | 'CREDIT_BUREAU' | 'WEBHOOK' | 'CUSTOM'
     baseUrl: string
-    authType: 'NONE' | 'API_KEY' | 'BEARER' | 'BASIC' | 'OAUTH2'
-
-    /**
-     * Reference to a Vault secret by its `name` field.
-     * If the secret doesn't exist, a placeholder will be created.
-     */
+    authType:
+        | 'NONE'
+        | 'API_KEY'
+        | 'BEARER'
+        | 'HEADER'
+        | 'QUERY_PARAM'
+        | 'BASIC'
+        | 'OAUTH2'
+        | 'OLIVEPAY_PUBLIC_BEARER'
+        | 'OLIVEPAY_JWT'
+        | 'OLIVEPAY_JWT_HMAC'
     secretName?: string
-
+    secondarySecretName?: string
+    webhookSecretName?: string
     defaultHeaders?: Array<{ key: string; value: string }>
     healthCheckUrl?: string
     metadata?: Record<string, any>
@@ -113,9 +87,7 @@ export interface BlueprintProvider {
 }
 
 export interface BlueprintSDL {
-    /** Blueprint format version for future compatibility */
     apiVersion: 'v1'
-    /** A human-readable name for this integration blueprint */
     name: string
     description?: string
     provider: BlueprintProvider
@@ -125,48 +97,71 @@ export interface BlueprintSDL {
 
 type IngestResult = {
     provider: { id: string; name: string; upserted: 'created' | 'updated' }
+    secrets: Array<{ id: number; name: string; created: boolean }>
     endpoints: Array<{ id: string; name: string; upserted: 'created' | 'updated' }>
     mappings: Array<{ id: string; name: string; upserted: 'created' | 'updated' }>
     errors: string[]
 }
 
 export async function ingestBlueprint(sdl: BlueprintSDL, payload: any): Promise<IngestResult> {
+    await ensureOlivePayTables().catch(() => {})
+
     const result: IngestResult = {
         provider: { id: '', name: sdl.provider.name, upserted: 'created' },
+        secrets: [],
         endpoints: [],
         mappings: [],
-        errors: []
+        errors: [],
     }
 
-    // ── 1. Upsert Provider ───────────────────────────────────────────────────
-    let providerId: string
+    // ── 1. Provision Vault Secrets (Primary, Secondary, Webhook) ─────────────
+    let primarySecretId: number | null = null
+    let secondarySecretId: number | null = null
+    let webhookSecretId: number | null = null
 
-    let existingSecretId: string | null = null
-
-    if (sdl.provider.secretName) {
+    const provisionSecret = async (
+        secretName: string | undefined,
+        category: string,
+        envKey?: string
+    ): Promise<number | null> => {
+        if (!secretName) return null
         try {
-            const secretRes = await payload.find({
-                collection: 'secrets',
-                where: { name: { equals: sdl.provider.secretName } },
-                limit: 1
+            const envVal = envKey ? process.env[envKey]?.trim() : undefined
+            const valueToStore =
+                envVal || `PLACEHOLDER_FOR_${secretName.toUpperCase().replace(/[^A-Z0-9]+/g, '_')}`
+            const saved = await upsertVaultSecret({
+                name: secretName,
+                category,
+                value: valueToStore,
+                description: `Vault credential for Blueprint "${sdl.name}". Replace placeholder in Superadmin Vault.`,
+                preserveExistingNonPlaceholder: true,
             })
-            if (secretRes.docs.length > 0) {
-                existingSecretId = secretRes.docs[0].id
-            } else {
-                // Create a placeholder secret
-                const newSecret = await payload.create({
-                    collection: 'secrets',
-                    data: {
-                        name: sdl.provider.secretName,
-                        value: `PLACEHOLDER_FOR_${sdl.provider.secretName.toUpperCase().replace(/\s+/g, '_')}`,
-                        description: `Auto-created by Blueprint: ${sdl.name}. Replace with the actual credential.`
-                    }
-                })
-                existingSecretId = newSecret.id
-            }
+            result.secrets.push(saved)
+            return saved.id
         } catch (e: any) {
-            result.errors.push(`Failed to resolve secret "${sdl.provider.secretName}": ${e.message}`)
+            result.errors.push(`Failed to provision secret "${secretName}": ${e.message}`)
+            return null
         }
+    }
+
+    primarySecretId = await provisionSecret(sdl.provider.secretName, 'API_KEY', sdl.provider.secretName)
+    secondarySecretId = await provisionSecret(
+        sdl.provider.secondarySecretName,
+        'API_KEY',
+        sdl.provider.secondarySecretName
+    )
+    webhookSecretId = await provisionSecret(
+        sdl.provider.webhookSecretName,
+        'WEBHOOK_SECRET',
+        sdl.provider.webhookSecretName
+    )
+
+    // ── 2. Upsert Service Provider ───────────────────────────────────────────
+    let providerId = ''
+    const mergedMetadata = {
+        ...(sdl.provider.metadata || {}),
+        ...(secondarySecretId ? { secondarySecretId, secondarySecretName: sdl.provider.secondarySecretName } : {}),
+        ...(webhookSecretId ? { webhookSecretId, webhookSecretName: sdl.provider.webhookSecretName } : {}),
     }
 
     const providerData = {
@@ -176,58 +171,64 @@ export async function ingestBlueprint(sdl: BlueprintSDL, payload: any): Promise<
         category: sdl.provider.category,
         baseUrl: sdl.provider.baseUrl,
         authType: sdl.provider.authType,
-        ...(existingSecretId ? { secret: existingSecretId } : {}),
+        ...(primarySecretId ? { secret: primarySecretId } : {}),
         defaultHeaders: sdl.provider.defaultHeaders ?? [],
         healthCheckUrl: sdl.provider.healthCheckUrl,
-        metadata: sdl.provider.metadata,
+        metadata: mergedMetadata,
         priority: sdl.provider.priority ?? 1,
         groupTag: sdl.provider.groupTag,
-        isActive: true
+        isActive: true,
     }
 
     try {
         const existingProvider = await payload.find({
             collection: 'service-providers',
             where: { slug: { equals: sdl.provider.slug } },
-            limit: 1
+            limit: 1,
+            overrideAccess: true,
         })
 
         if (existingProvider.docs.length > 0) {
             const updated = await payload.update({
                 collection: 'service-providers',
                 id: existingProvider.docs[0].id,
-                data: providerData
+                data: providerData,
+                overrideAccess: true,
             })
             providerId = updated.id
-            result.provider = { id: providerId, name: sdl.provider.name, upserted: 'updated' }
+            result.provider = { id: String(providerId), name: sdl.provider.name, upserted: 'updated' }
         } else {
             const created = await payload.create({
                 collection: 'service-providers',
-                data: providerData
+                data: providerData,
+                overrideAccess: true,
             })
             providerId = created.id
-            result.provider = { id: providerId, name: sdl.provider.name, upserted: 'created' }
+            result.provider = { id: String(providerId), name: sdl.provider.name, upserted: 'created' }
         }
     } catch (e: any) {
         result.errors.push(`Provider upsert failed: ${e.message}`)
-        return result // Can't proceed without a provider
+        return result
     }
 
-    // ── 2. Upsert Endpoints (indexed by name for mapping resolution) ─────────
+    // ── 3. Upsert Endpoints (including authOverride & auth keys!) ────────────
     const endpointIdByName: Record<string, string> = {}
 
     for (const ep of sdl.endpoints) {
-        const endpointData = {
+        const endpointData: Record<string, any> = {
             name: ep.name,
             description: ep.description,
             provider: providerId,
             method: ep.method,
             path: ep.path,
             status: ep.status ?? 'active',
+            authOverride: ep.authOverride ?? 'INHERIT',
+            ...(ep.authQueryParamKey ? { authQueryParamKey: ep.authQueryParamKey } : {}),
+            ...(ep.authBodyFieldKey ? { authBodyFieldKey: ep.authBodyFieldKey } : {}),
             headers: ep.headers ?? [],
             queryParamsSchema: ep.queryParamsSchema,
             bodySchema: ep.bodySchema,
-            responseSchema: ep.responseSchema
+            responseSchema: ep.responseSchema,
         }
 
         try {
@@ -236,10 +237,11 @@ export async function ingestBlueprint(sdl: BlueprintSDL, payload: any): Promise<
                 where: {
                     and: [
                         { name: { equals: ep.name } },
-                        { provider: { equals: providerId } }
-                    ]
+                        { provider: { equals: providerId } },
+                    ],
                 },
-                limit: 1
+                limit: 1,
+                overrideAccess: true,
             })
 
             let endpointId: string
@@ -247,16 +249,18 @@ export async function ingestBlueprint(sdl: BlueprintSDL, payload: any): Promise<
                 const updated = await payload.update({
                     collection: 'endpoints',
                     id: existing.docs[0].id,
-                    data: endpointData
+                    data: endpointData,
+                    overrideAccess: true,
                 })
-                endpointId = updated.id
+                endpointId = String(updated.id)
                 result.endpoints.push({ id: endpointId, name: ep.name, upserted: 'updated' })
             } else {
                 const created = await payload.create({
                     collection: 'endpoints',
-                    data: endpointData
+                    data: endpointData,
+                    overrideAccess: true,
                 })
-                endpointId = created.id
+                endpointId = String(created.id)
                 result.endpoints.push({ id: endpointId, name: ep.name, upserted: 'created' })
             }
             endpointIdByName[ep.name] = endpointId
@@ -265,24 +269,26 @@ export async function ingestBlueprint(sdl: BlueprintSDL, payload: any): Promise<
         }
     }
 
-    // ── 3. Upsert Provider Mappings ──────────────────────────────────────────
+    // ── 4. Upsert Provider Mappings ──────────────────────────────────────────
     for (const mapping of sdl.mappings ?? []) {
         let syncEndpointId: string | null = null
 
         if (mapping.syncEndpoint) {
             syncEndpointId = endpointIdByName[mapping.syncEndpoint] ?? null
             if (!syncEndpointId) {
-                result.errors.push(`Mapping "${mapping.internalName}": syncEndpoint "${mapping.syncEndpoint}" not found in this blueprint.`)
+                result.errors.push(
+                    `Mapping "${mapping.internalName}": syncEndpoint "${mapping.syncEndpoint}" not found in this blueprint.`
+                )
             }
         }
 
         const autoSyncConfig = syncEndpointId
             ? {
-                enabled: true,
-                syncEndpoint: syncEndpointId,
-                syncKeyPath: mapping.syncKeyPath,
-                matchOn: mapping.matchOn
-            }
+                  enabled: true,
+                  syncEndpoint: syncEndpointId,
+                  syncKeyPath: mapping.syncKeyPath,
+                  matchOn: mapping.matchOn,
+              }
             : { enabled: false }
 
         const mappingData = {
@@ -290,7 +296,7 @@ export async function ingestBlueprint(sdl: BlueprintSDL, payload: any): Promise<
             provider: providerId,
             externalCode: mapping.externalCode,
             schemaMapping: mapping.schemaMapping,
-            autoSyncConfig
+            autoSyncConfig,
         }
 
         try {
@@ -299,25 +305,28 @@ export async function ingestBlueprint(sdl: BlueprintSDL, payload: any): Promise<
                 where: {
                     and: [
                         { internalName: { equals: mapping.internalName } },
-                        { provider: { equals: providerId } }
-                    ]
+                        { provider: { equals: providerId } },
+                    ],
                 },
-                limit: 1
+                limit: 1,
+                overrideAccess: true,
             })
 
             if (existing.docs.length > 0) {
                 const updated = await payload.update({
                     collection: 'provider-mappings',
                     id: existing.docs[0].id,
-                    data: mappingData
+                    data: mappingData,
+                    overrideAccess: true,
                 })
-                result.mappings.push({ id: updated.id, name: mapping.internalName, upserted: 'updated' })
+                result.mappings.push({ id: String(updated.id), name: mapping.internalName, upserted: 'updated' })
             } else {
                 const created = await payload.create({
                     collection: 'provider-mappings',
-                    data: mappingData
+                    data: mappingData,
+                    overrideAccess: true,
                 })
-                result.mappings.push({ id: created.id, name: mapping.internalName, upserted: 'created' })
+                result.mappings.push({ id: String(created.id), name: mapping.internalName, upserted: 'created' })
             }
         } catch (e: any) {
             result.errors.push(`Mapping "${mapping.internalName}" upsert failed: ${e.message}`)

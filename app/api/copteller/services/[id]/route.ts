@@ -1,8 +1,26 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { getDb } from '@/lib/copteller/db'
 import { getCoptellerAuth, requireCoptellerRole } from '@/lib/copteller/auth'
+import { invalidateServicesCache } from '@/app/api/copteller/services/route'
 
 export const dynamic = 'force-dynamic'
+
+function sanitizeServicePayload(body: Record<string, any>) {
+    const clean: Record<string, any> = { ...body }
+    for (const relField of ['provider', 'validation_workflow', 'execution_workflow', 'category']) {
+        if (relField in clean) {
+            const val = clean[relField]
+            if (val === '' || val === 'none' || val === undefined) {
+                clean[relField] = null
+            } else if (typeof val === 'object' && val !== null && val.id) {
+                clean[relField] = /^\d+$/.test(String(val.id)) ? Number(val.id) : val.id
+            } else if (typeof val === 'string' && /^\d+$/.test(val)) {
+                clean[relField] = Number(val)
+            }
+        }
+    }
+    return clean
+}
 
 export async function GET(
     req: NextRequest,
@@ -10,13 +28,10 @@ export async function GET(
 ) {
     try {
         const auth = await getCoptellerAuth(req)
-        if (!auth) {
-            return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
-        }
+        if (auth instanceof NextResponse) return auth
 
         const { id } = await params
         const payload = await getDb()
-
         const serviceId = /^\d+$/.test(id) ? Number(id) : id
 
         const service = await payload.findByID({
@@ -37,10 +52,7 @@ export async function GET(
     }
 }
 
-export async function PUT(
-    req: NextRequest,
-    { params }: { params: Promise<{ id: string }> }
-) {
+async function handleUpdate(req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
     try {
         const auth = await requireCoptellerRole(req, ['superadmin', 'bank_staff'])
         if (auth instanceof NextResponse) return auth
@@ -48,21 +60,29 @@ export async function PUT(
         const { id } = await params
         const body = await req.json().catch(() => ({}))
         const payload = await getDb()
-
         const serviceId = /^\d+$/.test(id) ? Number(id) : id
 
         const updatedService = await payload.update({
             collection: 'services',
             id: serviceId as any,
-            data: body,
+            data: sanitizeServicePayload(body),
             overrideAccess: true,
         })
 
+        invalidateServicesCache()
         return NextResponse.json({ success: true, service: updatedService })
     } catch (error: any) {
-        console.error('Copteller PUT /api/copteller/services/[id] error:', error)
+        console.error('Copteller UPDATE /api/copteller/services/[id] error:', error)
         return NextResponse.json({ error: error.message || 'Internal server error' }, { status: 500 })
     }
+}
+
+export async function PUT(req: NextRequest, ctx: { params: Promise<{ id: string }> }) {
+    return handleUpdate(req, ctx)
+}
+
+export async function PATCH(req: NextRequest, ctx: { params: Promise<{ id: string }> }) {
+    return handleUpdate(req, ctx)
 }
 
 export async function DELETE(
@@ -75,7 +95,6 @@ export async function DELETE(
 
         const { id } = await params
         const payload = await getDb()
-
         const serviceId = /^\d+$/.test(id) ? Number(id) : id
 
         await payload.delete({
@@ -84,6 +103,7 @@ export async function DELETE(
             overrideAccess: true,
         })
 
+        invalidateServicesCache()
         return NextResponse.json({ success: true, message: 'Service successfully deleted' })
     } catch (error: any) {
         console.error('Copteller DELETE /api/copteller/services/[id] error:', error)

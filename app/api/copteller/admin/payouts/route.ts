@@ -1,6 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { requireCoptellerRole } from '@/lib/copteller/auth'
 import { queryCopteller } from '@/lib/copteller/pg'
+import { olivePayClient } from '@/lib/copteller/olivepay-client'
+import { ensureMemberOlivePaySubWallet, ensureCooperativeTreasurySubWallet } from '@/lib/copteller/olivepay-sync'
 
 export const dynamic = 'force-dynamic'
 
@@ -197,6 +199,33 @@ export async function POST(req: NextRequest) {
                         SET current_payout_index = $1, updated_at = NOW()
                         WHERE id = $2
                     `, [nextIndex, cycle.id])
+
+                    // Mirror Ajo batch disbursement onto OlivePay / Sandbox SubWallet W2W
+                    try {
+                        const [treasurySw, recSw] = await Promise.all([
+                            ensureCooperativeTreasurySubWallet({
+                                cooperativeId: cycle.cooperative_id || 'ajo_treasury',
+                                cooperativeName: cycle.name || 'Ajo Treasury',
+                            }),
+                            ensureMemberOlivePaySubWallet({
+                                userId: String(rec.user_id || `cust_${rec.customer_id}`),
+                                email: `member_${rec.customer_id || rec.id}@copteller.app`,
+                                accountId: Number(rec.account_id),
+                                customerId: rec.customer_id ? Number(rec.customer_id) : null,
+                            }),
+                        ])
+                        if (treasurySw?.olivepay_sub_wallet_id && recSw?.olivepay_sub_wallet_id) {
+                            await olivePayClient.transferSubWallet({
+                                sourceSubWalletId: treasurySw.olivepay_sub_wallet_id,
+                                destinationSubWalletId: recSw.olivepay_sub_wallet_id,
+                                amountKobo: payoutKobo,
+                                narration: `Ajo Payout ${cycle.name || ''}`.slice(0, 25),
+                                idempotencyKey: ref,
+                            })
+                        }
+                    } catch (opErr: any) {
+                        console.warn('[Admin Payouts] OlivePay W2W mirror skipped:', opErr?.message)
+                    }
 
                     clearedCount++
                     totalAmountNaira += payoutKobo / 100

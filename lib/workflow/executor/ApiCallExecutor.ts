@@ -1,14 +1,18 @@
 import type { ExecutionEnvironment } from '../types/executor'
+import { executeResolvedEndpoint } from '../utils/apiResolver'
 
-export async function ApiCallExecutor(
-    env: ExecutionEnvironment<any>
-): Promise<boolean> {
+/**
+ * API_CALL Executor — fixed to read `provider.secret` (was broken `provider.secretId`),
+ * support all auth modes via `executeResolvedEndpoint()`, and transparently handle OlivePay + Sandbox Rail.
+ */
+export async function ApiCallExecutor(env: ExecutionEnvironment<any>): Promise<boolean> {
     const providerId = env.getInput('providerId') as string
-    const endpoint = env.getInput('endpoint') as string
-    const method = (env.getInput('method') as string) || 'POST'
-    const body = env.getInput('body')
+    const endpointPath = env.getInput('endpoint') as string
+    const method = ((env.getInput('method') as string) || 'POST').toUpperCase()
+    const rawBody = env.getInput('body')
+    const extraHeaders = env.getInput('headers')
 
-    if (!providerId || !endpoint) {
+    if (!providerId || !endpointPath) {
         env.log.error('ApiCall: providerId and endpoint are required')
         return false
     }
@@ -18,70 +22,61 @@ export async function ApiCallExecutor(
         env.log.error(`ApiCall: provider ${providerId} not found`)
         return false
     }
-    if (!provider.isActive) {
+    if (provider.isActive === false) {
         env.log.error(`ApiCall: provider "${provider.name}" is inactive`)
         return false
     }
 
-    // Build auth headers
-    const authHeaders: Record<string, string> = {}
-    if (provider.authType !== 'NONE' && provider.secretId) {
-        try {
-            const secretValue = await env.resolveSecret(provider.secretId)
-            if (provider.authType === 'API_KEY') {
-                authHeaders['Authorization'] = `Bearer ${secretValue}`
-            } else if (provider.authType === 'BEARER') {
-                authHeaders['Authorization'] = `Bearer ${secretValue}`
-            } else if (provider.authType === 'BASIC') {
-                authHeaders['Authorization'] = `Basic ${Buffer.from(secretValue).toString('base64')}`
-            }
-        } catch (err: any) {
-            env.log.error(`ApiCall: failed to resolve secret: ${err.message}`)
-            return false
-        }
+    const parsedBody =
+        typeof rawBody === 'string'
+            ? (() => {
+                  try {
+                      return JSON.parse(rawBody)
+                  } catch {
+                      return {}
+                  }
+              })()
+            : rawBody || {}
+
+    const parsedHeadersObj =
+        typeof extraHeaders === 'string'
+            ? (() => {
+                  try {
+                      return JSON.parse(extraHeaders || '{}')
+                  } catch {
+                      return {}
+                  }
+              })()
+            : extraHeaders || {}
+
+    const syntheticEndpoint = {
+        name: `ApiCall:${endpointPath}`,
+        provider,
+        method,
+        path: endpointPath.startsWith('/') ? endpointPath : `/${endpointPath}`,
+        authOverride: 'INHERIT',
+        headers: Object.entries(parsedHeadersObj).map(([key, value]) => ({ key, value: String(value) })),
     }
-
-    // Merge provider default headers
-    const defaultHeaders: Record<string, string> = {}
-    for (const h of provider.defaultHeaders ?? []) {
-        defaultHeaders[h.key] = h.value
-    }
-
-    const extraHeaders = env.getInput('headers')
-    const parsedExtra = typeof extraHeaders === 'string' ? JSON.parse(extraHeaders || '{}') : (extraHeaders ?? {})
-
-    const url = `${provider.baseUrl.replace(/\/$/, '')}/${endpoint.replace(/^\//, '')}`
-    env.log.info(`ApiCall: ${method} ${url}`)
 
     try {
-        const response = await fetch(url, {
-            method,
-            headers: {
-                'Content-Type': 'application/json',
-                ...defaultHeaders,
-                ...authHeaders,
-                ...parsedExtra,
-            },
-            ...(method !== 'GET' && body ? { body: JSON.stringify(body) } : {}),
-            signal: AbortSignal.timeout(30_000), // 30s timeout
+        const result = await executeResolvedEndpoint(syntheticEndpoint, {
+            body: method === 'GET' ? undefined : parsedBody,
+            query: method === 'GET' ? parsedBody : undefined,
+            idempotencyKey: parsedBody?.idempotencyKey || `${env.executionId}_apicall`,
         })
 
-        const responseText = await response.text()
-        let responseJson: any = null
-        try { responseJson = JSON.parse(responseText) } catch { responseJson = responseText }
+        env.setOutput('response', result.data)
+        env.setOutput('statusCode', result.status)
 
-        env.setOutput('response', responseJson)
-        env.setOutput('statusCode', response.status)
-
-        if (!response.ok) {
-            env.log.error(`ApiCall: HTTP ${response.status} from ${provider.name}: ${responseText.slice(0, 300)}`)
+        if (!result.ok) {
+            env.log.error(`ApiCall: HTTP ${result.status} from ${provider.name}`)
             return false
         }
 
-        env.log.info(`ApiCall: success (HTTP ${response.status}) from ${provider.name}`)
+        env.log.info(`ApiCall: success (HTTP ${result.status}) from ${provider.name} in ${result.timeMs}ms`)
         return true
     } catch (err: any) {
-        env.log.error(`ApiCall: network error: ${err.message}`)
+        env.log.error(`ApiCall: execution error: ${err.message}`)
         return false
     }
 }

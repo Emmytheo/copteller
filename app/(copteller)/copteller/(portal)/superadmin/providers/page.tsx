@@ -8,6 +8,7 @@ import {
 import { ProviderActions } from './client-actions'
 import { ProviderEditor } from './provider-editor'
 import { Badge } from '@/components/ui/badge'
+import { CoptellerSubsystemNav } from '@/components/copteller/subsystem-nav'
 
 const CATEGORY_COLORS: Record<string, string> = {
     PAYMENT: 'bg-emerald-500',
@@ -57,7 +58,9 @@ export default async function CoptellerProvidersManagerPage({
     const isDetailView = !!selectedId
 
     return (
-        <div className="flex h-[calc(100vh-theme(spacing.16))] w-full overflow-hidden bg-muted/10">
+        <div className="flex flex-col h-[calc(100vh-theme(spacing.16))] w-full overflow-hidden bg-muted/10">
+            <CoptellerSubsystemNav group="automation" compact />
+            <div className="flex flex-1 min-h-0 w-full overflow-hidden">
 
             {/* ── LEFT: Provider List ────────────────────────────────── */}
             <aside className={`
@@ -149,9 +152,17 @@ export default async function CoptellerProvidersManagerPage({
                         {/* Endpoints List Pane (Visible only for existing providers on lg screen) */}
                         {selectedProvider && selectedId !== 'new' && (
                             <div className="hidden lg:flex flex-col w-80 border-l bg-slate-50/20 shrink-0">
-                                <div className="p-4 border-b bg-muted/10 shrink-0">
-                                    <h3 className="text-xs font-black uppercase tracking-widest text-muted-foreground">Associated Endpoints</h3>
-                                    <p className="text-[10px] text-muted-foreground font-semibold mt-0.5">{selectedEndpoints.length} methods configured</p>
+                                <div className="p-4 border-b bg-muted/10 shrink-0 flex items-center justify-between gap-2">
+                                    <div>
+                                        <h3 className="text-xs font-black uppercase tracking-widest text-muted-foreground">Associated Endpoints</h3>
+                                        <p className="text-[10px] text-muted-foreground font-semibold mt-0.5">{selectedEndpoints.length} methods configured</p>
+                                    </div>
+                                    <Link
+                                        href="/copteller/superadmin/endpoints/new"
+                                        className="text-[10px] font-black px-2 py-1 rounded-lg bg-emerald-500/10 text-emerald-600 hover:bg-emerald-500/20"
+                                    >
+                                        + New
+                                    </Link>
                                 </div>
 
                                 <div className="flex-1 overflow-y-auto p-4 space-y-2">
@@ -162,7 +173,7 @@ export default async function CoptellerProvidersManagerPage({
                                     ) : selectedEndpoints.map((ep) => (
                                         <Link
                                             key={ep.id}
-                                            href={`/copteller/superadmin/endpoints?id=${ep.id}`}
+                                            href={`/copteller/superadmin/endpoints/${ep.id}`}
                                             className="block p-3 bg-background border border-slate-200 dark:border-slate-800 rounded-xl hover:shadow-sm transition-all text-left"
                                         >
                                             <div className="flex items-center justify-between mb-1">
@@ -191,6 +202,7 @@ export default async function CoptellerProvidersManagerPage({
                     </div>
                 )}
             </main>
+            </div>
         </div>
     )
 }

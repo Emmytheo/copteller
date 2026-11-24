@@ -74,6 +74,27 @@ import {
     QoreInterBankTransferExecutor,
 } from './QoreExecutors'
 
+import {
+    OlivePayCreateSubWalletExecutor,
+    OlivePayGetSubWalletExecutor,
+    OlivePayUpgradeTierExecutor,
+    OlivePayUploadKycDocumentExecutor,
+    OlivePaySubWalletTransferExecutor,
+    OlivePaySubWalletPayoutExecutor,
+    OlivePayFundSubWalletExecutor,
+    OlivePayNameEnquiryExecutor,
+    OlivePayFeeEstimateExecutor,
+    OlivePayMerchantPayoutExecutor,
+    OlivePayPayoutStatusExecutor,
+    OlivePayPlaceHoldExecutor,
+    OlivePayCaptureHoldExecutor,
+    OlivePayReleaseHoldExecutor,
+    OlivePayCreateVirtualAccountExecutor,
+    OlivePayCheckVirtualAccountExecutor,
+    OlivePayInitializeCollectionExecutor,
+    OlivePayVerifyCollectionExecutor,
+} from './OlivePayExecutors'
+
 type ExecutorFn<T extends WorkflowTask> = (
     env: ExecutionEnvironment<T>
 ) => Promise<boolean>
@@ -147,6 +168,25 @@ export const ExecutorRegistry: RegistryType = {
     QORE_TRANSACTION_STATUS_QUERY: QoreTransactionStatusQueryExecutor,
     QORE_INTRA_BANK_TRANSFER: QoreIntraBankTransferExecutor,
     QORE_INTER_BANK_TRANSFER: QoreInterBankTransferExecutor,
+    // OlivePay Native Financial Primitives (18 Nodes)
+    OLIVEPAY_CREATE_SUBWALLET: OlivePayCreateSubWalletExecutor,
+    OLIVEPAY_GET_SUBWALLET: OlivePayGetSubWalletExecutor,
+    OLIVEPAY_UPGRADE_TIER: OlivePayUpgradeTierExecutor,
+    OLIVEPAY_UPLOAD_KYC_DOCUMENT: OlivePayUploadKycDocumentExecutor,
+    OLIVEPAY_SUBWALLET_TRANSFER: OlivePaySubWalletTransferExecutor,
+    OLIVEPAY_SUBWALLET_PAYOUT: OlivePaySubWalletPayoutExecutor,
+    OLIVEPAY_FUND_SUBWALLET: OlivePayFundSubWalletExecutor,
+    OLIVEPAY_NAME_ENQUIRY: OlivePayNameEnquiryExecutor,
+    OLIVEPAY_FEE_ESTIMATE: OlivePayFeeEstimateExecutor,
+    OLIVEPAY_MERCHANT_PAYOUT: OlivePayMerchantPayoutExecutor,
+    OLIVEPAY_PAYOUT_STATUS: OlivePayPayoutStatusExecutor,
+    OLIVEPAY_PLACE_HOLD: OlivePayPlaceHoldExecutor,
+    OLIVEPAY_CAPTURE_HOLD: OlivePayCaptureHoldExecutor,
+    OLIVEPAY_RELEASE_HOLD: OlivePayReleaseHoldExecutor,
+    OLIVEPAY_CREATE_VIRTUAL_ACCOUNT: OlivePayCreateVirtualAccountExecutor,
+    OLIVEPAY_CHECK_VIRTUAL_ACCOUNT: OlivePayCheckVirtualAccountExecutor,
+    OLIVEPAY_INITIALIZE_COLLECTION: OlivePayInitializeCollectionExecutor,
+    OLIVEPAY_VERIFY_COLLECTION: OlivePayVerifyCollectionExecutor,
     REGISTRY_SYNC: RegistrySyncExecutor,
     AUTO_REPAYMENT_COLLECTION: AutoRepaymentCollectorExecutor,
 }

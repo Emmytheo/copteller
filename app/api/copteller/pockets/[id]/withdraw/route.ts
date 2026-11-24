@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { getCoptellerAuth } from '@/lib/copteller/auth'
-import { getCoptellerPool } from '@/lib/copteller/pg'
+import { getCoptellerPool, queryCopteller } from '@/lib/copteller/pg'
+import { olivePayClient } from '@/lib/copteller/olivepay-client'
 
 export const dynamic = 'force-dynamic'
 
@@ -123,11 +124,32 @@ export async function POST(
 
             await client.query('COMMIT')
 
+            // Release matching active OlivePay Escrow Hold(s) for this pocket
+            let releasedHolds: string[] = []
+            try {
+                const activeHolds = await queryCopteller(
+                    `SELECT olivepay_hold_id, amount_kobo FROM copteller.olivepay_holds
+                     WHERE entity_type = 'pocket' AND entity_id = $1 AND status = 'Active'
+                     ORDER BY created_at ASC`,
+                    [String(pocketId)]
+                )
+                let remaining = amountKobo
+                for (const h of activeHolds.rows) {
+                    if (remaining <= 0) break
+                    const rel = await olivePayClient.releaseHold(h.olivepay_hold_id, `Pocket withdrawal: ${pocket.name}`)
+                    if (rel.ok) {
+                        releasedHolds.push(h.olivepay_hold_id)
+                        remaining -= Number(h.amount_kobo || 0)
+                    }
+                }
+            } catch {}
+
             return NextResponse.json({
                 success: true,
                 message: `Successfully released ₦${amountNum.toLocaleString()} back to your main wallet balance!`,
                 pocket: updatePocketRes.rows[0],
-                primaryBalanceNaira: newAccBalanceKobo / 100
+                primaryBalanceNaira: newAccBalanceKobo / 100,
+                releasedHolds,
             })
         } catch (txErr) {
             await client.query('ROLLBACK')

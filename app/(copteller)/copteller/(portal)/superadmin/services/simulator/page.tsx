@@ -98,6 +98,7 @@ function SimulatorContent() {
                 body: JSON.stringify({
                     serviceId: selectedService.id,
                     formData,
+                    simulatedRole: selectedRole,
                     mockEnvironment: "sandbox",
                 }),
             })

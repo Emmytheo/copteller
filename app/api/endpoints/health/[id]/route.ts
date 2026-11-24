@@ -1,100 +1,132 @@
-import { NextRequest, NextResponse } from 'next/server';
-import { getPayload } from 'payload';
-import config from '@payload-config';
-import { createClient } from '@/lib/supabase/server';
+import { NextRequest, NextResponse } from 'next/server'
+import { getPayload } from 'payload'
+import config from '@payload-config'
+import { requireCoptellerRole } from '@/lib/copteller/auth'
+import { probeOlivePayCapabilities } from '@/lib/copteller/olivepay-client'
 
+/**
+ * GET /api/endpoints/health/[id]
+ * Fixed to use Copteller Superadmin RBAC (`requireCoptellerRole`), handle OlivePay capability probes,
+ * and gracefully fall back from HEAD -> GET when REST APIs return 405 Method Not Allowed.
+ */
 export async function GET(
     req: NextRequest,
     context: { params: Promise<{ id: string }> }
 ) {
     try {
-        const { id: endpointId } = await context.params;
-        const payload = await getPayload({ config });
-        const supabase = await createClient();
-        const { data: { user } } = await supabase.auth.getUser();
+        const auth = await requireCoptellerRole(req, ['superadmin', 'bank_staff'])
+        if (auth instanceof NextResponse) return auth
 
-        if (!user || user.user_metadata?.role !== 'admin') {
-            return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
-        }
+        const { id: endpointId } = await context.params
+        const payload = await getPayload({ config })
 
-        const endpoint = await payload.findByID({
+        const endpoint = (await payload.findByID({
             collection: 'endpoints',
             id: endpointId,
             depth: 1,
-        }) as any;
+            overrideAccess: true,
+        })) as any
 
         if (!endpoint) {
-            return NextResponse.json({ error: 'Endpoint not found' }, { status: 404 });
+            return NextResponse.json({ error: 'Endpoint not found' }, { status: 404 })
         }
 
-        const provider = endpoint.provider;
-        if (!provider) {
-            return NextResponse.json({ error: 'No provider linked to endpoint' }, { status: 400 });
+        const provider = endpoint.provider
+        if (!provider || typeof provider !== 'object') {
+            return NextResponse.json({ error: 'No provider linked to endpoint' }, { status: 400 })
         }
 
-        // 1. Resolve Health Check URL
-        // Priority: Provider healthCheckUrl -> Base URL
-        const checkUrl = provider.healthCheckUrl || provider.baseUrl;
-        
-        if (!checkUrl) {
-            return NextResponse.json({ error: 'No health check URL or base URL found' }, { status: 400 });
-        }
+        const start = Date.now()
 
-        // 2. Perform Ping
-        const start = Date.now();
-        try {
-            // Use a HEAD request with a short timeout
-            const controller = new AbortController();
-            const timeoutId = setTimeout(() => controller.abort(), 5000);
+        // OlivePay native health probe
+        if (String(provider.slug || '').toLowerCase() === 'olivepay') {
+            const report = await probeOlivePayCapabilities(false)
+            const latency = Date.now() - start
+            const healthy =
+                report.railMode === 'sandbox_simulator' ||
+                report.capabilities.jwtAuth.status === 'enabled' ||
+                report.capabilities.collections.status === 'enabled'
 
-            const res = await fetch(checkUrl, {
-                method: 'HEAD',
-                signal: controller.signal,
-                headers: {
-                    'User-Agent': 'Copteller-HealthCheck/1.0',
-                }
-            });
-            clearTimeout(timeoutId);
-
-            const latency = Date.now() - start;
-
-            // 3. Update Provider Status (Optional but helpful)
             await payload.update({
                 collection: 'service-providers',
                 id: provider.id,
+                overrideAccess: true,
                 data: {
-                    lastHealthStatus: res.ok ? 'healthy' : 'degraded',
+                    lastHealthStatus: healthy ? 'healthy' : 'degraded',
                     lastHealthCheckedAt: new Date().toISOString(),
                     avgLatencyMs: latency,
-                }
-            });
+                },
+            }).catch(() => {})
+
+            return NextResponse.json({
+                healthy,
+                status: healthy ? 200 : 503,
+                latencyMs: latency,
+                url: report.credentials.baseUrl,
+                olivepayReport: report,
+            })
+        }
+
+        const checkUrl = provider.healthCheckUrl || provider.baseUrl
+        if (!checkUrl) {
+            return NextResponse.json({ error: 'No health check URL or base URL found' }, { status: 400 })
+        }
+
+        try {
+            let res = await fetch(checkUrl, {
+                method: 'HEAD',
+                signal: AbortSignal.timeout(5000),
+                headers: { 'User-Agent': 'Copteller-HealthCheck/2.0' },
+            })
+
+            // Many REST APIs return 405 on HEAD — retry cleanly with GET
+            if (res.status === 405) {
+                res = await fetch(checkUrl, {
+                    method: 'GET',
+                    signal: AbortSignal.timeout(5000),
+                    headers: { 'User-Agent': 'Copteller-HealthCheck/2.0', Accept: 'application/json' },
+                })
+            }
+
+            const latency = Date.now() - start
+            const isReachable = res.status < 500
+
+            await payload.update({
+                collection: 'service-providers',
+                id: provider.id,
+                overrideAccess: true,
+                data: {
+                    lastHealthStatus: res.ok ? 'healthy' : isReachable ? 'degraded' : 'down',
+                    lastHealthCheckedAt: new Date().toISOString(),
+                    avgLatencyMs: latency,
+                },
+            }).catch(() => {})
 
             return NextResponse.json({
                 healthy: res.ok,
+                reachable: isReachable,
                 status: res.status,
                 latencyMs: latency,
-                url: checkUrl
-            });
+                url: checkUrl,
+            })
         } catch (pingError: any) {
-            console.error(`Health ping failed for ${checkUrl}:`, pingError.message);
-            
             await payload.update({
                 collection: 'service-providers',
                 id: provider.id,
+                overrideAccess: true,
                 data: {
                     lastHealthStatus: 'down',
                     lastHealthCheckedAt: new Date().toISOString(),
-                }
-            });
+                },
+            }).catch(() => {})
 
-            return NextResponse.json({
-                healthy: false,
-                error: pingError.message,
-                url: checkUrl
-            }, { status: 500 });
+            return NextResponse.json(
+                { healthy: false, error: pingError.message, url: checkUrl },
+                { status: 502 }
+            )
         }
     } catch (error: any) {
-        console.error('[HEALTH_CHECK_ERROR]', error);
-        return NextResponse.json({ error: error.message }, { status: 500 });
+        console.error('[HEALTH_CHECK_ERROR]', error)
+        return NextResponse.json({ error: error.message }, { status: 500 })
     }
 }

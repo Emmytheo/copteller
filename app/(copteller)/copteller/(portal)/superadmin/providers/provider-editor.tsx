@@ -40,8 +40,13 @@ export function ProviderEditor({ provider, secrets, cooperatives }: ProviderEdit
         slug: provider?.slug || '',
         category: provider?.category || 'PAYMENT',
         baseUrl: provider?.baseUrl || '',
+        healthCheckUrl: provider?.healthCheckUrl || '',
         authType: provider?.authType || 'API_KEY',
-        secret: typeof provider?.secret === 'object' && provider.secret !== null ? provider.secret.id : provider?.secret || '',
+        authQueryParamKey: provider?.authQueryParamKey || 'authToken',
+        authBodyFieldKey: provider?.authBodyFieldKey || 'AuthenticationCode',
+        secret: typeof provider?.secret === 'object' && provider.secret !== null ? String(provider.secret.id) : String(provider?.secret || ''),
+        secondarySecretId: String(provider?.metadata?.secondarySecretId || ''),
+        webhookSecretId: String(provider?.metadata?.webhookSecretId || ''),
         isActive: provider?.isActive ?? true,
         priority: provider?.priority || 1,
         groupTag: provider?.groupTag || '',
@@ -70,10 +75,23 @@ export function ProviderEditor({ provider, secrets, cooperatives }: ProviderEdit
             return
         }
 
-        const payloadData: any = { 
-            ...formData, 
-            metadata: entriesToMeta(metaEntries),
-            cooperative: formData.cooperative || null
+        const secObj = secrets.find((s) => String(s.id) === String(formData.secondarySecretId))
+        const whObj = secrets.find((s) => String(s.id) === String(formData.webhookSecretId))
+        const mergedMetadata: Record<string, any> = {
+            ...entriesToMeta(metaEntries),
+            ...(formData.secondarySecretId
+                ? { secondarySecretId: Number(formData.secondarySecretId) || formData.secondarySecretId, secondarySecretName: secObj?.name || '' }
+                : {}),
+            ...(formData.webhookSecretId
+                ? { webhookSecretId: Number(formData.webhookSecretId) || formData.webhookSecretId, webhookSecretName: whObj?.name || '' }
+                : {}),
+        }
+
+        const { secondarySecretId: _s, webhookSecretId: _w, ...coreFields } = formData
+        const payloadData: any = {
+            ...coreFields,
+            metadata: mergedMetadata,
+            cooperative: formData.cooperative || null,
         }
         if (payloadData.authType === 'NONE' || !payloadData.secret) {
             payloadData.secret = null
@@ -244,15 +262,20 @@ export function ProviderEditor({ provider, secrets, cooperatives }: ProviderEdit
                                 className="w-full text-xs font-bold rounded-lg border bg-background border-slate-200 dark:border-slate-800 px-3 py-2"
                             >
                                 <option value="NONE">None</option>
-                                <option value="API_KEY">API Key</option>
+                                <option value="API_KEY">API Key (Dual URL/Body)</option>
                                 <option value="BEARER">Bearer Token</option>
+                                <option value="HEADER">Custom Header</option>
                                 <option value="QUERY_PARAM">Query Parameter</option>
                                 <option value="BASIC">Basic Auth</option>
+                                <option value="OAUTH2">OAuth 2.0 Bearer</option>
+                                <option value="OLIVEPAY_PUBLIC_BEARER">OlivePay Public Key (Collections)</option>
+                                <option value="OLIVEPAY_JWT">OlivePay JWT (SubWallet / VA)</option>
+                                <option value="OLIVEPAY_JWT_HMAC">OlivePay JWT + HMAC-SHA256 (Payouts)</option>
                             </select>
                         </div>
                         {formData.authType !== 'NONE' && (
                             <div>
-                                <label className="text-[11px] font-bold text-slate-700 dark:text-slate-300">Vault Secret (API Key)</label>
+                                <label className="text-[11px] font-bold text-slate-700 dark:text-slate-300">Primary Vault Secret (API / Public Key)</label>
                                 <select
                                     value={formData.secret}
                                     onChange={(e) => setFormData({ ...formData, secret: e.target.value })}
@@ -260,11 +283,58 @@ export function ProviderEditor({ provider, secrets, cooperatives }: ProviderEdit
                                 >
                                     <option value="">Select a Secret from Vault...</option>
                                     {secrets.map((s) => (
-                                        <option key={s.id} value={s.id}>{s.name}</option>
+                                        <option key={s.id} value={String(s.id)}>{s.name}</option>
                                     ))}
                                 </select>
                             </div>
                         )}
+                        <div>
+                            <label className="text-[11px] font-bold text-slate-700 dark:text-slate-300">Secondary Vault Secret (e.g. OlivePay Secret Key)</label>
+                            <select
+                                value={formData.secondarySecretId}
+                                onChange={(e) => setFormData({ ...formData, secondarySecretId: e.target.value })}
+                                className="w-full text-xs font-bold rounded-lg border bg-background border-slate-200 dark:border-slate-800 px-3 py-2"
+                            >
+                                <option value="">None (Optional)</option>
+                                {secrets.map((s) => (
+                                    <option key={s.id} value={String(s.id)}>{s.name}</option>
+                                ))}
+                            </select>
+                        </div>
+                        <div>
+                            <label className="text-[11px] font-bold text-slate-700 dark:text-slate-300">Webhook Vault Secret (Inbound HMAC)</label>
+                            <select
+                                value={formData.webhookSecretId}
+                                onChange={(e) => setFormData({ ...formData, webhookSecretId: e.target.value })}
+                                className="w-full text-xs font-bold rounded-lg border bg-background border-slate-200 dark:border-slate-800 px-3 py-2"
+                            >
+                                <option value="">None (Optional)</option>
+                                {secrets.map((s) => (
+                                    <option key={s.id} value={String(s.id)}>{s.name}</option>
+                                ))}
+                            </select>
+                        </div>
+                        <div className="sm:col-span-2 grid grid-cols-1 sm:grid-cols-2 gap-4 pt-2">
+                            <div>
+                                <label className="text-[11px] font-bold text-slate-700 dark:text-slate-300">Health Check URL (Optional)</label>
+                                <input
+                                    type="text"
+                                    value={formData.healthCheckUrl}
+                                    onChange={(e) => setFormData({ ...formData, healthCheckUrl: e.target.value })}
+                                    className="w-full text-xs font-mono rounded-lg border bg-background border-slate-200 dark:border-slate-800 px-3 py-2"
+                                    placeholder="https://api.olivepayment.com/api/v1/merchant-api/payouts/banks"
+                                />
+                            </div>
+                            <label className="flex items-center gap-2.5 pt-5 cursor-pointer text-xs font-bold">
+                                <input
+                                    type="checkbox"
+                                    checked={Boolean(formData.isActive)}
+                                    onChange={(e) => setFormData({ ...formData, isActive: e.target.checked })}
+                                    className="rounded border-slate-300"
+                                />
+                                Provider Active (Available to Endpoints &amp; Workflows)
+                            </label>
+                        </div>
                     </div>
                 </section>
 

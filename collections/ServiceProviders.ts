@@ -1,4 +1,5 @@
 import type { CollectionConfig } from 'payload'
+import { coptellerAdminAccess } from './access'
 
 export const ServiceProviders: CollectionConfig = {
     slug: 'service-providers',
@@ -9,10 +10,10 @@ export const ServiceProviders: CollectionConfig = {
         description: 'External API and service providers used in workflow nodes.',
     },
     access: {
-        read: ({ req }) => req.user?.role === 'admin',
-        create: ({ req }) => req.user?.role === 'admin',
-        update: ({ req }) => req.user?.role === 'admin',
-        delete: ({ req }) => req.user?.role === 'admin',
+        read: coptellerAdminAccess,
+        create: coptellerAdminAccess,
+        update: coptellerAdminAccess,
+        delete: coptellerAdminAccess,
     },
     fields: [
         {
@@ -56,11 +57,15 @@ export const ServiceProviders: CollectionConfig = {
             type: 'select',
             options: [
                 { label: 'None', value: 'NONE' },
-                { label: 'API Key (Body)', value: 'API_KEY' },
+                { label: 'API Key (Body/Query)', value: 'API_KEY' },
                 { label: 'Bearer Token', value: 'BEARER' },
+                { label: 'Custom Header', value: 'HEADER' },
                 { label: 'Query Parameter', value: 'QUERY_PARAM' },
                 { label: 'Basic Auth', value: 'BASIC' },
                 { label: 'OAuth 2.0', value: 'OAUTH2' },
+                { label: 'OlivePay Public Key (Collections)', value: 'OLIVEPAY_PUBLIC_BEARER' },
+                { label: 'OlivePay JWT (SubWallet / Virtual Account)', value: 'OLIVEPAY_JWT' },
+                { label: 'OlivePay JWT + HMAC-SHA256 (Payouts / Funding)', value: 'OLIVEPAY_JWT_HMAC' },
             ],
             defaultValue: 'API_KEY',
             required: true,

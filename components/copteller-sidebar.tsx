@@ -163,16 +163,19 @@ const SUPERADMIN_NAV: NavGroup[] = [
     {
         label: "Platform Health",
         items: [
+            { title: "System Infrastructure", url: "/copteller/superadmin/infrastructure", icon: Settings },
+            { title: "Workflow Automations", url: "/copteller/superadmin/workflows", icon: Layers },
+            { title: "Workflow Run History", url: "/copteller/superadmin/workflows/runs", icon: History },
+            { title: "Scheduled Jobs & Crons", url: "/copteller/superadmin/workflows/scheduled-jobs", icon: RefreshCw },
+            { title: "API Endpoints Specs", url: "/copteller/superadmin/endpoints", icon: Cpu },
+            { title: "Service Providers", url: "/copteller/superadmin/providers", icon: Plug },
+            { title: "Vault & API Keys", url: "/copteller/superadmin/vault", icon: KeyRound },
+            { title: "Provider Mappings", url: "/copteller/superadmin/mappings", icon: Landmark },
             { title: "Services & Matrix", url: "/copteller/superadmin/services", icon: Zap },
             { title: "Service Simulator", url: "/copteller/superadmin/services/simulator", icon: Play },
-            { title: "System Infrastructure", url: "/copteller/superadmin/infrastructure", icon: Settings },
+            { title: "Financial Products", url: "/copteller/superadmin/products", icon: FileText },
             { title: "Leased Asset Registry", url: "/copteller/superadmin/assets", icon: Truck },
-            { title: "Vault & API Keys", url: "/copteller/superadmin/vault", icon: KeyRound },
-            { title: "Service Providers", url: "/copteller/superadmin/providers", icon: Plug },
             { title: "Compliance Logs", url: "/copteller/superadmin/compliance", icon: Activity },
-            { title: "API Endpoints Specs", url: "/copteller/superadmin/endpoints", icon: Cpu },
-            { title: "Workflow Automations", url: "/copteller/superadmin/workflows", icon: Layers },
-            { title: "Financial Products", url: "/copteller/superadmin/products", icon: Settings },
         ]
     }
 ]

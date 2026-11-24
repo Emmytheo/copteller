@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { getCoptellerAuth } from '@/lib/copteller/auth'
-import { getCoptellerPool } from '@/lib/copteller/pg'
+import { getCoptellerPool, queryCopteller } from '@/lib/copteller/pg'
+import { olivePayClient } from '@/lib/copteller/olivepay-client'
 
 export const dynamic = 'force-dynamic'
 
@@ -158,10 +159,38 @@ export async function POST(req: NextRequest) {
 
             await client.query('COMMIT')
 
+            // Best-effort mirror to OlivePay SubWallet W2W rail when both accounts are bound
+            let olivePayReference: string | null = null
+            try {
+                const swRows = await queryCopteller(
+                    `SELECT account_id, olivepay_sub_wallet_id, rail_mode FROM copteller.olivepay_subwallets WHERE account_id IN ($1, $2)`,
+                    [Number(senderAcc.id), Number(recipientAcc.id)]
+                )
+                const srcSw = swRows.rows.find((r) => Number(r.account_id) === Number(senderAcc.id))
+                const dstSw = swRows.rows.find((r) => Number(r.account_id) === Number(recipientAcc.id))
+                if (srcSw && dstSw) {
+                    if (srcSw.rail_mode === 'sandbox_simulator') {
+                        await queryCopteller(
+                            `UPDATE copteller.olivepay_subwallets SET available_balance_kobo = GREATEST(available_balance_kobo, $1), ledger_balance_kobo = GREATEST(ledger_balance_kobo, $1) WHERE olivepay_sub_wallet_id = $2`,
+                            [senderBalanceKobo, srcSw.olivepay_sub_wallet_id]
+                        )
+                    }
+                    const w2w = await olivePayClient.transferSubWallet({
+                        sourceSubWalletId: srcSw.olivepay_sub_wallet_id,
+                        destinationSubWalletId: dstSw.olivepay_sub_wallet_id,
+                        amountKobo,
+                        narration,
+                        idempotencyKey: txRefDebit,
+                    })
+                    if (w2w.ok) olivePayReference = w2w.data?.reference || null
+                }
+            } catch {}
+
             return NextResponse.json({
                 success: true,
                 message: `₦${amountNum.toLocaleString()} sent instantly to ${recipientDisplayName}!`,
                 reference: txRefDebit,
+                olivePayReference,
                 amount: amountNum,
                 fee: 0.00,
                 recipientName: recipientDisplayName,

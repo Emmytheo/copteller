@@ -1,0 +1,29 @@
+{
+  "name": "OlivePay: Member SubWallet Onboarding & Tier 2 Upgrade",
+  "description": "Provisions a dedicated OlivePay SubWallet + Static Virtual Account for a newly onboarded cooperative member, auto-requesting Tier 2 when NIN is supplied.",
+  "trigger": "APPLICATION_SUBMIT",
+  "steps": [
+    {
+      "id": "create_subwallet",
+      "type": "OLIVEPAY_CREATE_SUBWALLET",
+      "inputs": {
+        "walletHolderReference": "{{TRIGGER_PAYLOAD.walletHolderReference}}",
+        "firstName": "{{TRIGGER_PAYLOAD.firstName}}",
+        "lastName": "{{TRIGGER_PAYLOAD.lastName}}",
+        "email": "{{TRIGGER_PAYLOAD.email}}",
+        "phoneNumber": "{{TRIGGER_PAYLOAD.phoneNumber}}",
+        "bvn": "{{TRIGGER_PAYLOAD.bvn}}",
+        "nin": "{{TRIGGER_PAYLOAD.nin}}",
+        "requestedTier": "{{TRIGGER_PAYLOAD.requestedTier}}"
+      },
+      "next": "fetch_details"
+    },
+    {
+      "id": "fetch_details",
+      "type": "OLIVEPAY_GET_SUBWALLET",
+      "inputs": {
+        "subWalletId": "{{create_subwallet.subWalletId}}"
+      }
+    }
+  ]
+}
